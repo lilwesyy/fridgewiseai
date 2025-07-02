@@ -221,7 +221,10 @@
       "gluten-free": "Gluten Free",
       "healthy": "Healthy",
       "quick": "Quick",
-      "easy": "Easy"
+      "easy": "Easy",
+      "homemade": "Homemade",
+      "fresh": "Fresh",
+      "ai-generated": "AI Generated"
     },
     "empty": {
       "title": "No recipes yet",
@@ -246,8 +249,46 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
-    "edit": "Edit",
     "close": "Close",
-    "goToTop": "Go to Top"
+    "exit": "Exit",
+    "prepTime": "Prep Time",
+    "cookTime": "Cook Time", 
+    "servings": "Servings",
+    "difficulty": "Difficulty",
+    "notSpecified": "Not specified"
+  },
+  "time": {
+    "prepTime": "Prep Time",
+    "cookTime": "Cook Time",
+    "totalTime": "Total Time",
+    "minutes": "minutes",
+    "hours": "hours",
+    "notSpecified": "Not specified"
+  },
+  "cookingMode": {
+    "stepProgress": "Step {current} of {total}",
+    "totalTime": "Total Time",
+    "ingredients": "Ingredients",
+    "ingredientsProgress": "Ingredients Progress",
+    "currentStep": "Current Step",
+    "stepTimer": "Step Timer",
+    "min": "min",
+    "startTimer": "Start Timer",
+    "pauseTimer": "Pause Timer",
+    "resetTimer": "Reset Timer",
+    "previous": "Previous",
+    "next": "Next",
+    "complete": "Complete",
+    "recipeInfo": "Recipe Info",
+    "allSteps": "All Steps",
+    "timerFinished": "Timer Finished!",
+    "stepCompleted": "Step completed! Ready for the next one?",
+    "continue": "Continue",
+    "cookingCompleted": "Cooking completed! Great job!",
+    "exitConfirm": "Exit",
+    "exitConfirmTitle": "Exit Cooking Mode?",
+    "exitConfirmMessage": "Are you sure you want to exit cooking mode? Your progress will be lost.",
+    "allIngredientsReady": "All ingredients checked! Ready to start cooking?",
+    "startCooking": "Start Cooking"
   }
 }

@@ -221,7 +221,10 @@
       "gluten-free": "Glutenfrei",
       "healthy": "Gesund",
       "quick": "Schnell",
-      "easy": "Einfach"
+      "easy": "Einfach",
+      "homemade": "Hausgemacht",
+      "fresh": "Frisch",
+      "ai-generated": "KI-generiert"
     },
     "empty": {
       "title": "Noch keine Rezepte",
@@ -248,6 +251,38 @@
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "close": "Schließen",
-    "goToTop": "Nach oben"
+    "goToTop": "Nach oben",
+    "exit": "Beenden",
+    "prepTime": "Zubereitungszeit",
+    "cookTime": "Kochzeit",
+    "servings": "Portionen",
+    "difficulty": "Schwierigkeit",
+    "notSpecified": "Nicht angegeben"
+  },
+  "cookingMode": {
+    "stepProgress": "Schritt {current} von {total}",
+    "totalTime": "Gesamtzeit",
+    "ingredients": "Zutaten",
+    "ingredientsProgress": "Zutaten-Fortschritt",
+    "currentStep": "Aktueller Schritt",
+    "stepTimer": "Schritt-Timer",
+    "min": "min",
+    "startTimer": "Timer starten",
+    "pauseTimer": "Timer pausieren",
+    "resetTimer": "Timer zurücksetzen",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "complete": "Fertig",
+    "recipeInfo": "Rezept-Info",
+    "allSteps": "Alle Schritte",
+    "timerFinished": "Timer beendet!",
+    "stepCompleted": "Schritt abgeschlossen! Bereit für den nächsten?",
+    "continue": "Weiter",
+    "cookingCompleted": "Kochen abgeschlossen! Gut gemacht!",
+    "exitConfirm": "Verlassen",
+    "exitConfirmTitle": "Koch-Modus verlassen?",
+    "exitConfirmMessage": "Möchten Sie wirklich den Koch-Modus verlassen? Ihr Fortschritt geht verloren.",
+    "allIngredientsReady": "Alle Zutaten überprüft! Bereit zum Kochen?",
+    "startCooking": "Mit Kochen beginnen"
   }
 }

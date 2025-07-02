@@ -188,7 +188,10 @@
       "gluten-free": "Sans Gluten",
       "healthy": "Sain",
       "quick": "Rapide",
-      "easy": "Facile"
+      "easy": "Facile",
+      "homemade": "Fait Maison",
+      "fresh": "Frais",
+      "ai-generated": "Généré par IA"
     },
     "empty": {
       "title": "Aucune recette encore",
@@ -215,7 +218,13 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "close": "Fermer",
-    "goToTop": "Retour en haut"
+    "goToTop": "Retour en haut",
+    "exit": "Sortir",
+    "prepTime": "Temps de préparation",
+    "cookTime": "Temps de cuisson",
+    "servings": "Portions",
+    "difficulty": "Difficulté",
+    "notSpecified": "Non spécifié"
   },
   "notifications": {
     "auth": {
@@ -249,5 +258,31 @@
       "error": "Une erreur s'est produite",
       "success": "Opération réalisée avec succès"
     }
+  },
+  "cookingMode": {
+    "stepProgress": "Étape {current} sur {total}",
+    "totalTime": "Temps Total",
+    "ingredients": "Ingrédients",
+    "ingredientsProgress": "Progrès des Ingrédients",
+    "currentStep": "Étape Actuelle",
+    "stepTimer": "Minuteur de l'Étape",
+    "min": "min",
+    "startTimer": "Démarrer le Minuteur",
+    "pauseTimer": "Pause Minuteur",
+    "resetTimer": "Remettre à Zéro",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "complete": "Terminer",
+    "recipeInfo": "Info Recette",
+    "allSteps": "Toutes les Étapes",
+    "timerFinished": "Minuteur Terminé!",
+    "stepCompleted": "Étape terminée! Prêt pour la suivante?",
+    "continue": "Continuer",
+    "cookingCompleted": "Cuisson terminée! Excellent travail!",
+    "exitConfirm": "Sortir",
+    "exitConfirmTitle": "Quitter le Mode Cuisine?",
+    "exitConfirmMessage": "Êtes-vous sûr de vouloir quitter le mode cuisine? Votre progression sera perdue.",
+    "allIngredientsReady": "Tous les ingrédients vérifiés! Prêt à commencer la cuisine?",
+    "startCooking": "Commencer à Cuisiner"
   }
 }
