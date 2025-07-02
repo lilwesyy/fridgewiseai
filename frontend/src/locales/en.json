@@ -16,6 +16,11 @@
     "loginSuccess": "Login successful!",
     "registerSuccess": "Registration successful!",
     "backToHome": "Back to Home",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passwordChangeSuccess": "Password changed successfully!",
     "validation": {
       "emailRequired": "Email is required",
       "passwordRequired": "Password is required",
@@ -23,7 +28,12 @@
       "passwordsDoNotMatch": "Passwords do not match",
       "invalidCredentials": "Invalid email or password",
       "accountDeactivated": "Your account has been deactivated",
-      "emailAlreadyExists": "This email is already registered"
+      "emailAlreadyExists": "This email is already registered",
+      "currentPasswordRequired": "Current password is required",
+      "newPasswordRequired": "New password is required",
+      "newPasswordMinLength": "New password must be at least 6 characters",
+      "newPasswordsDoNotMatch": "New passwords do not match",
+      "wrongCurrentPassword": "Current password is incorrect"
     }
   },
   "navigation": {
