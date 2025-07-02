@@ -247,6 +247,7 @@
 
 <script>
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
 
@@ -258,7 +259,8 @@ export default {
   },
   setup() {
     const authStore = useAuthStore()
-    return { authStore }
+    const toast = useToast()
+    return { authStore, toast }
   },
   data() {
     return {
@@ -309,6 +311,7 @@ export default {
       // In a real app, this would make an API call
       console.log('Updating profile:', this.profileForm)
       this.showAccountSettings = false
+      this.toast.success(this.$t('notifications.profile.updateSuccess'))
       
       // Update local user data
       if (this.authStore.user) {
@@ -340,9 +343,11 @@ export default {
         a.click()
         document.body.removeChild(a)
         URL.revokeObjectURL(url)
+        
+        this.toast.success(this.$t('notifications.profile.exportSuccess'))
       } catch (error) {
         console.error('Export error:', error)
-        alert('Failed to export data')
+        this.toast.error(this.$t('notifications.profile.exportError'))
       }
     },
 
@@ -362,6 +367,7 @@ export default {
     handleLogout() {
       if (confirm('Are you sure you want to logout?')) {
         this.authStore.logout()
+        this.toast.info(this.$t('notifications.auth.logoutSuccess'))
         this.$router.push('/')
       }
     }

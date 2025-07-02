@@ -48,7 +48,25 @@ const userSchema = new mongoose.Schema({
     maxCookingTime: {
       type: Number,
       default: 120 // minutes
-    }
+    },
+    savedRecipes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe'
+    }],
+    recentActivity: [{
+      id: {
+        type: String,
+        required: true
+      },
+      title: {
+        type: String,
+        required: true
+      },
+      timestamp: {
+        type: String,
+        required: true
+      }
+    }]
   },
   stats: {
     totalRecipes: {

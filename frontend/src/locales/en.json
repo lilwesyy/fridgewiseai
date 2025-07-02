@@ -30,6 +30,39 @@
     "saved": "Saved",
     "profile": "Profile"
   },
+  "notifications": {
+    "auth": {
+      "loginSuccess": "Login successful! Welcome back, {name}!",
+      "registerSuccess": "Registration completed successfully!",
+      "logoutSuccess": "Logout completed"
+    },
+    "profile": {
+      "updateSuccess": "Profile updated successfully",
+      "exportSuccess": "Data exported successfully",
+      "exportError": "Error exporting data"
+    },
+    "recipes": {
+      "generateSuccess": "Recipe generated successfully!",
+      "generateError": "Error generating recipe",
+      "saveSuccess": "Recipe saved to favorites",
+      "saveError": "Error saving recipe",
+      "removeSuccess": "Recipe removed from favorites",
+      "removeError": "Error removing recipe",
+      "shareSuccess": "Recipe copied to clipboard",
+      "loadError": "Error loading recipes"
+    },
+    "camera": {
+      "ingredientsDetected": "Detected {count} ingredients!",
+      "analysisError": "Error analyzing image",
+      "permissionError": "Camera access denied",
+      "detectSuccess": "Ingredients detected successfully!",
+      "detectError": "Error detecting ingredients"
+    },
+    "general": {
+      "error": "An error occurred",
+      "success": "Operation completed successfully"
+    }
+  },
   "landing": {
     "nav": {
       "features": "Features",
@@ -123,12 +156,43 @@
   },
   "recipes": {
     "title": "Your Recipes",
+    "subtitle": "Delicious recipes based on your ingredients",
+    "currentIngredients": "Current Ingredients",
     "generate": "Generate Recipe",
     "ingredients": "Ingredients",
     "instructions": "Instructions",
     "cookingTime": "Cooking Time",
-    "difficulty": "Difficulty",
-    "save": "Save Recipe"
+    "minutes": "min",
+    "servings": "servings",
+    "calories": "Calories",
+    "difficulty": {
+      "label": "Difficulty",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "viewRecipe": "View Recipe",
+    "saved": "Saved",
+    "filters": {
+      "all": "All",
+      "quick": "Quick (< 30 min)",
+      "easy": "Easy",
+      "vegetarian": "Vegetarian",
+      "healthy": "Healthy"
+    },
+    "tags": {
+      "vegetarian": "Vegetarian",
+      "vegan": "Vegan",
+      "gluten-free": "Gluten Free",
+      "healthy": "Healthy",
+      "quick": "Quick",
+      "easy": "Easy"
+    },
+    "empty": {
+      "title": "No recipes yet",
+      "subtitle": "Start by scanning some ingredients to generate your first recipe!",
+      "action": "Scan Ingredients"
+    }
   },
   "ingredients": {
     "tomatoes": "Tomatoes",

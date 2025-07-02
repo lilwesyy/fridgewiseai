@@ -13,44 +13,64 @@ const recipeSchema = new mongoose.Schema({
     trim: true,
     maxlength: [500, 'Description must be less than 500 characters']
   },
-  ingredients: [{
-    name: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    amount: {
-      type: String,
-      required: true
-    },
-    unit: {
-      type: String,
-      default: ''
-    },
-    notes: {
-      type: String,
-      default: ''
-    }
-  }],
-  instructions: [{
-    step: {
-      type: Number,
-      required: true
-    },
-    description: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    duration: {
-      type: Number, // in minutes
-      default: null
-    },
-    temperature: {
-      type: String,
-      default: null
-    }
-  }],
+  ingredients: {
+    type: [{
+      name: {
+        type: String,
+        required: [true, 'Ingredient name is required'],
+        trim: true
+      },
+      amount: {
+        type: String,
+        required: [true, 'Ingredient amount is required']
+      },
+      unit: {
+        type: String,
+        default: ''
+      },
+      notes: {
+        type: String,
+        default: ''
+      }
+    }],
+    validate: [
+      {
+        validator: function(v) {
+          return v && v.length > 0;
+        },
+        message: 'At least one ingredient is required'
+      }
+    ]
+  },
+  instructions: {
+    type: [{
+      step: {
+        type: Number,
+        required: [true, 'Step number is required']
+      },
+      description: {
+        type: String,
+        required: [true, 'Step description is required'],
+        trim: true
+      },
+      duration: {
+        type: Number, // in minutes
+        default: null
+      },
+      temperature: {
+        type: String,
+        default: null
+      }
+    }],
+    validate: [
+      {
+        validator: function(v) {
+          return v && v.length > 0;
+        },
+        message: 'At least one instruction step is required'
+      }
+    ]
+  },
   cookingTime: {
     prep: {
       type: Number, // in minutes

@@ -85,7 +85,7 @@ export const generateToken = (userId) => {
     { userId }, 
     process.env.JWT_SECRET, 
     { 
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+      expiresIn: '6h', // Token scade dopo 6 ore
       issuer: 'fridgewiseai'
     }
   )

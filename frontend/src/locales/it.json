@@ -30,6 +30,39 @@
     "saved": "Salvate",
     "profile": "Profilo"
   },
+  "notifications": {
+    "auth": {
+      "loginSuccess": "Accesso riuscito! Bentornato, {name}!",
+      "registerSuccess": "Registrazione completata con successo!",
+      "logoutSuccess": "Disconnessione completata"
+    },
+    "profile": {
+      "updateSuccess": "Profilo aggiornato con successo",
+      "exportSuccess": "Dati esportati con successo",
+      "exportError": "Errore durante l'esportazione dei dati"
+    },
+    "recipes": {
+      "generateSuccess": "Ricetta generata con successo!",
+      "generateError": "Errore durante la generazione della ricetta",
+      "saveSuccess": "Ricetta salvata nei preferiti",
+      "saveError": "Errore nel salvare la ricetta",
+      "removeSuccess": "Ricetta rimossa dai preferiti",
+      "removeError": "Errore nel rimuovere la ricetta",
+      "shareSuccess": "Ricetta copiata negli appunti",
+      "loadError": "Errore nel caricamento delle ricette"
+    },
+    "camera": {
+      "ingredientsDetected": "Rilevati {count} ingredienti!",
+      "analysisError": "Errore durante l'analisi dell'immagine",
+      "permissionError": "Accesso alla fotocamera negato",
+      "detectSuccess": "Ingredienti rilevati con successo!",
+      "detectError": "Errore nel rilevamento degli ingredienti"
+    },
+    "general": {
+      "error": "Si è verificato un errore",
+      "success": "Operazione completata con successo"
+    }
+  },
   "landing": {
     "nav": {
       "features": "Funzionalità",
@@ -123,12 +156,43 @@
   },
   "recipes": {
     "title": "Le Tue Ricette",
+    "subtitle": "Ricette deliziose basate sui tuoi ingredienti",
+    "currentIngredients": "Ingredienti Attuali",
     "generate": "Genera Ricetta",
     "ingredients": "Ingredienti",
     "instructions": "Istruzioni",
     "cookingTime": "Tempo di Cottura",
-    "difficulty": "Difficoltà",
-    "save": "Salva Ricetta"
+    "minutes": "min",
+    "servings": "porzioni",
+    "calories": "Calorie",
+    "difficulty": {
+      "label": "Difficoltà",
+      "easy": "Facile",
+      "medium": "Medio",
+      "hard": "Difficile"
+    },
+    "viewRecipe": "Visualizza Ricetta",
+    "saved": "Salvata",
+    "filters": {
+      "all": "Tutte",
+      "quick": "Veloci (< 30 min)",
+      "easy": "Facili",
+      "vegetarian": "Vegetariane",
+      "healthy": "Salutari"
+    },
+    "tags": {
+      "vegetarian": "Vegetariana",
+      "vegan": "Vegana",
+      "gluten-free": "Senza Glutine",
+      "healthy": "Salutare",
+      "quick": "Veloce",
+      "easy": "Facile"
+    },
+    "empty": {
+      "title": "Nessuna ricetta ancora",
+      "subtitle": "Inizia scansionando alcuni ingredienti per generare la tua prima ricetta!",
+      "action": "Scansiona Ingredienti"
+    }
   },
   "ingredients": {
     "tomatoes": "Pomodori",

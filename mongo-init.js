@@ -34,7 +34,7 @@ db.createCollection('recipes', {
   validator: {
     $jsonSchema: {
       bsonType: "object",
-      required: ["title", "ingredients", "instructions", "userId"],
+      required: ["title", "ingredients", "instructions", "createdBy"],
       properties: {
         title: {
           bsonType: "string",
@@ -48,7 +48,7 @@ db.createCollection('recipes', {
           bsonType: "array", 
           description: "must be an array and is required"
         },
-        userId: {
+        createdBy: {
           bsonType: "objectId",
           description: "must be an objectId and is required"
         }
@@ -61,7 +61,7 @@ db.createCollection('recipes', {
 db.users.createIndex({ "email": 1 }, { unique: true });
 db.users.createIndex({ "createdAt": 1 });
 
-db.recipes.createIndex({ "userId": 1 });
+db.recipes.createIndex({ "createdBy": 1 });
 db.recipes.createIndex({ "title": "text", "description": "text" });
 db.recipes.createIndex({ "createdAt": 1 });
 

@@ -58,7 +58,7 @@
       <div v-else-if="filteredSavedRecipes.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div 
           v-for="recipe in filteredSavedRecipes" 
-          :key="recipe.id"
+          :key="recipe._id || recipe.id"
           class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
         >
           <div class="p-4">
@@ -66,7 +66,7 @@
               <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">{{ recipe.title }}</h3>
               <div class="flex space-x-1 ml-2">
                 <button 
-                  @click="toggleSaved(recipe.id)"
+                  @click="toggleSaved(recipe._id || recipe.id)"
                   class="p-1 text-red-600 hover:bg-red-50 rounded-full transition-colors"
                 >
                   <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -89,7 +89,7 @@
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                {{ recipe.cookingTime }}
+                {{ recipe.cookingTime?.total || recipe.cookingTime }}{{ typeof recipe.cookingTime?.total === 'number' ? ' min' : '' }}
               </div>
               <div class="flex items-center">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,13 +157,14 @@
         <p class="text-gray-500 mb-4">
           {{ searchQuery ? 'Try adjusting your search terms' : 'Save your favorite recipes to see them here' }}
         </p>
-        <BaseButton 
-          v-if="!searchQuery"
-          variant="primary"
-          @click="$router.push('/app/recipes')"
-        >
-          Browse Recipes
-        </BaseButton>
+        <div class="flex justify-center">
+          <BaseButton 
+            v-if="!searchQuery"
+            variant="primary"
+            @click="$router.push('/app/recipes')"
+          >
+            Browse Recipes
+          </BaseButton>
         <BaseButton 
           v-else
           variant="secondary"
@@ -171,6 +172,7 @@
         >
           Clear Search
         </BaseButton>
+        </div>
       </div>
     </div>
 
@@ -193,7 +195,7 @@
             <div>
               <h4 class="font-medium text-gray-900 mb-2">{{ $t('recipes.ingredients') }}:</h4>
               <ul class="text-sm text-gray-600 space-y-1">
-                <li v-for="ingredient in selectedRecipe.ingredients" :key="ingredient">
+                <li v-for="ingredient in getIngredientList(selectedRecipe.ingredients)" :key="ingredient">
                   • {{ ingredient }}
                 </li>
               </ul>
@@ -202,7 +204,7 @@
             <div>
               <h4 class="font-medium text-gray-900 mb-2">{{ $t('recipes.instructions') }}:</h4>
               <ol class="text-sm text-gray-600 space-y-2">
-                <li v-for="(step, index) in selectedRecipe.instructions" :key="index" class="flex">
+                <li v-for="(step, index) in getInstructionsList(selectedRecipe.instructions)" :key="index" class="flex">
                   <span class="font-medium mr-2">{{ index + 1 }}.</span>
                   <span>{{ step }}</span>
                 </li>
@@ -233,8 +235,10 @@
 </template>
 
 <script>
+import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
+import { userDataService } from '@/services/api'
 
 export default {
   name: 'SavedRecipesPage',
@@ -242,10 +246,13 @@ export default {
     AuthenticatedLayout,
     BaseButton
   },
+  setup() {
+    const toast = useToast()
+    return { toast }
+  },
   data() {
     return {
-      savedRecipeIds: [],
-      allRecipes: [],
+      savedRecipes: [],
       loading: false,
       searchQuery: '',
       activeFilter: 'all',
@@ -260,11 +267,6 @@ export default {
     }
   },
   computed: {
-    savedRecipes() {
-      return this.allRecipes.filter(recipe => 
-        this.savedRecipeIds.includes(recipe.id)
-      )
-    },
     filteredSavedRecipes() {
       let filtered = this.savedRecipes
 
@@ -274,7 +276,7 @@ export default {
         filtered = filtered.filter(recipe =>
           recipe.title.toLowerCase().includes(query) ||
           recipe.description.toLowerCase().includes(query) ||
-          recipe.ingredients.some(ing => ing.toLowerCase().includes(query))
+          this.getIngredientNames(recipe.ingredients).some(ing => ing.toLowerCase().includes(query))
         )
       }
 
@@ -283,9 +285,9 @@ export default {
         filtered = filtered.filter(recipe => {
           switch (this.activeFilter) {
             case 'quick':
-              return parseInt(recipe.cookingTime) <= 30
+              return recipe.cookingTime?.total <= 30
             case 'easy':
-              return recipe.difficulty === 'Easy'
+              return recipe.difficulty === 'easy'
             case 'vegetarian':
               return recipe.tags?.includes('vegetarian')
             case 'healthy':
@@ -303,23 +305,15 @@ export default {
     this.loadSavedRecipes()
   },
   methods: {
-    loadSavedRecipes() {
+    async loadSavedRecipes() {
       this.loading = true
       
       try {
-        // Load saved recipe IDs
-        const savedIds = localStorage.getItem('savedRecipes')
-        if (savedIds) {
-          this.savedRecipeIds = JSON.parse(savedIds)
-        }
-
-        // Load all recipes
-        const allRecipes = localStorage.getItem('generatedRecipes')
-        if (allRecipes) {
-          this.allRecipes = JSON.parse(allRecipes)
-        }
+        // Load saved recipes from database
+        this.savedRecipes = await userDataService.getSavedRecipes()
       } catch (error) {
         console.error('Error loading saved recipes:', error)
+        this.toast.error(this.$t('notifications.recipes.loadError') || 'Failed to load saved recipes')
       } finally {
         this.loading = false
       }
@@ -333,11 +327,17 @@ export default {
       this.selectedRecipe = null
     },
 
-    toggleSaved(recipeId) {
-      const index = this.savedRecipeIds.indexOf(recipeId)
-      if (index > -1) {
-        this.savedRecipeIds.splice(index, 1)
-        localStorage.setItem('savedRecipes', JSON.stringify(this.savedRecipeIds))
+    async toggleSaved(recipeId) {
+      try {
+        await userDataService.removeSavedRecipe(recipeId)
+        // Remove from local list
+        this.savedRecipes = this.savedRecipes.filter(recipe => 
+          (recipe._id || recipe.id) !== recipeId
+        )
+        this.toast.info(this.$t('notifications.recipes.removeSuccess'))
+      } catch (error) {
+        console.error('Failed to remove saved recipe:', error)
+        this.toast.error(this.$t('notifications.recipes.removeError') || 'Failed to remove recipe')
       }
     },
 
@@ -350,10 +350,12 @@ export default {
         })
       } else {
         // Fallback: copy to clipboard
-        const text = `${recipe.title}\n\n${recipe.description}\n\nIngredients:\n${recipe.ingredients.join('\n')}`
+        const ingredientsText = this.getIngredientNames(recipe.ingredients).join('\n')
+        const text = `${recipe.title}\n\n${recipe.description}\n\nIngredients:\n${ingredientsText}`
         navigator.clipboard.writeText(text).then(() => {
-          // Show toast notification
-          alert('Recipe copied to clipboard!')
+          this.toast.success(this.$t('notifications.recipes.shareSuccess'))
+        }).catch(() => {
+          this.toast.error(this.$t('notifications.general.error'))
         })
       }
     },
@@ -361,12 +363,41 @@ export default {
     cookRecipe(recipe) {
       // Start cooking mode - could open a step-by-step cooking guide
       this.closeRecipeModal()
-      // For now, just show an alert
-      alert(`Starting cooking mode for ${recipe.title}!`)
+      this.toast.info(this.$t('notifications.general.success'))
+      // For now, just show a toast notification
     },
 
     clearSearch() {
       this.searchQuery = ''
+    },
+
+    // Helper methods to handle different data formats
+    getIngredientNames(ingredients) {
+      if (!ingredients) return []
+      if (Array.isArray(ingredients)) {
+        return ingredients.map(ing => {
+          if (typeof ing === 'string') return ing
+          if (ing.name) return `${ing.amount || ''} ${ing.unit || ''} ${ing.name}`.trim()
+          return ing.toString()
+        })
+      }
+      return []
+    },
+
+    getIngredientList(ingredients) {
+      return this.getIngredientNames(ingredients)
+    },
+
+    getInstructionsList(instructions) {
+      if (!instructions) return []
+      if (Array.isArray(instructions)) {
+        return instructions.map(inst => {
+          if (typeof inst === 'string') return inst
+          if (inst.description) return inst.description
+          return inst.toString()
+        })
+      }
+      return []
     }
   }
 }

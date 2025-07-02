@@ -4,13 +4,13 @@
       <!-- Header -->
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ $t('recipes.title') }}</h1>
-        <p class="text-gray-600">Delicious recipes based on your ingredients</p>
+        <p class="text-gray-600">{{ $t('recipes.subtitle') }}</p>
       </div>
 
       <!-- Generate Recipe Button -->
       <div v-if="currentIngredients.length > 0" class="mb-6">
         <div class="bg-primary-50 rounded-lg p-4 border border-primary-200">
-          <h3 class="font-semibold text-primary-900 mb-2">Current Ingredients:</h3>
+          <h3 class="font-semibold text-primary-900 mb-2">{{ $t('recipes.currentIngredients') }}:</h3>
           <div class="flex flex-wrap gap-2 mb-3">
             <span 
               v-for="ingredient in currentIngredients" 
@@ -45,7 +45,7 @@
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
           >
-            {{ filter.label }}
+            {{ $t(`recipes.filters.${filter.key}`) }}
           </button>
         </div>
       </div>
@@ -65,17 +65,17 @@
       <div v-else-if="filteredRecipes.length > 0" class="space-y-4">
         <div 
           v-for="recipe in filteredRecipes" 
-          :key="recipe.id"
+          :key="recipe._id || recipe.id"
           class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
         >
           <div class="p-4">
             <div class="flex items-start justify-between mb-2">
               <h3 class="text-lg font-semibold text-gray-900">{{ recipe.title }}</h3>
               <button 
-                @click="toggleSaved(recipe.id)"
+                @click="toggleSaved(recipe._id || recipe.id)"
                 :class="[
                   'p-2 rounded-full transition-colors',
-                  savedRecipes.includes(recipe.id)
+                  savedRecipes.includes(recipe._id || recipe.id)
                     ? 'text-red-600 hover:bg-red-50'
                     : 'text-gray-400 hover:bg-gray-50'
                 ]"
@@ -85,124 +85,128 @@
                 </svg>
               </button>
             </div>
-
-            <div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-              <div class="flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                {{ recipe.cookingTime }}
-              </div>
-              <div class="flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                </svg>
-                {{ recipe.difficulty }}
-              </div>
-              <div class="flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
-                {{ recipe.servings }} servings
-              </div>
+            
+            <p class="text-gray-600 text-sm mb-3">{{ recipe.description }}</p>
+            
+            <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
+              <span v-if="recipe.cookingTime">⏱️ {{ recipe.cookingTime.total || recipe.cookingTime }} {{ $t('recipes.minutes') }}</span>
+              <span v-if="recipe.difficulty">📊 {{ $t(`recipes.difficulty.${recipe.difficulty}`) }}</span>
+              <span v-if="recipe.servings">👥 {{ recipe.servings }} {{ $t('recipes.servings') }}</span>
             </div>
 
-            <p class="text-gray-600 text-sm mb-4">{{ recipe.description }}</p>
-
-            <!-- Ingredients preview -->
-            <div class="mb-4">
-              <h4 class="font-medium text-gray-900 mb-2">{{ $t('recipes.ingredients') }}:</h4>
-              <div class="flex flex-wrap gap-1">
-                <span 
-                  v-for="ingredient in recipe.ingredients.slice(0, 3)" 
-                  :key="ingredient"
-                  class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
-                >
-                  {{ ingredient }}
-                </span>
-                <span 
-                  v-if="recipe.ingredients.length > 3"
-                  class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
-                >
-                  +{{ recipe.ingredients.length - 3 }} more
-                </span>
-              </div>
-            </div>
-
-            <div class="flex space-x-2">
-              <BaseButton 
-                variant="secondary" 
-                size="sm"
-                @click="viewRecipe(recipe)"
-                class="flex-1"
+            <div v-if="recipe.tags && recipe.tags.length" class="flex flex-wrap gap-1 mb-3">
+              <span 
+                v-for="tag in recipe.tags" 
+                :key="tag"
+                class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
               >
-                View Recipe
-              </BaseButton>
-              <BaseButton 
-                variant="primary" 
-                size="sm"
-                @click="saveRecipe(recipe)"
-                :disabled="savedRecipes.includes(recipe.id)"
-              >
-                {{ savedRecipes.includes(recipe.id) ? 'Saved' : 'Save' }}
-              </BaseButton>
+                {{ $t(`recipes.tags.${tag}`, tag) }}
+              </span>
             </div>
+
+            <BaseButton 
+              variant="outline" 
+              @click="viewRecipe(recipe)"
+              class="w-full"
+            >
+              {{ $t('recipes.viewRecipe') }}
+            </BaseButton>
           </div>
         </div>
       </div>
 
       <!-- Empty State -->
-      <div v-else class="text-center py-12">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+      <div v-else-if="!loading" class="text-center py-12">
+        <div class="text-gray-400 mb-4">
+          <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
           </svg>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No recipes found</h3>
-        <p class="text-gray-500 mb-4">Start by scanning your ingredients to generate personalized recipes</p>
-        <BaseButton 
-          variant="primary"
-          @click="$router.push('/app/camera')"
-        >
-          Scan Ingredients
-        </BaseButton>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('recipes.empty.title') }}</h3>
+        <p class="text-gray-500 mb-4">{{ $t('recipes.empty.subtitle') }}</p>
+        <div class="flex justify-center">
+          <BaseButton 
+            variant="primary" 
+            @click="$router.push('/camera')"
+          >
+            {{ $t('recipes.empty.action') }}
+          </BaseButton>
+        </div>
       </div>
     </div>
 
-    <!-- Recipe Detail Modal -->
-    <div v-if="selectedRecipe" class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50" @click="closeRecipeModal">
-      <div class="min-h-screen px-4 text-center">
-        <div class="fixed inset-0 transition-opacity"></div>
-        
-        <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-lg" @click.stop>
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">{{ selectedRecipe.title }}</h3>
-            <button @click="closeRecipeModal" class="text-gray-400 hover:text-gray-600">
+    <!-- Recipe Modal -->
+    <div 
+      v-if="selectedRecipe" 
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      @click="closeRecipeModal"
+    >
+      <div 
+        class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        @click.stop
+      >
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <h2 class="text-2xl font-bold text-gray-900">{{ selectedRecipe.title }}</h2>
+            <button 
+              @click="closeRecipeModal"
+              class="text-gray-400 hover:text-gray-600"
+            >
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
 
-          <div class="space-y-4">
-            <div>
-              <h4 class="font-medium text-gray-900 mb-2">{{ $t('recipes.ingredients') }}:</h4>
-              <ul class="text-sm text-gray-600 space-y-1">
-                <li v-for="ingredient in selectedRecipe.ingredients" :key="ingredient">
-                  • {{ ingredient }}
-                </li>
-              </ul>
-            </div>
+          <p v-if="selectedRecipe.description" class="text-gray-600 mb-4">{{ selectedRecipe.description }}</p>
 
-            <div>
-              <h4 class="font-medium text-gray-900 mb-2">{{ $t('recipes.instructions') }}:</h4>
-              <ol class="text-sm text-gray-600 space-y-2">
-                <li v-for="(step, index) in selectedRecipe.instructions" :key="index" class="flex">
-                  <span class="font-medium mr-2">{{ index + 1 }}.</span>
-                  <span>{{ step }}</span>
-                </li>
-              </ol>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
+            <div v-if="selectedRecipe.cookingTime" class="text-center p-3 bg-gray-50 rounded">
+              <div class="font-semibold">{{ $t('recipes.cookingTime') }}</div>
+              <div class="text-gray-600">{{ selectedRecipe.cookingTime.total || selectedRecipe.cookingTime }} {{ $t('recipes.minutes') }}</div>
             </div>
+            <div v-if="selectedRecipe.difficulty" class="text-center p-3 bg-gray-50 rounded">
+              <div class="font-semibold">{{ $t('recipes.difficulty.label') }}</div>
+              <div class="text-gray-600">{{ $t(`recipes.difficulty.${selectedRecipe.difficulty}`) }}</div>
+            </div>
+            <div v-if="selectedRecipe.servings" class="text-center p-3 bg-gray-50 rounded">
+              <div class="font-semibold">{{ $t('recipes.servings') }}</div>
+              <div class="text-gray-600">{{ selectedRecipe.servings }}</div>
+            </div>
+            <div v-if="selectedRecipe.nutritionalInfo" class="text-center p-3 bg-gray-50 rounded">
+              <div class="font-semibold">{{ $t('recipes.calories') }}</div>
+              <div class="text-gray-600">{{ selectedRecipe.nutritionalInfo.calories || '-' }}</div>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">{{ $t('recipes.ingredients') }}</h3>
+            <ul class="space-y-2">
+              <li 
+                v-for="(ingredient, index) in getIngredientList(selectedRecipe.ingredients)" 
+                :key="index"
+                class="flex items-center text-gray-700"
+              >
+                <span class="w-2 h-2 bg-primary-500 rounded-full mr-3"></span>
+                {{ ingredient }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">{{ $t('recipes.instructions') }}</h3>
+            <ol class="space-y-3">
+              <li 
+                v-for="(instruction, index) in getInstructionsList(selectedRecipe.instructions)" 
+                :key="index"
+                class="flex text-gray-700"
+              >
+                <span class="flex-shrink-0 w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3 mt-0.5">
+                  {{ index + 1 }}
+                </span>
+                <span>{{ instruction }}</span>
+              </li>
+            </ol>
           </div>
 
           <div class="mt-6 flex space-x-3">
@@ -216,10 +220,10 @@
             <BaseButton 
               variant="primary" 
               @click="saveRecipe(selectedRecipe)"
-              :disabled="savedRecipes.includes(selectedRecipe.id)"
+              :disabled="savedRecipes.includes(selectedRecipe._id || selectedRecipe.id)"
               class="flex-1"
             >
-              {{ savedRecipes.includes(selectedRecipe.id) ? 'Saved' : $t('common.save') }}
+              {{ savedRecipes.includes(selectedRecipe._id || selectedRecipe.id) ? $t('recipes.saved') : $t('common.save') }}
             </BaseButton>
           </div>
         </div>
@@ -229,14 +233,20 @@
 </template>
 
 <script>
+import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
+import { recipeService, userDataService } from '@/services/api'
 
 export default {
   name: 'RecipesPage',
   components: {
     AuthenticatedLayout,
     BaseButton
+  },
+  setup() {
+    const toast = useToast()
+    return { toast }
   },
   data() {
     return {
@@ -264,9 +274,9 @@ export default {
       return this.recipes.filter(recipe => {
         switch (this.activeFilter) {
           case 'quick':
-            return parseInt(recipe.cookingTime) <= 30
+            return (recipe.cookingTime?.total || recipe.cookingTime) <= 30
           case 'easy':
-            return recipe.difficulty === 'Easy'
+            return recipe.difficulty === 'easy'
           case 'vegetarian':
             return recipe.tags?.includes('vegetarian')
           case 'healthy':
@@ -277,31 +287,41 @@ export default {
       })
     }
   },
-  mounted() {
-    this.loadCurrentIngredients()
-    this.loadRecipes()
-    this.loadSavedRecipes()
+  async mounted() {
+    await this.loadCurrentIngredients()
+    await this.loadRecipes()
+    await this.loadSavedRecipes()
   },
   methods: {
-    loadCurrentIngredients() {
-      const stored = localStorage.getItem('currentIngredients')
-      if (stored) {
-        this.currentIngredients = JSON.parse(stored)
+    async loadCurrentIngredients() {
+      try {
+        this.currentIngredients = userDataService.getCurrentIngredients()
+      } catch (error) {
+        console.error('Failed to load current ingredients:', error)
+        this.currentIngredients = []
       }
     },
 
-    loadRecipes() {
-      // Load recipes from localStorage or API
-      const stored = localStorage.getItem('generatedRecipes')
-      if (stored) {
-        this.recipes = JSON.parse(stored)
+    async loadRecipes() {
+      this.loading = true
+      try {
+        // Load user's recipes from database
+        this.recipes = await recipeService.getAllUserRecipes()
+      } catch (error) {
+        console.error('Failed to load recipes:', error)
+        this.toast.error(this.$t('notifications.recipes.loadError'))
+        this.recipes = []
+      } finally {
+        this.loading = false
       }
     },
 
-    loadSavedRecipes() {
-      const stored = localStorage.getItem('savedRecipes')
-      if (stored) {
-        this.savedRecipes = JSON.parse(stored)
+    async loadSavedRecipes() {
+      try {
+        this.savedRecipes = await userDataService.getSavedRecipeIds()
+      } catch (error) {
+        console.error('Failed to load saved recipes:', error)
+        this.savedRecipes = []
       }
     },
 
@@ -311,47 +331,31 @@ export default {
       this.generating = true
 
       try {
-        // Simulate API call to generate recipe
-        await new Promise(resolve => setTimeout(resolve, 3000))
+        console.log('Sending ingredients to API:', this.currentIngredients)
+        
+        // Call backend API to generate recipe
+        const response = await recipeService.generateRecipe(this.currentIngredients)
+        const newRecipe = response.recipe
 
-        const newRecipe = {
-          id: Date.now(),
-          title: `${this.currentIngredients[0]} ${this.currentIngredients[1] || 'Dish'}`,
-          description: `A delicious recipe using ${this.currentIngredients.join(', ')}`,
-          cookingTime: '25 min',
-          difficulty: 'Medium',
-          servings: 4,
-          ingredients: [
-            ...this.currentIngredients.map(ing => `1 cup ${ing.toLowerCase()}`),
-            '2 tbsp olive oil',
-            'Salt and pepper to taste'
-          ],
-          instructions: [
-            'Prepare all ingredients by washing and chopping as needed.',
-            'Heat olive oil in a large pan over medium heat.',
-            'Add main ingredients and cook for 10-15 minutes.',
-            'Season with salt and pepper.',
-            'Serve hot and enjoy!'
-          ],
-          tags: ['healthy', 'homemade']
-        }
-
+        // Add to local recipes list
         this.recipes.unshift(newRecipe)
-        localStorage.setItem('generatedRecipes', JSON.stringify(this.recipes))
-        localStorage.removeItem('currentIngredients')
+
+        // Clear current ingredients
+        userDataService.clearCurrentIngredients()
         this.currentIngredients = []
 
         // Add to recent activity
-        const recentActivity = JSON.parse(localStorage.getItem('recentActivity') || '[]')
-        recentActivity.unshift({
-          id: newRecipe.id,
+        await userDataService.addRecentActivity({
+          id: newRecipe._id,
           title: `Generated: ${newRecipe.title}`,
           timestamp: new Date().toLocaleDateString()
         })
-        localStorage.setItem('recentActivity', JSON.stringify(recentActivity.slice(0, 10)))
+
+        this.toast.success(this.$t('notifications.recipes.generateSuccess'))
 
       } catch (error) {
         console.error('Recipe generation error:', error)
+        this.toast.error(this.$t('notifications.recipes.generateError'))
       } finally {
         this.generating = false
       }
@@ -365,21 +369,61 @@ export default {
       this.selectedRecipe = null
     },
 
-    saveRecipe(recipe) {
-      if (!this.savedRecipes.includes(recipe.id)) {
-        this.savedRecipes.push(recipe.id)
-        localStorage.setItem('savedRecipes', JSON.stringify(this.savedRecipes))
+    async saveRecipe(recipe) {
+      try {
+        const recipeId = recipe._id || recipe.id
+        if (!this.savedRecipes.includes(recipeId)) {
+          await userDataService.addSavedRecipe(recipeId)
+          this.savedRecipes.push(recipeId)
+          this.toast.success(this.$t('notifications.recipes.saveSuccess'))
+        }
+      } catch (error) {
+        console.error('Failed to save recipe:', error)
+        this.toast.error(this.$t('notifications.recipes.saveError'))
       }
     },
 
-    toggleSaved(recipeId) {
-      const index = this.savedRecipes.indexOf(recipeId)
-      if (index > -1) {
-        this.savedRecipes.splice(index, 1)
-      } else {
-        this.savedRecipes.push(recipeId)
+    async toggleSaved(recipeId) {
+      try {
+        const index = this.savedRecipes.indexOf(recipeId)
+        if (index > -1) {
+          await userDataService.removeSavedRecipe(recipeId)
+          this.savedRecipes.splice(index, 1)
+          this.toast.info(this.$t('notifications.recipes.removeSuccess'))
+        } else {
+          await userDataService.addSavedRecipe(recipeId)
+          this.savedRecipes.push(recipeId)
+          this.toast.success(this.$t('notifications.recipes.saveSuccess'))
+        }
+      } catch (error) {
+        console.error('Failed to toggle saved recipe:', error)
+        this.toast.error(this.$t('notifications.recipes.saveError'))
       }
-      localStorage.setItem('savedRecipes', JSON.stringify(this.savedRecipes))
+    },
+
+    // Helper methods to handle different data formats
+    getIngredientList(ingredients) {
+      if (!ingredients) return []
+      if (Array.isArray(ingredients)) {
+        return ingredients.map(ing => {
+          if (typeof ing === 'string') return ing
+          if (ing.name) return `${ing.amount || ''} ${ing.unit || ''} ${ing.name}`.trim()
+          return ing.toString()
+        })
+      }
+      return []
+    },
+
+    getInstructionsList(instructions) {
+      if (!instructions) return []
+      if (Array.isArray(instructions)) {
+        return instructions.map(inst => {
+          if (typeof inst === 'string') return inst
+          if (inst.description) return inst.description
+          return inst.toString()
+        })
+      }
+      return []
     }
   }
 }

@@ -27,7 +27,7 @@
     "home": "Accueil",
     "camera": "Caméra",
     "recipes": "Recettes",
-    "saved": "Sauvegardées",
+    "saved": "Sauvées",
     "profile": "Profil"
   },
   "landing": {
@@ -123,12 +123,43 @@
   },
   "recipes": {
     "title": "Vos Recettes",
+    "subtitle": "Délicieuses recettes basées sur vos ingrédients",
+    "currentIngredients": "Ingrédients Actuels",
     "generate": "Générer une Recette",
     "ingredients": "Ingrédients",
     "instructions": "Instructions",
     "cookingTime": "Temps de Cuisson",
-    "difficulty": "Difficulté",
-    "save": "Sauvegarder la Recette"
+    "minutes": "min",
+    "servings": "portions",
+    "calories": "Calories",
+    "difficulty": {
+      "label": "Difficulté",
+      "easy": "Facile",
+      "medium": "Moyen",
+      "hard": "Difficile"
+    },
+    "viewRecipe": "Voir la Recette",
+    "saved": "Sauvegardé",
+    "filters": {
+      "all": "Toutes",
+      "quick": "Rapides (< 30 min)",
+      "easy": "Faciles",
+      "vegetarian": "Végétariennes",
+      "healthy": "Saines"
+    },
+    "tags": {
+      "vegetarian": "Végétarien",
+      "vegan": "Végan",
+      "gluten-free": "Sans Gluten",
+      "healthy": "Sain",
+      "quick": "Rapide",
+      "easy": "Facile"
+    },
+    "empty": {
+      "title": "Aucune recette encore",
+      "subtitle": "Commencez par scanner des ingrédients pour générer votre première recette!",
+      "action": "Scanner des Ingrédients"
+    }
   },
   "ingredients": {
     "tomatoes": "Tomates",
@@ -150,5 +181,38 @@
     "edit": "Modifier",
     "close": "Fermer",
     "goToTop": "Retour en haut"
+  },
+  "notifications": {
+    "auth": {
+      "loginSuccess": "Connexion réussie! Bon retour, {name}!",
+      "registerSuccess": "Inscription réussie!",
+      "logoutSuccess": "Déconnexion réussie"
+    },
+    "profile": {
+      "updateSuccess": "Profil mis à jour avec succès",
+      "exportSuccess": "Données exportées avec succès",
+      "exportError": "Erreur lors de l'exportation des données"
+    },
+    "recipes": {
+      "generateSuccess": "Recette générée avec succès!",
+      "generateError": "Erreur lors de la génération de la recette",
+      "saveSuccess": "Recette ajoutée aux favoris",
+      "saveError": "Erreur lors de la sauvegarde de la recette",
+      "removeSuccess": "Recette supprimée des favoris",
+      "removeError": "Erreur lors de la suppression de la recette",
+      "shareSuccess": "Recette copiée dans le presse-papiers",
+      "loadError": "Erreur lors du chargement des recettes"
+    },
+    "camera": {
+      "ingredientsDetected": "{count} ingrédients détectés!",
+      "analysisError": "Erreur lors de l'analyse de l'image",
+      "permissionError": "Accès à la caméra refusé",
+      "detectSuccess": "Ingrédients détectés avec succès!",
+      "detectError": "Erreur lors de la détection des ingrédients"
+    },
+    "general": {
+      "error": "Une erreur s'est produite",
+      "success": "Opération réalisée avec succès"
+    }
   }
 }

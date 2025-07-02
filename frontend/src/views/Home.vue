@@ -69,12 +69,14 @@
           </div>
           <h3 class="text-lg font-medium text-gray-900 mb-2">No recipes yet</h3>
           <p class="text-gray-500 mb-4">Start by scanning your ingredients to generate your first recipe</p>
-          <BaseButton 
-            variant="primary"
-            @click="$router.push('/app/camera')"
-          >
-            Get Started
-          </BaseButton>
+          <div class="flex justify-center">
+            <BaseButton 
+              variant="primary"
+              @click="$router.push('/app/camera')"
+            >
+              Get Started
+            </BaseButton>
+          </div>
         </div>
       </div>
 
@@ -103,6 +105,7 @@
 import { useAuthStore } from '@/stores/auth'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
+import { userDataService } from '@/services/api'
 
 export default {
   name: 'HomePage',
@@ -116,20 +119,25 @@ export default {
   },
   data() {
     return {
-      recentItems: []
-      // In a real app, this would be loaded from an API
+      recentItems: [],
+      loading: false
     }
   },
   mounted() {
-    // Load recent activity from localStorage or API
     this.loadRecentActivity()
   },
   methods: {
-    loadRecentActivity() {
-      // Mock recent activity - in real app, this would come from an API
-      const stored = localStorage.getItem('recentActivity')
-      if (stored) {
-        this.recentItems = JSON.parse(stored)
+    async loadRecentActivity() {
+      this.loading = true
+      try {
+        // Load recent activity from database
+        this.recentItems = await userDataService.getRecentActivity()
+      } catch (error) {
+        console.error('Failed to load recent activity:', error)
+        // Fallback to empty array
+        this.recentItems = []
+      } finally {
+        this.loading = false
       }
     }
   }

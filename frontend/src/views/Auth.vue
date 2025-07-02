@@ -223,12 +223,14 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/ui/Button.vue'
 import BaseInput from '@/components/ui/Input.vue'
 
 const router = useRouter()
 const { t } = useI18n()
+const toast = useToast()
 const authStore = useAuthStore()
 
 // Reactive state
@@ -268,7 +270,7 @@ const switchTab = (tab) => {
 
 const handleLogin = async () => {
   loginErrors.value = {}
-  authStore.clearError()
+  authStore.clearMessages()
 
   // Basic validation
   if (!loginForm.value.email) {
@@ -282,13 +284,14 @@ const handleLogin = async () => {
 
   const result = await authStore.login(loginForm.value)
   if (result.success) {
+    toast.success(t('notifications.auth.loginSuccess', { name: result.user.name }))
     router.push('/app/home')
   }
 }
 
 const handleRegister = async () => {
   registerErrors.value = {}
-  authStore.clearError()
+  authStore.clearMessages()
 
   // Basic validation
   if (!registerForm.value.name) {
@@ -315,6 +318,7 @@ const handleRegister = async () => {
   })
   
   if (result.success) {
+    toast.success(t('notifications.auth.registerSuccess'))
     router.push('/app/home')
   }
 }
@@ -323,7 +327,7 @@ const handleRegister = async () => {
 watch(activeTab, () => {
   loginErrors.value = {}
   registerErrors.value = {}
-  authStore.clearError()
+  authStore.clearMessages()
 })
 </script>
 

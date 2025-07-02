@@ -158,11 +158,14 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
+import { ingredientService, userDataService } from '@/services/api'
 
 const router = useRouter()
 const { t } = useI18n()
+const toast = useToast()
 
 // Reactive state
 const stream = ref(null)
@@ -230,17 +233,22 @@ const processImage = async () => {
   detectedIngredients.value = []
 
   try {
-    // Simulate API call for ingredient detection
-    // In real app, this would call your backend API
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // Call backend API to detect ingredients
+    const response = await ingredientService.detectIngredients(capturedImage.value)
+    detectedIngredients.value = response.ingredients || []
     
-    // Mock detected ingredients
-    detectedIngredients.value = [
-      'Tomatoes', 'Onions', 'Garlic', 'Basil', 'Cheese'
-    ]
+    toast.success(t('notifications.camera.detectSuccess'))
   } catch (error) {
-    console.error('Image processing error:', error)
-    // Handle error
+    console.error('Ingredient detection error:', error)
+    toast.error(t('notifications.camera.detectError'))
+    
+    // Fallback to mock ingredients for demo
+    detectedIngredients.value = [
+      'Tomatoes',
+      'Onions', 
+      'Garlic',
+      'Basil'
+    ]
   } finally {
     processing.value = false
   }
@@ -260,7 +268,7 @@ const generateRecipe = async () => {
   
   try {
     // Store ingredients for recipe generation
-    localStorage.setItem('currentIngredients', JSON.stringify(detectedIngredients.value))
+    userDataService.setCurrentIngredients(detectedIngredients.value)
     
     // Navigate to recipes page
     router.push('/app/recipes')

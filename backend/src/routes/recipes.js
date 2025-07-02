@@ -8,6 +8,8 @@ const router = express.Router()
 // Generate recipe from ingredients
 router.post('/generate', authenticateToken, async (req, res) => {
   try {
+    console.log('Generate recipe request body:', JSON.stringify(req.body, null, 2))
+    
     const generateSchema = Joi.object({
       ingredients: Joi.array().items(Joi.string().trim()).min(1).required(),
       preferences: Joi.object({
@@ -20,6 +22,7 @@ router.post('/generate', authenticateToken, async (req, res) => {
 
     const { error, value } = generateSchema.validate(req.body)
     if (error) {
+      console.log('Validation error:', error.details)
       return res.status(400).json({
         error: 'Validation failed',
         details: error.details.map(detail => detail.message)
@@ -31,13 +34,21 @@ router.post('/generate', authenticateToken, async (req, res) => {
     // Simulate AI recipe generation
     await new Promise(resolve => setTimeout(resolve, 2000))
 
+    // Ensure we have at least one ingredient
+    if (!ingredients || ingredients.length === 0) {
+      return res.status(400).json({
+        error: 'At least one ingredient is required',
+        code: 'VALIDATION_ERROR'
+      })
+    }
+
     // Create mock recipe based on ingredients
-    const recipe = new Recipe({
-      title: `Delicious ${ingredients[0]} ${ingredients[1] || 'Dish'}`,
+    const recipeData = {
+      title: `Delicious ${ingredients[0]} ${ingredients[1] ? ingredients[1] : 'Dish'}`,
       description: `A wonderful recipe featuring ${ingredients.join(', ')} with perfect flavors and textures.`,
       ingredients: [
         ...ingredients.map((ing, index) => ({
-          name: ing,
+          name: ing.trim(),
           amount: index === 0 ? '2 cups' : '1 cup',
           unit: '',
           notes: ''
@@ -93,18 +104,33 @@ router.post('/generate', authenticateToken, async (req, res) => {
         cook: 25,
         total: 35
       },
-      servings: preferences.servings || 4,
-      difficulty: preferences.difficulty || 'medium',
-      cuisine: preferences.cuisine || 'other',
+      servings: Math.max(1, Math.min(20, preferences.servings || 4)), // Ensure within valid range
+      difficulty: ['easy', 'medium', 'hard'].includes(preferences.difficulty) ? preferences.difficulty : 'medium',
+      cuisine: ['italian', 'french', 'chinese', 'japanese', 'indian', 'mexican', 'american', 'mediterranean', 'other'].includes(preferences.cuisine) ? preferences.cuisine : 'other',
       tags: ['homemade', 'fresh', 'ai-generated'],
       generatedFrom: {
-        ingredients,
+        ingredients: ingredients.map(ing => ing.trim()),
         prompt: `Generate recipe with ${ingredients.join(', ')}`,
         aiModel: 'mock-ai'
       },
       createdBy: req.user._id,
       isPublic: false
-    })
+    }
+
+    // Create and validate the recipe
+    const recipe = new Recipe(recipeData)
+
+    // Validate before saving
+    try {
+      await recipe.validate()
+    } catch (validationError) {
+      console.error('Recipe validation failed:', validationError)
+      return res.status(400).json({
+        error: 'Recipe validation failed',
+        details: validationError.errors,
+        code: 'VALIDATION_ERROR'
+      })
+    }
 
     await recipe.save()
 
@@ -117,6 +143,24 @@ router.post('/generate', authenticateToken, async (req, res) => {
     })
   } catch (error) {
     console.error('Recipe generation error:', error)
+    
+    // More detailed error response
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        error: 'Recipe validation failed',
+        details: error.errors,
+        code: 'VALIDATION_ERROR'
+      })
+    }
+
+    if (error.code === 121) { // MongoDB validation error
+      return res.status(400).json({
+        error: 'Document validation failed',
+        details: error.errInfo?.details || 'Invalid document structure',
+        code: 'DOCUMENT_VALIDATION_ERROR'
+      })
+    }
+
     res.status(500).json({
       error: 'Failed to generate recipe',
       code: 'GENERATION_ERROR'

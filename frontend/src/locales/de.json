@@ -30,6 +30,39 @@
     "saved": "Gespeichert",
     "profile": "Profil"
   },
+  "notifications": {
+    "auth": {
+      "loginSuccess": "Anmeldung erfolgreich! Willkommen zurück, {name}!",
+      "registerSuccess": "Registrierung erfolgreich abgeschlossen!",
+      "logoutSuccess": "Abmeldung erfolgreich"
+    },
+    "profile": {
+      "updateSuccess": "Profil erfolgreich aktualisiert",
+      "exportSuccess": "Daten erfolgreich exportiert",
+      "exportError": "Fehler beim Exportieren der Daten"
+    },
+    "recipes": {
+      "generateSuccess": "Rezept erfolgreich generiert!",
+      "generateError": "Fehler beim Generieren des Rezepts",
+      "saveSuccess": "Rezept zu Favoriten hinzugefügt",
+      "saveError": "Fehler beim Speichern des Rezepts",
+      "removeSuccess": "Rezept aus Favoriten entfernt",
+      "removeError": "Fehler beim Entfernen des Rezepts",
+      "shareSuccess": "Rezept in Zwischenablage kopiert",
+      "loadError": "Fehler beim Laden der Rezepte"
+    },
+    "camera": {
+      "ingredientsDetected": "{count} Zutaten erkannt!",
+      "analysisError": "Fehler bei der Bildanalyse",
+      "permissionError": "Kamera-Zugriff verweigert",
+      "detectSuccess": "Zutaten erfolgreich erkannt!",
+      "detectError": "Fehler beim Erkennen der Zutaten"
+    },
+    "general": {
+      "error": "Ein Fehler ist aufgetreten",
+      "success": "Vorgang erfolgreich abgeschlossen"
+    }
+  },
   "landing": {
     "nav": {
       "features": "Funktionen",
@@ -123,12 +156,43 @@
   },
   "recipes": {
     "title": "Ihre Rezepte",
+    "subtitle": "Köstliche Rezepte basierend auf Ihren Zutaten",
+    "currentIngredients": "Aktuelle Zutaten",
     "generate": "Rezept generieren",
     "ingredients": "Zutaten",
     "instructions": "Anweisungen",
     "cookingTime": "Kochzeit",
-    "difficulty": "Schwierigkeit",
-    "save": "Rezept speichern"
+    "minutes": "Min",
+    "servings": "Portionen",
+    "calories": "Kalorien",
+    "difficulty": {
+      "label": "Schwierigkeit",
+      "easy": "Einfach",
+      "medium": "Mittel",
+      "hard": "Schwer"
+    },
+    "viewRecipe": "Rezept ansehen",
+    "saved": "Gespeichert",
+    "filters": {
+      "all": "Alle",
+      "quick": "Schnell (< 30 Min)",
+      "easy": "Einfach",
+      "vegetarian": "Vegetarisch",
+      "healthy": "Gesund"
+    },
+    "tags": {
+      "vegetarian": "Vegetarisch",
+      "vegan": "Vegan",
+      "gluten-free": "Glutenfrei",
+      "healthy": "Gesund",
+      "quick": "Schnell",
+      "easy": "Einfach"
+    },
+    "empty": {
+      "title": "Noch keine Rezepte",
+      "subtitle": "Beginnen Sie mit dem Scannen von Zutaten, um Ihr erstes Rezept zu generieren!",
+      "action": "Zutaten scannen"
+    }
   },
   "ingredients": {
     "tomatoes": "Tomaten",
