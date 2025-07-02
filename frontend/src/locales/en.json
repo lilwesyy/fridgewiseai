@@ -1,0 +1,154 @@
+{
+  "app": {
+    "name": "FridgeWiseAI",
+    "tagline": "Turn your ingredients into amazing recipes with AI"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginSuccess": "Login successful!",
+    "registerSuccess": "Registration successful!",
+    "backToHome": "Back to Home",
+    "validation": {
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required",
+      "nameRequired": "Name is required",
+      "passwordsDoNotMatch": "Passwords do not match"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "camera": "Camera",
+    "recipes": "Recipes",
+    "saved": "Saved",
+    "profile": "Profile"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How It Works",
+      "about": "About",
+      "getStarted": "Get Started"
+    },
+    "hero": {
+      "badge": "New! AI-Powered",
+      "title": "Smart Recipes from Your",
+      "titleHighlight": "Ingredients",
+      "subtitle": "Take a photo of your fridge and get personalized AI recipes instantly. Transform leftovers into extraordinary dishes.",
+      "cta": "Start Free",
+      "demo": "Watch Demo"
+    },
+    "stats": {
+      "recipes": "Recipes",
+      "accuracy": "Accuracy",
+      "users": "Users"
+    },
+    "features": {
+      "title": "Amazing Features",
+      "subtitle": "Discover how FridgeWise AI revolutionizes the way you cook",
+      "recognize": {
+        "title": "Smart Recognition",
+        "description": "Advanced AI recognizes ingredients from photos with 95% accuracy"
+      },
+      "recipes": {
+        "title": "Personalized Recipes",
+        "description": "Get recipes tailored to your ingredients, diet, and culinary preferences"
+      },
+      "save": {
+        "title": "Save Favorites",
+        "description": "Build your personal collection of favorite recipes and access them anywhere"
+      },
+      "zeroWaste": {
+        "title": "Zero Waste",
+        "description": "Reduce food waste by using everything you have in your fridge"
+      },
+      "multilang": {
+        "title": "Multi-language",
+        "description": "Available in Italian, English, French, and German"
+      },
+      "offline": {
+        "title": "Offline Mode",
+        "description": "Access your saved recipes even without internet connection"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Three simple steps to transform your ingredients into delicious dishes",
+      "step1": {
+        "title": "Take a Photo",
+        "description": "Photograph the ingredients you have available"
+      },
+      "step2": {
+        "title": "AI Analyzes",
+        "description": "Our AI automatically recognizes and categorizes ingredients"
+      },
+      "step3": {
+        "title": "Get Recipes",
+        "description": "Receive personalized recipes and start cooking"
+      }
+    },
+    "cta": {
+      "title": "Ready to Transform Your Kitchen?",
+      "subtitle": "Join thousands of users who have already discovered the magic of AI in cooking",
+      "button": "Start Your Culinary Adventure"
+    },
+    "footer": {
+      "description": "FridgeWise AI helps you cook intelligently, reducing waste and discovering new recipes with ingredients you already have.",
+      "quickLinks": "Quick Links",
+      "support": "Support",
+      "help": "Help",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "pricing": "Pricing",
+      "rights": "All rights reserved.",
+      "madeWith": "Made with",
+      "location": "in Italy"
+    }
+  },
+  "camera": {
+    "title": "Scan Ingredients",
+    "capture": "Capture Photo",
+    "retake": "Retake",
+    "confirm": "Confirm",
+    "scanning": "Scanning ingredients...",
+    "permissionDenied": "Camera permission denied"
+  },
+  "recipes": {
+    "title": "Your Recipes",
+    "generate": "Generate Recipe",
+    "ingredients": "Ingredients",
+    "instructions": "Instructions",
+    "cookingTime": "Cooking Time",
+    "difficulty": "Difficulty",
+    "save": "Save Recipe"
+  },
+  "ingredients": {
+    "tomatoes": "Tomatoes",
+    "cheese": "Cheese",
+    "basil": "Basil"
+  },
+  "recipe": {
+    "suggested": "Suggested Recipe:",
+    "aiMagic": "AI Magic",
+    "pizzaMargherita": "Margherita Pizza"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "tryAgain": "Try Again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "goToTop": "Go to Top"
+  }
+}

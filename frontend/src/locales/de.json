@@ -1,0 +1,154 @@
+{
+  "app": {
+    "name": "FridgeWiseAI",
+    "tagline": "Verwandle deine Zutaten mit KI in fantastische Rezepte"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "name": "Name",
+    "confirmPassword": "Passwort bestätigen",
+    "forgotPassword": "Passwort vergessen?",
+    "dontHaveAccount": "Haben Sie noch kein Konto?",
+    "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
+    "loginSuccess": "Anmeldung erfolgreich!",
+    "registerSuccess": "Registrierung erfolgreich!",
+    "backToHome": "Zurück zur Startseite",
+    "validation": {
+      "emailRequired": "E-Mail ist erforderlich",
+      "passwordRequired": "Passwort ist erforderlich",
+      "nameRequired": "Name ist erforderlich",
+      "passwordsDoNotMatch": "Passwörter stimmen nicht überein"
+    }
+  },
+  "navigation": {
+    "home": "Startseite",
+    "camera": "Kamera",
+    "recipes": "Rezepte",
+    "saved": "Gespeichert",
+    "profile": "Profil"
+  },
+  "landing": {
+    "nav": {
+      "features": "Funktionen",
+      "howItWorks": "Wie es Funktioniert",
+      "about": "Über uns",
+      "getStarted": "Loslegen"
+    },
+    "hero": {
+      "badge": "Neu! KI-betrieben",
+      "title": "Intelligente Rezepte aus Ihren",
+      "titleHighlight": "Zutaten",
+      "subtitle": "Fotografieren Sie Ihren Kühlschrank und erhalten Sie sofort personalisierte KI-Rezepte. Verwandeln Sie Reste in außergewöhnliche Gerichte.",
+      "cta": "Kostenlos Starten",
+      "demo": "Demo Ansehen"
+    },
+    "stats": {
+      "recipes": "Rezepte",
+      "accuracy": "Genauigkeit",
+      "users": "Nutzer"
+    },
+    "features": {
+      "title": "Erstaunliche Funktionen",
+      "subtitle": "Entdecken Sie, wie FridgeWise AI Ihre Art zu kochen revolutioniert",
+      "recognize": {
+        "title": "Intelligente Erkennung",
+        "description": "Fortgeschrittene KI erkennt Zutaten aus Fotos mit 95% Genauigkeit"
+      },
+      "recipes": {
+        "title": "Personalisierte Rezepte",
+        "description": "Erhalten Sie Rezepte, die auf Ihre Zutaten, Diät und kulinarischen Vorlieben zugeschnitten sind"
+      },
+      "save": {
+        "title": "Favoriten Speichern",
+        "description": "Erstellen Sie Ihre persönliche Sammlung von Lieblingsrezepten und greifen Sie überall darauf zu"
+      },
+      "zeroWaste": {
+        "title": "Null Verschwendung",
+        "description": "Reduzieren Sie Lebensmittelverschwendung, indem Sie alles verwenden, was Sie im Kühlschrank haben"
+      },
+      "multilang": {
+        "title": "Mehrsprachig",
+        "description": "Verfügbar auf Italienisch, Englisch, Französisch und Deutsch"
+      },
+      "offline": {
+        "title": "Offline-Modus",
+        "description": "Greifen Sie auf Ihre gespeicherten Rezepte auch ohne Internetverbindung zu"
+      }
+    },
+    "howItWorks": {
+      "title": "Wie es Funktioniert",
+      "subtitle": "Drei einfache Schritte, um Ihre Zutaten in köstliche Gerichte zu verwandeln",
+      "step1": {
+        "title": "Foto Aufnehmen",
+        "description": "Fotografieren Sie die verfügbaren Zutaten"
+      },
+      "step2": {
+        "title": "KI Analysiert",
+        "description": "Unsere KI erkennt und kategorisiert automatisch die Zutaten"
+      },
+      "step3": {
+        "title": "Rezepte Erhalten",
+        "description": "Erhalten Sie personalisierte Rezepte und beginnen Sie zu kochen"
+      }
+    },
+    "cta": {
+      "title": "Bereit, Ihre Küche zu Verwandeln?",
+      "subtitle": "Schließen Sie sich Tausenden von Nutzern an, die bereits die Magie der KI beim Kochen entdeckt haben",
+      "button": "Starten Sie Ihr Kulinarisches Abenteuer"
+    },
+    "footer": {
+      "description": "FridgeWise AI hilft Ihnen intelligent zu kochen, Verschwendung zu reduzieren und neue Rezepte mit den Zutaten zu entdecken, die Sie bereits haben.",
+      "quickLinks": "Schnelllinks",
+      "support": "Support",
+      "help": "Hilfe",
+      "contact": "Kontakt",
+      "privacy": "Datenschutz",
+      "terms": "Bedingungen",
+      "pricing": "Preise",
+      "rights": "Alle Rechte vorbehalten.",
+      "madeWith": "Gemacht mit",
+      "location": "in Italien"
+    }
+  },
+  "camera": {
+    "title": "Zutaten scannen",
+    "capture": "Foto aufnehmen",
+    "retake": "Wiederholen",
+    "confirm": "Bestätigen",
+    "scanning": "Zutaten werden gescannt...",
+    "permissionDenied": "Kamera-Berechtigung verweigert"
+  },
+  "recipes": {
+    "title": "Ihre Rezepte",
+    "generate": "Rezept generieren",
+    "ingredients": "Zutaten",
+    "instructions": "Anweisungen",
+    "cookingTime": "Kochzeit",
+    "difficulty": "Schwierigkeit",
+    "save": "Rezept speichern"
+  },
+  "ingredients": {
+    "tomatoes": "Tomaten",
+    "cheese": "Käse",
+    "basil": "Basilikum"
+  },
+  "recipe": {
+    "suggested": "Vorgeschlagenes Rezept:",
+    "aiMagic": "KI-Magie",
+    "pizzaMargherita": "Pizza Margherita"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "tryAgain": "Erneut versuchen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "goToTop": "Nach oben"
+  }
+}

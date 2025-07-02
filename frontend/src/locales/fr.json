@@ -1,0 +1,154 @@
+{
+  "app": {
+    "name": "FridgeWiseAI",
+    "tagline": "Transformez vos ingrédients en recettes fantastiques avec l'IA"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "email": "Email",
+    "password": "Mot de passe",
+    "name": "Nom",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "loginSuccess": "Connexion réussie !",
+    "registerSuccess": "Inscription réussie !",
+    "backToHome": "Retour à l'accueil",
+    "validation": {
+      "emailRequired": "L'email est requis",
+      "passwordRequired": "Le mot de passe est requis",
+      "nameRequired": "Le nom est requis",
+      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas"
+    }
+  },
+  "navigation": {
+    "home": "Accueil",
+    "camera": "Caméra",
+    "recipes": "Recettes",
+    "saved": "Sauvegardées",
+    "profile": "Profil"
+  },
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment Ça Marche",
+      "about": "À Propos",
+      "getStarted": "Commencer"
+    },
+    "hero": {
+      "badge": "Nouveau! Alimenté par IA",
+      "title": "Recettes Intelligentes à partir de vos",
+      "titleHighlight": "Ingrédients",
+      "subtitle": "Prenez une photo de votre frigo et obtenez des recettes IA personnalisées instantanément. Transformez les restes en plats extraordinaires.",
+      "cta": "Commencer Gratuitement",
+      "demo": "Voir la Démo"
+    },
+    "stats": {
+      "recipes": "Recettes",
+      "accuracy": "Précision",
+      "users": "Utilisateurs"
+    },
+    "features": {
+      "title": "Fonctionnalités Incroyables",
+      "subtitle": "Découvrez comment FridgeWise AI révolutionne votre façon de cuisiner",
+      "recognize": {
+        "title": "Reconnaissance Intelligente",
+        "description": "L'IA avancée reconnaît les ingrédients à partir des photos avec 95% de précision"
+      },
+      "recipes": {
+        "title": "Recettes Personnalisées",
+        "description": "Obtenez des recettes adaptées à vos ingrédients, régime et préférences culinaires"
+      },
+      "save": {
+        "title": "Sauvegarder les Favoris",
+        "description": "Créez votre collection personnelle de recettes favorites et accédez-y partout"
+      },
+      "zeroWaste": {
+        "title": "Zéro Gaspillage",
+        "description": "Réduisez le gaspillage alimentaire en utilisant tout ce que vous avez dans votre frigo"
+      },
+      "multilang": {
+        "title": "Multi-langues",
+        "description": "Disponible en italien, anglais, français et allemand"
+      },
+      "offline": {
+        "title": "Mode Hors Ligne",
+        "description": "Accédez à vos recettes sauvegardées même sans connexion internet"
+      }
+    },
+    "howItWorks": {
+      "title": "Comment Ça Marche",
+      "subtitle": "Trois étapes simples pour transformer vos ingrédients en plats délicieux",
+      "step1": {
+        "title": "Prenez une Photo",
+        "description": "Photographiez les ingrédients que vous avez disponibles"
+      },
+      "step2": {
+        "title": "L'IA Analyse",
+        "description": "Notre IA reconnaît et catégorise automatiquement les ingrédients"
+      },
+      "step3": {
+        "title": "Recevez des Recettes",
+        "description": "Recevez des recettes personnalisées et commencez à cuisiner"
+      }
+    },
+    "cta": {
+      "title": "Prêt à Transformer Votre Cuisine?",
+      "subtitle": "Rejoignez des milliers d'utilisateurs qui ont déjà découvert la magie de l'IA en cuisine",
+      "button": "Commencez Votre Aventure Culinaire"
+    },
+    "footer": {
+      "description": "FridgeWise AI vous aide à cuisiner intelligemment, en réduisant le gaspillage et en découvrant de nouvelles recettes avec les ingrédients que vous avez déjà.",
+      "quickLinks": "Liens Rapides",
+      "support": "Support",
+      "help": "Aide",
+      "contact": "Contact",
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "pricing": "Tarifs",
+      "rights": "Tous droits réservés.",
+      "madeWith": "Fait avec",
+      "location": "en Italie"
+    }
+  },
+  "camera": {
+    "title": "Scanner les Ingrédients",
+    "capture": "Prendre une Photo",
+    "retake": "Reprendre",
+    "confirm": "Confirmer",
+    "scanning": "Scan des ingrédients...",
+    "permissionDenied": "Permission de caméra refusée"
+  },
+  "recipes": {
+    "title": "Vos Recettes",
+    "generate": "Générer une Recette",
+    "ingredients": "Ingrédients",
+    "instructions": "Instructions",
+    "cookingTime": "Temps de Cuisson",
+    "difficulty": "Difficulté",
+    "save": "Sauvegarder la Recette"
+  },
+  "ingredients": {
+    "tomatoes": "Tomates",
+    "cheese": "Fromage",
+    "basil": "Basilic"
+  },
+  "recipe": {
+    "suggested": "Recette Suggérée:",
+    "aiMagic": "Magie IA",
+    "pizzaMargherita": "Pizza Margherita"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "tryAgain": "Réessayer",
+    "cancel": "Annuler",
+    "save": "Sauvegarder",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "goToTop": "Retour en haut"
+  }
+}

@@ -1,0 +1,370 @@
+INSTRUCTIONS.TXT - FRIDGEWISEAI
+
+=== COSA FAREMO ===
+App mobile per riconoscere ingredienti da foto e generare ricette AI
+- Frontend: Vue.js + Tailwind CSS
+- Backend: Node.js + Express + MongoDB
+- Auth: Registrazione obbligatoria
+- Design: Mobile-first
+
+=== STEP 1 - INSTALLAZIONI ===
+
+1. Scarica Node.js 18+ da nodejs.org
+2. Verifica: apri terminale, scrivi "node --version"
+3. Crea account MongoDB Atlas gratuito su cloud.mongodb.com
+4. Installa VS Code o editor preferito
+
+=== STEP 2 - SETUP PROGETTO ===
+
+1. Crea cartella "fridgewiseai" sul desktop
+2. Apri terminale in quella cartella
+3. Scrivi: mkdir backend frontend
+4. cd backend
+5. npm init -y
+6. npm install express mongoose cors bcryptjs jsonwebtoken joi multer axios dotenv
+7. npm install -D nodemon
+8. mkdir -p src/controllers src/models src/routes src/middleware src/services
+9. cd ../frontend
+10. npm create vue@latest . -- --router --pinia
+11. npm install axios vue-i18n tailwindcss postcss autoprefixer
+12. npx tailwindcss init -p
+13. mkdir -p src/components/ui src/components/auth src/components/camera src/stores
+
+=== STEP 3 - CONFIGURAZIONE ===
+
+Backend - Crea file backend/.env:
+NODE_ENV=development
+PORT=3000
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/fridgewiseai
+JWT_SECRET=chiave-segreta-molto-lunga-32-caratteri-minimo
+
+Frontend - Crea file frontend/.env:
+VITE_API_BASE_URL=http://localhost:3000/api
+VITE_APP_NAME=FridgeWiseAI
+
+=== STEP 4 - DATABASE ===
+
+1. Vai su MongoDB Atlas
+2. Crea cluster gratuito M0
+3. Crea database "fridgewiseai"
+4. Crea utente database
+5. Copia connection string nell'env
+
+=== STEP 5 - BACKEND BASE ===
+
+Crea backend/src/app.js:
+- Setup Express
+- Middleware CORS, helmet, morgan
+- Connessione MongoDB
+- Routes setup
+
+Crea backend/src/server.js:
+- Import app.js
+- Listen su porta 3000
+
+Modifica backend/package.json scripts:
+"dev": "nodemon src/server.js"
+"start": "node src/server.js"
+
+=== STEP 6 - AUTENTICAZIONE ===
+
+Crea backend/src/models/User.js:
+- Schema utente con email, password, nome
+- Hash password con bcrypt
+
+Crea backend/src/controllers/authController.js:
+- register: crea nuovo utente
+- login: verifica credenziali, ritorna JWT
+- getMe: ritorna dati utente corrente
+
+Crea backend/src/routes/auth.js:
+- POST /register
+- POST /login  
+- GET /me
+
+Crea backend/src/middleware/auth.js:
+- Verifica JWT token
+- Protegge routes
+
+=== STEP 7 - FRONTEND AUTH ===
+
+Crea frontend/src/stores/auth.js:
+- State: user, token, isAuthenticated
+- Actions: login, register, logout
+- Persisti token in localStorage
+
+Crea frontend/src/components/auth/LoginForm.vue:
+- Form email/password
+- Chiamata API login
+- Redirect dopo login
+
+Crea frontend/src/components/auth/RegisterForm.vue:
+- Form registrazione completa
+- Validazione frontend
+
+Crea frontend/src/views/Auth.vue:
+- Toggle login/register
+- Design mobile-first
+
+=== STEP 8 - DESIGN SYSTEM ===
+
+Configura frontend/tailwind.config.js:
+- Colori custom brand
+- Breakpoints mobile
+- Components utilities
+
+Crea frontend/src/styles/main.css:
+- Import Tailwind
+- Stili base mobile
+- Safe areas iOS
+
+Crea frontend/src/components/ui/Button.vue:
+- Bottoni mobile (min 44px)
+- Varianti primary/secondary
+
+Crea frontend/src/components/ui/Input.vue:
+- Input mobile-friendly
+- Stati focus/error
+
+=== STEP 9 - LAYOUT MOBILE ===
+
+Crea frontend/src/components/layout/MobileHeader.vue:
+- Header fisso con logo
+- Safe area iOS
+
+Crea frontend/src/components/layout/BottomNavigation.vue:
+- Tab bar fisso bottom
+- 5 tab: Home, Camera, Recipes, Saved, Profile
+
+Crea frontend/src/layouts/AuthenticatedLayout.vue:
+- Combina header + content + bottom nav
+- Router outlet
+
+=== STEP 10 - LANDING PAGE ===
+
+Crea frontend/src/components/landing/Hero.vue:
+- Hero mobile con CTA
+- Video demo app
+
+Crea frontend/src/components/landing/Features.vue:
+- Carousel features swipeable
+- Animazioni
+
+Crea frontend/src/views/Landing.vue:
+- Landing pubblica
+- Solo illustrativa
+
+=== STEP 11 - ROUTER GUARDS ===
+
+Configura frontend/src/router/index.js:
+- Route pubbliche: /, /auth
+- Route protette: /app/*
+- Auth guards globali
+- Redirect se non autenticato
+
+=== STEP 12 - CAMERA SETUP ===
+
+Setup RAM API:
+1. docker run -p 3001:3000 mnahkies/recognize-anything-api
+2. Testa: curl http://localhost:3001/health
+
+Crea backend/src/services/ramService.js:
+- Connessione RAM API
+- Upload foto e analisi
+- Fallback OpenRouter
+
+Crea backend/src/controllers/ingredientController.js:
+- POST /ingredients/detect
+- Elabora foto, ritorna ingredienti
+
+=== STEP 13 - FRONTEND CAMERA ===
+
+Crea frontend/src/components/camera/CameraCapture.vue:
+- Access camera native
+- Capture foto full-screen
+- Gestione permessi
+
+Crea frontend/src/components/camera/ImagePreview.vue:
+- Preview foto scattata
+- Conferma/rifai
+
+Crea frontend/src/components/camera/Results.vue:
+- Lista ingredienti trovati
+- Edit manuale
+
+Crea frontend/src/views/Camera.vue:
+- Flow completo camera
+
+=== STEP 14 - RICETTE AI ===
+
+Crea backend/src/models/Recipe.js:
+- Schema ricetta completa
+- Multilingua
+
+Crea backend/src/services/recipeGenerator.js:
+- Connessione OpenRouter
+- Prompt engineering
+- Parsing risposte AI
+
+Crea backend/src/controllers/recipeController.js:
+- POST /recipes/generate
+- Filtri difficoltà/tempo
+
+Crea frontend/src/components/recipes/RecipeCard.vue:
+- Card mobile con swipe actions
+- Design moderno
+
+Crea frontend/src/views/Recipes.vue:
+- Lista ricette generate
+- Filtri mobile
+
+=== STEP 15 - RICETTE SALVATE ===
+
+Crea backend/src/models/SavedRecipe.js:
+- Link user-recipe
+- Note personali, rating
+
+Crea backend/src/controllers/savedController.js:
+- CRUD ricette salvate
+- Organizzazione collezione
+
+Crea frontend/src/components/saved/Collection.vue:
+- Grid ricette salvate
+- Search e filtri
+
+Crea frontend/src/views/SavedRecipes.vue:
+- Collezione completa
+
+=== STEP 16 - NOTIFICHE ===
+
+Crea backend/src/models/Notification.js:
+- Notifiche persistenti
+- Tipo, stato, messaggio
+
+Crea frontend/src/components/ui/Toast.vue:
+- Notifiche popup
+- Slide animations
+
+Integra notifiche in app:
+- Salvataggio ricette
+- Errori/successi
+
+=== STEP 17 - DONAZIONI PAYPAL ===
+
+Setup PayPal:
+1. Account PayPal Developer
+2. Crea app sandbox
+3. Client ID e Secret
+
+Crea backend/src/services/paypalService.js:
+- Integrazione PayPal API
+- Webhook handling
+
+Crea backend/src/models/Donation.js:
+- Tracking donazioni
+- Badge sistema
+
+Crea frontend/src/components/donation/Modal.vue:
+- UI donazioni mobile
+- PayPal integration
+
+=== STEP 18 - PWA ===
+
+Crea frontend/public/manifest.json:
+- App metadata
+- Icons set
+
+Crea frontend/public/sw.js:
+- Cache offline
+- Background sync
+
+Configura PWA in Vite:
+- Auto-generate service worker
+- Add to home screen
+
+=== STEP 19 - MULTILINGUA ===
+
+Setup Vue I18n:
+- Configurazione main.js
+- Language detector
+
+Crea frontend/src/locales/:
+- en.json, it.json, fr.json, de.json
+- Tutte le traduzioni
+
+Crea backend/src/locales/:
+- Traduzioni server-side
+- Error messages
+
+=== STEP 20 - TESTING ===
+
+Test backend:
+1. npm test
+2. Test API con Postman
+3. Test auth flow
+
+Test frontend:
+1. npm run build
+2. Test su mobile reale
+3. Test offline mode
+
+=== STEP 21 - DEPLOY ===
+
+Opzione A - DigitalOcean:
+1. Droplet 4GB
+2. Docker setup
+3. Domain + SSL
+
+Opzione B - Railway + Vercel:
+1. Backend su Railway
+2. Frontend su Vercel
+3. Env variables
+
+Prep deploy:
+1. Build produzione
+2. Env variables setup
+3. Database backup
+
+=== STEP 22 - MONITORAGGIO ===
+
+Setup analytics:
+1. Error tracking
+2. Performance monitoring
+3. User behavior
+
+Post-launch:
+1. User feedback
+2. Bug fixes
+3. Feature iterations
+
+=== ORDINE IMPLEMENTAZIONE ===
+
+Settimana 1: Step 1-7 (Setup + Auth)
+Settimana 2: Step 8-11 (Design + Landing)
+Settimana 3: Step 12-14 (Camera + AI)
+Settimana 4: Step 15-17 (Saved + Donazioni)
+Settimana 5: Step 18-19 (PWA + i18n)
+Settimana 6: Step 20-21 (Test + Deploy)
+Settimana 7: Step 22 (Monitoring)
+
+TOTALE: 7 settimane per MVP completo
+
+=== BUDGET MENSILE ===
+- MongoDB Atlas: €0 (gratuito)
+- DigitalOcean: €20/mese
+- Dominio: €12/anno
+- PayPal: 2.9% commissioni
+- TOTALE: €20-30/mese
+
+=== REVENUE TARGET ===
+- 1000 utenti/mese
+- 3% donation rate = 30 donazioni
+- €15 media donazione
+- €450 revenue/mese
+- €420 profit/mese
+
+SUCCESS METRICS:
+- 95% mobile usage
+- 25% landing conversion
+- 85% onboarding completion
+- €500+ revenue/mese entro 6 mesi
