@@ -1,110 +1,233 @@
 <template>
-  <AuthenticatedLayout>
-    <div class="h-full flex flex-col">
-      <!-- Safari Ask permission overlay -->
-      <div v-if="isAskPermission" class="absolute inset-0 flex items-center justify-center px-4 bg-white">
-        <div class="text-center max-w-sm mx-auto">
-          <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+  <AuthenticatedLayout :show-header="false" :show-navigation="true">
+    <div class="fixed inset-0 flex flex-col relative overflow-hidden bg-black z-30">
+      <!-- Loading State -->
+      <div v-if="isRequestingPermission" class="absolute inset-0 flex items-center justify-center bg-white z-50">
+        <button 
+          @click="goBack"
+          class="absolute top-4 left-4 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center transition-all active:scale-95"
+        >
+          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Inizializzazione Camera</h3>
+          <p class="text-gray-600">Attendere prego...</p>
+        </div>
+      </div>
+
+      <!-- Permission Denied -->
+      <div v-if="permissionDenied" class="absolute inset-0 flex items-center justify-center bg-white z-50 overflow-y-auto">
+        <button 
+          @click="goBack"
+          class="absolute top-4 left-4 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center transition-all active:scale-95 z-10"
+        >
+          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        
+        <div class="text-center max-w-lg mx-auto px-6 py-8">
+          <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ t('camera.needPermission') || 'Camera Access Required' }}</h3>
-          <p class="text-gray-600 mb-6">{{ t('camera.safariAskMode') || 'Safari is set to ask for permission each time. Please click the button below and then allow camera access when prompted.' }}</p>
           
-          <div class="flex justify-center">
-            <BaseButton variant="primary" @click="triggerSafariPermissionPrompt">
-              {{ t('camera.enableCamera') || 'Enable Camera' }}
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Accesso Camera Limitato</h3>
+          <p class="text-gray-600 mb-6">{{ cameraError }}</p>
+          
+          <!-- iOS Fallback Notice -->
+          <div v-if="deviceInfo.isIOS" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center mb-2">
+              <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="font-semibold text-green-800">Soluzione Alternativa Disponibile</span>
+            </div>
+            <p class="text-green-700 text-sm">
+              Puoi comunque scattare foto usando il pulsante <strong>"📷 Scatta Foto con Camera iPhone"</strong> qui sotto. Questo aprirà direttamente la camera del tuo iPhone per scattare una foto.
+            </p>
+          </div>
+          
+          <!-- iOS specific instructions -->
+          <div v-if="deviceInfo.isIOS" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+            <h4 class="font-semibold text-blue-900 mb-3 flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              Istruzioni per iPhone
+            </h4>
+            <div class="space-y-3 text-sm text-blue-800">
+              <div class="flex items-start">
+                <span class="font-semibold mr-2">1.</span>
+                <span>Vai su <strong>Impostazioni</strong> > <strong>Safari</strong></span>
+              </div>
+              <div class="flex items-start">
+                <span class="font-semibold mr-2">2.</span>
+                <span>Scorri fino a "Privacy e sicurezza"</span>
+              </div>
+              <div class="flex items-start">
+                <span class="font-semibold mr-2">3.</span>
+                <span>Attiva <strong>Camera</strong> ✅</span>
+              </div>
+              <div class="flex items-start">
+                <span class="font-semibold mr-2">4.</span>
+                <span>Vai su <strong>Impostazioni</strong> > <strong>Privacy e sicurezza</strong> > <strong>Camera</strong></span>
+              </div>
+              <div class="flex items-start">
+                <span class="font-semibold mr-2">5.</span>
+                <span>Attiva <strong>Safari</strong> ✅</span>
+              </div>
+              <div class="flex items-start">
+                <span class="font-semibold mr-2">6.</span>
+                <span>Torna su Safari e ricarica la pagina</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="space-y-3">
+            <!-- iOS Camera Capture Button -->
+            <BaseButton v-if="deviceInfo.isIOS" variant="primary" full-width @click="openCameraCapture">
+              📷 Scatta Foto con Camera iPhone
+            </BaseButton>
+            <!-- iOS Force Camera Button -->
+            <BaseButton v-if="deviceInfo.isIOS && deviceInfo.hasMediaDevices" variant="primary" full-width @click="forceIOSCameraRequest">
+              🚀 Forza Accesso Camera iOS
+            </BaseButton>
+            <BaseButton variant="primary" full-width @click="requestPermission">
+              {{ deviceInfo.isIOS ? 'Prova Dopo Aver Cambiato Impostazioni' : 'Riprova' }}
+            </BaseButton>
+            <BaseButton variant="secondary" full-width @click="testCameraPermissions" v-if="deviceInfo.isIOS">
+              Testa Permessi Camera
+            </BaseButton>
+            <BaseButton variant="secondary" full-width @click="openGallery">
+              Carica da Galleria
+            </BaseButton>
+            <BaseButton v-if="deviceInfo.isIOS" variant="outline" full-width @click="openIOSSettings">
+              Apri Impostazioni iPhone
             </BaseButton>
           </div>
         </div>
       </div>
 
       <!-- Camera View -->
-      <div v-if="!capturedImage && !permissionDenied && !isAskPermission" class="flex-1 relative bg-black">
+      <div v-if="!capturedImage && !permissionDenied" class="absolute inset-0">
         <video 
           ref="videoElement"
           autoplay
-          playsinline="true"
+          playsinline
           muted
-          webkit-playsinline="true"
-          x-webkit-airplay="allow"
-          playsInline
-          disablePictureInPicture
-          class="w-full h-full object-cover"
-          @loadedmetadata="onVideoLoaded"
+          class="absolute inset-0 w-full h-full object-cover"
+          style="background: #000;"
+          :style="{ visibility: isStreamActive ? 'visible' : 'hidden' }"
         ></video>
         
-        <!-- Camera overlay for mobile full screen -->
-        <div class="absolute inset-0 flex flex-col">
-          <!-- Minimal top overlay -->
-          <div class="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/50 to-transparent p-4">
-            <div class="text-white text-center">
-              <h2 class="text-lg font-semibold">{{ t('camera.title') }}</h2>
+        <!-- Show loading overlay if stream not active yet -->
+        <div v-if="!isStreamActive || isRequestingPermission" class="absolute inset-0 flex items-center justify-center bg-black">
+          <div class="text-center px-6">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <h3 class="text-lg font-semibold text-white mb-2">{{ isRequestingPermission ? 'Inizializzazione Camera' : 'Avvio Camera' }}</h3>
+            <p class="text-gray-300 mb-6">{{ isRequestingPermission ? 'Attendere prego...' : 'Connessione in corso...' }}</p>
+            
+            <!-- iOS fallback option during loading -->
+            <div v-if="deviceInfo.isIOS && !isRequestingPermission" class="space-y-3">
+              <p class="text-sm text-gray-400 mb-3">Problemi con la camera? Prova l'alternativa:</p>
+              <BaseButton variant="primary" @click="openCameraCapture" class="bg-white/20 border-white/30 text-white hover:bg-white/30">
+                📷 Scatta Foto con Camera iPhone
+              </BaseButton>
+              <BaseButton variant="secondary" @click="openGallery" class="bg-transparent border-white/30 text-white hover:bg-white/10">
+                🖼️ Carica da Galleria
+              </BaseButton>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Camera Controls Overlay - only show when stream is active -->
+        <div v-if="isStreamActive" class="absolute inset-0 pointer-events-none">
+          <!-- Top bar -->
+          <div class="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-4 pointer-events-auto">
+            <div class="flex items-center justify-between">
+              <button @click="goBack" class="w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              
+              <!-- Debug info (only show in development) -->
+              <div v-if="isDevelopment" class="text-xs text-white/70 bg-black/40 rounded px-2 py-1">
+                {{ useIOSWorkaround ? 'iOS Enhanced' : 'Standard' }}
+              </div>
+              
+              <!-- Camera switch button with indicator -->
+              <div class="relative">
+                <button @click="switchCamera" class="w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center transition-all active:scale-95">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0l-2-2m0 0l7-7 7 7m-10 5h10a1 1 0 001-1V10"></path>
+                  </svg>
+                </button>
+                <!-- Camera mode indicator -->
+                <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span class="text-xs text-white font-bold">{{ currentFacingMode === 'environment' ? 'P' : 'F' }}</span>
+                </div>
+              </div>
             </div>
           </div>
           
-          <!-- Center guide frame -->
+          <!-- Center guide -->
           <div class="flex-1 flex items-center justify-center p-8">
-            <div class="w-64 h-64 border-2 border-white/30 border-dashed rounded-2xl"></div>
+            <div class="w-64 h-64 border-2 border-white/40 border-dashed rounded-2xl"></div>
           </div>
           
           <!-- Bottom controls -->
-          <div class="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/70 to-transparent p-6 pb-safe">
-            <div class="flex items-center justify-center space-x-12">
-              <!-- Gallery button -->
-              <button 
-                @click="openGallery"
-                class="w-14 h-14 bg-white/20 backdrop-blur rounded-full flex items-center justify-center transition-all active:scale-95"
-              >
-                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 pb-24 pointer-events-auto">
+            <div class="flex items-center justify-center space-x-8">
+              <button @click="openGallery" class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center transition-all active:scale-95 touch-manipulation">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
               </button>
               
-              <!-- Capture button -->
-              <button 
-                @click="capturePhoto"
-                :disabled="!cameraReady"
-                class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg disabled:opacity-50 transition-all active:scale-95"
-              >
-                <div class="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center">
-                  <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                  </svg>
-                </div>
+              <button @click="capturePhoto" class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg transition-all active:scale-95 touch-manipulation">
+                <div class="w-12 h-12 bg-white border-4 border-gray-300 rounded-full"></div>
               </button>
               
-              <!-- Switch camera button -->
-              <button 
-                @click="switchCamera"
-                class="w-14 h-14 bg-white/20 backdrop-blur rounded-full flex items-center justify-center transition-all active:scale-95"
-              >
-                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-              </button>
+              <!-- Camera switch button -->
+              <div class="relative">
+                <button @click="switchCamera" class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center transition-all active:scale-95 touch-manipulation">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                </button>
+                <!-- Camera mode indicator -->
+                <div class="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span class="text-xs text-white font-bold">{{ currentFacingMode === 'environment' ? 'P' : 'F' }}</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <!-- Gallery Button sempre visibile per problemi di compatibilità su iOS/Safari -->
-        <div class="absolute top-4 right-4 z-20">
-          <button
-            @click="openGallery"
-            class="bg-white/20 backdrop-blur rounded-full p-3 shadow-lg"
-            title="Apri Galleria"
-          >
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-          </button>
         </div>
       </div>
 
       <!-- Image Preview -->
-      <div v-if="capturedImage && !permissionDenied" class="flex-1 flex flex-col">
-        <div class="flex-1 relative bg-black">
+      <div v-if="capturedImage" class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 relative bg-black min-h-0">
+          <!-- Top overlay with back button -->
+          <div class="absolute top-4 left-4 z-10">
+            <button 
+              @click="goBack"
+              class="w-10 h-10 bg-black/50 backdrop-blur rounded-full flex items-center justify-center transition-all active:scale-95"
+            >
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+          </div>
+          
           <img 
             :src="capturedImage" 
             alt="Captured ingredients"
@@ -115,101 +238,72 @@
           <div v-if="processing" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div class="text-white text-center">
               <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-              <h3 class="text-lg font-semibold mb-2">{{ t('camera.scanning') }}</h3>
-              <p class="text-sm opacity-80">Analyzing your ingredients...</p>
+              <h3 class="text-lg font-semibold mb-2">Scansione in corso...</h3>
+              <p class="text-sm opacity-80">Analizzando gli ingredienti...</p>
             </div>
           </div>
         </div>
 
-        <!-- Preview Controls -->
-        <div class="bg-white p-4 space-y-4">
-          <div v-if="detectedIngredients.length > 0" class="mb-4">
-            <h3 class="font-semibold text-gray-900 mb-2">Detected Ingredients:</h3>
-            <div class="flex flex-wrap gap-2">
-              <span 
-                v-for="ingredient in detectedIngredients" 
-                :key="ingredient"
-                class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
+        <!-- Preview Controls - scrollable section -->
+        <div class="bg-white flex-shrink-0 max-h-80 overflow-y-auto">
+          <div class="p-4 space-y-4">
+            <div v-if="detectedIngredients.length > 0" class="mb-4">
+              <h3 class="font-semibold text-gray-900 mb-2">Ingredienti Rilevati:</h3>
+              <div class="flex flex-wrap gap-2">
+                <span 
+                  v-for="ingredient in detectedIngredients" 
+                  :key="ingredient"
+                  class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+                >
+                  {{ ingredient }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Main action buttons - responsive layout -->
+            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+              <BaseButton 
+                variant="secondary" 
+                full-width
+                @click="retakePhoto"
+                :disabled="processing"
               >
-                {{ ingredient }}
-              </span>
+                {{ deviceInfo.isIOS && !deviceInfo.hasMediaDevices ? 'Scatta Altra Foto' : 'Scatta di nuovo' }}
+              </BaseButton>
+              <BaseButton 
+                variant="primary" 
+                full-width
+                @click="generateRecipe"
+                :loading="processing"
+                :disabled="detectedIngredients.length === 0"
+              >
+                Genera Ricette
+              </BaseButton>
             </div>
+            
+            <!-- iOS Additional Options -->
+            <div v-if="deviceInfo.isIOS && !deviceInfo.hasMediaDevices" class="flex space-x-3 mt-3">
+              <BaseButton 
+                variant="outline" 
+                full-width
+                @click="openCameraCapture"
+                :disabled="processing"
+              >
+                📷 Camera iPhone
+              </BaseButton>
+              <BaseButton 
+                variant="outline" 
+                full-width
+                @click="openGallery"
+                :disabled="processing"
+              >
+                🖼️ Galleria
+              </BaseButton>
+            </div>
+            
+            <!-- Add some padding at bottom for mobile navigation -->
+            <div class="h-20 md:h-4"></div>
           </div>
-
-          <div class="flex space-x-3">
-            <BaseButton 
-              variant="secondary" 
-              full-width
-              @click="retakePhoto"
-              :disabled="processing"
-            >
-              {{ t('camera.retake') }}
-            </BaseButton>
-            <BaseButton 
-              variant="primary" 
-              full-width
-              @click="generateRecipe"
-              :loading="processing"
-              :disabled="detectedIngredients.length === 0"
-            >
-              {{ t('recipes.generate') }}
-            </BaseButton>
-          </div>
-        </div>
-      </div>
-
-      <!-- Permission denied with iOS guidance -->
-      <div v-if="permissionDenied" class="absolute inset-0 flex items-center justify-center px-4 bg-white">
-        <div class="text-center max-w-sm mx-auto">
-          <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"></path>
-            </svg>
-          </div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ t('camera.permissionDenied') }}</h3>
-          <p class="text-gray-600 mb-4">{{ t('camera.permissionInstructions') || 'We need camera access to scan your ingredients' }}</p>
-          
-          <!-- iOS specific guidance -->
-          <div v-if="isIOS" class="bg-blue-50 p-4 rounded-lg mb-6 text-left">
-            <h4 class="font-medium text-blue-800 mb-1">{{ t('camera.iOSInstructionsTitle') || 'On iOS devices:' }}</h4>
-            <ul class="list-disc pl-5 text-sm text-blue-700 space-y-1">
-              <li>{{ t('camera.iOSInstructions1') || 'Make sure you\'re using Safari browser' }}</li>
-              <li>{{ t('camera.iOSInstructions2') || 'Go to iOS Settings > Safari > Camera' }}</li>
-              <li>{{ t('camera.iOSInstructions3') || 'Enable camera access for this website' }}</li>
-              <li>{{ t('camera.iOSInstructions4') || 'Return to Safari and reload this page' }}</li>
-            </ul>
-          </div>
-          
-          <div class="flex justify-center">
-            <BaseButton variant="primary" @click="requestCameraPermission">
-              {{ t('camera.tryAgain') || 'Try Again' }}
-            </BaseButton>
-          </div>
-        </div>
-      </div>
-
-      <!-- Permission denied with iOS gallery option -->
-      <div v-if="permissionDenied && isIOS" class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
-        <div class="text-center">
-          <p class="text-sm text-gray-600 mb-3">{{ t('camera.useGalleryInstead') || 'Or upload a photo from your gallery:' }}</p>
-          <BaseButton variant="outline" full-width @click="openGallery">
-            <span class="flex items-center justify-center space-x-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-              <span>{{ t('camera.uploadPhoto') || 'Upload Photo from Gallery' }}</span>
-            </span>
-          </BaseButton>
-        </div>
-      </div>
-
-      <!-- Attempting permission loading state -->
-      <div v-if="attemptingPermission && !permissionDenied" class="absolute inset-0 flex items-center justify-center bg-white">
-        <div class="text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ t('camera.requestingAccess') || 'Requesting Camera Access' }}</h3>
-          <p class="text-gray-600">{{ t('camera.pleaseAllowAccess') || 'Please allow access when prompted' }}</p>
         </div>
       </div>
 
@@ -218,494 +312,1099 @@
         ref="fileInput"
         type="file"
         accept="image/*"
-        capture="false"
         class="hidden"
         @change="handleFileSelect"
       />
 
-      <!-- Hidden textarea to force keyboard on iOS -->
-      <textarea 
-        ref="dummyInput"
-        class="opacity-0 absolute top-0 left-0 w-0 h-0 -z-10"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-      ></textarea>
-      
+      <!-- Hidden file input for iOS camera capture -->
+      <input 
+        ref="cameraInput"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        class="hidden"
+        @change="handleCameraCapture"
+      />
+
       <!-- Hidden canvas for image capture -->
       <canvas ref="canvasElement" class="hidden"></canvas>
-
-      <!-- Permission denied with iOS guidance -->
-      <div v-if="permissionDenied" class="absolute inset-0 flex items-center justify-center px-4 bg-white">
-        <div class="text-center max-w-sm mx-auto">
-          <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"></path>
-            </svg>
-          </div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ t('camera.permissionDenied') }}</h3>
-          <p class="text-gray-600 mb-4">{{ t('camera.permissionInstructions') || 'We need camera access to scan your ingredients' }}</p>
-          
-          <!-- iOS specific guidance -->
-          <div v-if="isIOS" class="bg-blue-50 p-4 rounded-lg mb-6 text-left">
-            <h4 class="font-medium text-blue-800 mb-1">{{ t('camera.iOSInstructionsTitle') || 'On iOS devices:' }}</h4>
-            <ul class="list-disc pl-5 text-sm text-blue-700 space-y-1">
-              <li>{{ t('camera.iOSInstructions1') || 'Make sure you\'re using Safari browser' }}</li>
-              <li>{{ t('camera.iOSInstructions2') || 'Go to iOS Settings > Safari > Camera' }}</li>
-              <li>{{ t('camera.iOSInstructions3') || 'Enable camera access for this website' }}</li>
-              <li>{{ t('camera.iOSInstructions4') || 'Return to Safari and reload this page' }}</li>
-            </ul>
-          </div>
-          
-          <div class="flex justify-center">
-            <BaseButton variant="primary" @click="requestCameraPermission">
-              {{ t('camera.tryAgain') || 'Try Again' }}
-            </BaseButton>
-          </div>
-        </div>
-      </div>
-
-      <!-- Permission denied with iOS gallery option -->
-      <div v-if="permissionDenied && isIOS" class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
-        <div class="text-center">
-          <p class="text-sm text-gray-600 mb-3">{{ t('camera.useGalleryInstead') || 'Or upload a photo from your gallery:' }}</p>
-          <BaseButton variant="outline" full-width @click="openGallery">
-            <span class="flex items-center justify-center space-x-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-              <span>{{ t('camera.uploadPhoto') || 'Upload Photo from Gallery' }}</span>
-            </span>
-          </BaseButton>
-        </div>
-      </div>
     </div>
   </AuthenticatedLayout>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
 import { ingredientService, userDataService } from '@/services/api'
 
 const router = useRouter()
-const { t } = useI18n()
 const toast = useToast()
-
-// Reactive state
-const stream = ref(null)
-const cameraReady = ref(false)
-const capturedImage = ref(null)
-const processing = ref(false)
-const permissionDenied = ref(false)
-const detectedIngredients = ref([])
-const facingMode = ref('environment') // 'user' for front camera, 'environment' for back camera
-const isIOS = ref(false)
-const isSafari = ref(false)
-const isAskPermission = ref(false) // Flag for Safari's "Ask" permission mode
-const attemptingPermission = ref(false)
-const permissionAttempts = ref(0) // Track permission attempts for fallbacks
-const galleryFallbackTimer = ref(null) // Timer for gallery fallback
-const showGalleryAlways = ref(false) // Always show gallery button
 
 // Template refs
 const videoElement = ref(null)
 const canvasElement = ref(null)
 const fileInput = ref(null)
-const dummyInput = ref(null)
+const cameraInput = ref(null)
 
-// Check if browser is Safari with potential camera issues
-const isSafariWithCameraIssues = () => {
-  // More permissive iOS detection
-  const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  
-  // More accurate Safari detection (detects Safari but not Chrome)
-  const isSafariBrowser = /AppleWebKit/.test(navigator.userAgent) && 
-    !/Chrome/.test(navigator.userAgent) &&
-    /Safari/.test(navigator.userAgent);
-  
-  // Also detect iOS WebView
-  const isIOSWebView = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
-  
-  return isIOSDevice || isSafariBrowser || isIOSWebView;
-}
+// Core state - simplified for reliability
+const mediaStream = ref(null)
+const isStreamActive = ref(false)
+const capturedImage = ref(null)
+const processing = ref(false)
+const cameraError = ref(null)
+const currentFacingMode = ref('environment')
+const detectedIngredients = ref([])
 
-// Force gallery open as fallback
-const forceOpenGallery = () => {
-  // Reset gallery input before opening
-  if (fileInput.value) {
-    // For Safari, specifically remove the capture attribute which can cause issues
-    fileInput.value.removeAttribute('capture');
-    
-    // Reset file input by replacing it (more reliable on iOS)
-    const parent = fileInput.value.parentNode;
-    const newInput = document.createElement('input');
-    newInput.type = 'file';
-    newInput.accept = 'image/*';
-    newInput.className = 'hidden';
-    newInput.addEventListener('change', handleFileSelect);
-    
-    // Replace old input with new one
-    parent.replaceChild(newInput, fileInput.value);
-    fileInput.value = newInput;
-    
-    // Then trigger click after a small delay
-    setTimeout(() => {
-      fileInput.value.click();
-    }, 100);
-  } else {
-    // Fallback if ref not available
-    openGallery();
+// Permission state
+const hasPermission = ref(false)
+const permissionDenied = ref(false)
+const isRequestingPermission = ref(false)
+const hasMultipleCameras = ref(false)
+
+// iOS Safari specific handling
+const retryCount = ref(0)
+const maxRetries = ref(3)
+const useIOSWorkaround = ref(false)
+
+// Development mode check
+const isDevelopment = ref(import.meta.env.DEV)
+
+// Device info
+const deviceInfo = ref({
+  isIOS: false,
+  isSafari: false,
+  isMobile: false,
+  hasMediaDevices: false
+})
+
+// Initialize device info with enhanced iOS detection
+const initDeviceInfo = () => {
+  const userAgent = navigator.userAgent
+  
+  // Enhanced iOS detection
+  const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  const isSafariBrowser = /AppleWebKit/.test(userAgent) && !/Chrome/.test(userAgent) && /Safari/.test(userAgent)
+  
+  deviceInfo.value = {
+    isIOS: isIOSDevice,
+    isSafari: isSafariBrowser,
+    isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent),
+    hasMediaDevices: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+  }
+  
+  console.log('Device info:', deviceInfo.value)
+  console.log('🌐 Protocol:', window.location.protocol)
+  console.log('🔗 Host:', window.location.host)
+  console.log('📱 MediaDevices available:', !!navigator.mediaDevices)
+  console.log('🎥 getUserMedia available:', !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia))
+  console.log('🔒 Secure context:', window.isSecureContext)
+  console.log('🍎 iOS + Safari detected:', isIOSDevice && isSafariBrowser)
+  
+  // Additional iOS-specific checks
+  if (isIOSDevice) {
+    console.log('📱 iOS Version info:', {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      maxTouchPoints: navigator.maxTouchPoints,
+      standalone: window.navigator.standalone,
+      webkitAudioContext: typeof window.webkitAudioContext !== 'undefined'
+    })
   }
 }
 
-// Methods
-const initCamera = async () => {
+// Check camera permissions status
+const checkCameraPermissions = async () => {
   try {
-    // Reset state
-    permissionDenied.value = false
-    attemptingPermission.value = true
-    isAskPermission.value = false
-    
-    // Check if iOS/Safari with potential camera issues
-    const hasPotentialCameraIssues = isSafariWithCameraIssues();
-    isIOS.value = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    isSafari.value = /AppleWebKit/.test(navigator.userAgent) && 
-      !/Chrome/.test(navigator.userAgent);
-    
-    // Always show gallery on problematic browsers
-    showGalleryAlways.value = hasPotentialCameraIssues;
-    
-    // Set timer for gallery fallback in case camera doesn't initialize
-    if (galleryFallbackTimer.value) clearTimeout(galleryFallbackTimer.value);
-    galleryFallbackTimer.value = setTimeout(() => {
-      if (!cameraReady.value && !capturedImage.value) {
-        console.log('Camera not ready after timeout, showing gallery option');
-        showGalleryAlways.value = true;
-        // Don't show error message, just make gallery prominent
-        toast.info(t('camera.useGalleryInstead') || 'Please use gallery upload instead');
-      }
-    }, 2000); // 2 seconds timeout for camera initialization
-
-    // Special handling for iOS Safari
-    if (isIOS.value || isSafari.value) {
-      // Force reflow of video element to help Safari
-      if (videoElement.value) {
-        videoElement.value.style.display = 'none'
-        setTimeout(() => {
-          videoElement.value.style.display = 'block'
-        }, 0)
-      }
-
-      // Check if we might be in Safari "Ask" mode by trying to detect permissions state
-      try {
-        // First try to check permissions
-        if (navigator.permissions && navigator.permissions.query) {
-          const permissionStatus = await navigator.permissions.query({ name: 'camera' })
-          if (permissionStatus.state === 'prompt') {
-            console.log('Camera permission state is prompt (Ask mode)')
-            isAskPermission.value = true
-            attemptingPermission.value = false
-            return // Exit and show the special UI for Ask mode
-          }
-        }
-      } catch (permError) {
-        console.log('Permission query not supported, continuing with regular flow:', permError)
-        // Some browsers don't support permissions API, continue with normal flow
-      }
-
-      // Check if camera APIs are actually available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        console.log('getUserMedia not supported on this browser - showing gallery option');
-        permissionDenied.value = true
-        attemptingPermission.value = false
-        showGalleryAlways.value = true;
-        // Don't block with error message, just switch to gallery
-        toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-        return
-      }
-
-      // Ensure we're using the safest possible constraints for iOS
-      const constraints = {
-        audio: false,
-        video: {
-          facingMode: facingMode.value,
-          // Avoid setting width/height on iOS as it can cause issues
-        }
-      }
-      
-      try {
-        // First try with simple constraints
-        try {
-          stream.value = await navigator.mediaDevices.getUserMedia({ video: true })
-          console.log('Got camera with simple constraints')
-        } catch (simpleError) {
-          console.log('Simple constraints failed, trying facingMode:', simpleError)
-          stream.value = await navigator.mediaDevices.getUserMedia(constraints)
-        }
-        
-        // If stream is obtained successfully
-        if (videoElement.value) {
-          // Make sure all attributes are set properly
-          videoElement.value.setAttribute('playsinline', 'true')
-          videoElement.value.setAttribute('webkit-playsinline', 'true')
-          videoElement.value.setAttribute('x-webkit-airplay', 'allow')
-          videoElement.value.setAttribute('autoplay', 'true')
-          videoElement.value.setAttribute('playsInline', 'true')
-          videoElement.value.setAttribute('disablePictureInPicture', 'true')
-          videoElement.value.muted = true
-          
-          videoElement.value.srcObject = stream.value
-          
-          try {
-            // Try to play the video
-            const playPromise = videoElement.value.play()
-            if (playPromise !== undefined) {
-              playPromise.catch(playError => {
-                console.error('Error playing video on iOS:', playError)
-                // If play fails, we'll still consider the camera initialized
-                // but we'll log the error and leave cameraReady false
-                showGalleryAlways.value = true; // Ensure gallery is available
-              }).then(() => {
-                console.log('Video playing successfully')
-                cameraReady.value = true;
-                // Clear fallback timer if camera successfully started
-                if (galleryFallbackTimer.value) {
-                  clearTimeout(galleryFallbackTimer.value);
-                  galleryFallbackTimer.value = null;
-                }
-              })
-            }
-          } catch (playError) {
-            console.error('Exception during play() on iOS:', playError)
-            showGalleryAlways.value = true;
-          }
-        }
-      } catch (iosError) {
-        console.error('iOS camera error:', iosError)
-        // Try again with even simpler constraints or show Ask mode UI
-        if (iosError.name === 'NotAllowedError' || iosError.name === 'SecurityError') {
-          // Likely a permission issue
-          isAskPermission.value = true
-          attemptingPermission.value = false
-          return
-        }
-        
-        try {
-          // Last attempt with minimal constraints
-          const lastResortConstraints = { 
-            video: true,
-            audio: false
-          }
-          
-          stream.value = await navigator.mediaDevices.getUserMedia(lastResortConstraints)
-          if (videoElement.value) {
-            videoElement.value.srcObject = stream.value
-            videoElement.value.setAttribute('playsinline', 'true')
-            try {
-              await videoElement.value.play()
-              cameraReady.value = true;
-            } catch (playError) {
-              console.error('Error playing video on iOS (fallback):', playError)
-              showGalleryAlways.value = true;
-            }
-          }
-        } catch (fallbackError) {
-          console.error('iOS fallback camera error:', fallbackError)
-          // Instead of throwing error, show gallery option
-          showGalleryAlways.value = true;
-          permissionDenied.value = true;
-          toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-        }
-      }
-    } else {
-      // Non-iOS handling
-      const constraints = {
-        video: {
-          facingMode: facingMode.value,
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      }
-
-      stream.value = await navigator.mediaDevices.getUserMedia(constraints)
-      
-      if (videoElement.value) {
-        videoElement.value.srcObject = stream.value
-        cameraReady.value = true;
-        // Clear fallback timer if camera successfully started
-        if (galleryFallbackTimer.value) {
-          clearTimeout(galleryFallbackTimer.value);
-          galleryFallbackTimer.value = null;
-        }
-      }
+    if (!navigator.permissions) {
+      console.log('🔍 Permissions API not available')
+      return 'prompt'
     }
     
-    permissionDenied.value = false
-    attemptingPermission.value = false
+    const result = await navigator.permissions.query({ name: 'camera' })
+    console.log('📋 Camera permission status:', result.state)
+    return result.state // 'granted', 'denied', 'prompt'
+  } catch (error) {
+    console.warn('Could not check camera permissions:', error)
+    return 'prompt'
+  }
+}
+
+// Check available cameras
+const checkAvailableCameras = async () => {
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+      return
+    }
+    
+    const devices = await navigator.mediaDevices.enumerateDevices()
+    const videoDevices = devices.filter(device => device.kind === 'videoinput')
+    hasMultipleCameras.value = videoDevices.length > 1
+    
+    console.log(`Found ${videoDevices.length} camera(s)`)
+  } catch (error) {
+    console.warn('Could not enumerate devices:', error)
+  }
+}
+
+// Force permission request with explicit user interaction
+const forcePermissionRequest = async () => {
+  console.log('🔐 Forcing permission request with user interaction...')
+  
+  // Check current permission status first
+  const permissionStatus = await checkCameraPermissions()
+  console.log('📋 Current permission status before request:', permissionStatus)
+  
+  if (permissionStatus === 'denied') {
+    console.log('❌ Camera permissions previously denied - user must enable manually')
+    cameraError.value = '🔒 I permessi della camera sono stati negati in precedenza. Segui le istruzioni qui sotto per riattivarli.'
+    permissionDenied.value = true
+    return false
+  }
+  
+  // For iOS, we need to make sure we're in a user gesture context
+  if (deviceInfo.value.isIOS) {
+    console.log('📱 iOS detected - ensuring user gesture context and trying immediate access')
+    
+    // Try to immediately request camera access within user gesture
+    try {
+      console.log('🚀 Attempting immediate iOS camera access...')
+      const testStream = await navigator.mediaDevices.getUserMedia({ video: true })
+      console.log('✅ iOS immediate access successful!')
+      
+      // Stop the test stream and return success
+      testStream.getTracks().forEach(track => track.stop())
+      return true
+    } catch (error) {
+      console.warn('⚠️ iOS immediate access failed:', error.name)
+      
+      // If it's a permission issue, let the user know
+      if (error.name === 'NotAllowedError') {
+        return false
+      }
+      
+      // For other errors, continue with the normal flow
+      return true
+    }
+  }
+  
+  return true
+}
+
+// iOS-specific aggressive camera request
+const forceIOSCameraAccess = async () => {
+  console.log('🍎 Forcing iOS camera access with aggressive tactics...')
+  console.log('📱 Requested facing mode:', currentFacingMode.value)
+  
+  if (!deviceInfo.value.isIOS) {
+    return false
+  }
+  
+  // Multiple strategies for iOS, respecting currentFacingMode
+  const strategies = [
+    // Strategy 1: Use current facing mode
+    async () => {
+      console.log(`📱 iOS Strategy 1: Current facing mode (${currentFacingMode.value})`)
+      return await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: currentFacingMode.value } 
+      })
+    },
+    
+    // Strategy 2: Use current facing mode with exact constraint
+    async () => {
+      console.log(`📱 iOS Strategy 2: Exact facing mode (${currentFacingMode.value})`)
+      return await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: { exact: currentFacingMode.value } } 
+      })
+    },
+    
+    // Strategy 3: Ultra-minimal request (fallback)
+    async () => {
+      console.log('📱 iOS Strategy 3: Ultra-minimal request')
+      return await navigator.mediaDevices.getUserMedia({ video: true })
+    },
+    
+    // Strategy 4: Low resolution with facing mode
+    async () => {
+      console.log(`📱 iOS Strategy 4: Low resolution with ${currentFacingMode.value}`)
+      return await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: currentFacingMode.value,
+          width: { exact: 320 }, 
+          height: { exact: 240 } 
+        } 
+      })
+    }
+  ]
+  
+  for (let i = 0; i < strategies.length; i++) {
+    try {
+      console.log(`🔄 Trying iOS strategy ${i + 1}...`)
+      const stream = await strategies[i]()
+      console.log(`✅ iOS strategy ${i + 1} successful!`)
+      return stream
+    } catch (error) {
+      console.warn(`❌ iOS strategy ${i + 1} failed:`, error.name)
+      
+      // Brief pause between strategies
+      if (i < strategies.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 300))
+      }
+    }
+  }
+  
+  throw new Error('All iOS strategies failed')
+}
+
+// Enhanced iOS Safari camera initialization with aggressive tactics
+const initIOSCamera = async () => {
+  console.log('🍎 Initializing camera for iOS Safari with aggressive tactics...')
+  console.log('📱 Requested facing mode:', currentFacingMode.value)
+  
+  // Force permission request first
+  const canRequest = await forcePermissionRequest()
+  if (!canRequest) {
+    throw new Error('Cannot request permissions - previously denied')
+  }
+  
+  // Try extremely simplified constraints for iOS Safari
+  const constraintSets = [
+    // Ultra-minimal constraints for iOS compatibility
+    {
+      video: {
+        facingMode: { exact: currentFacingMode.value }
+      }
+    },
+    // Fallback without exact facingMode
+    {
+      video: {
+        facingMode: currentFacingMode.value
+      }
+    },
+    // iOS-specific low resolution
+    {
+      video: {
+        width: { exact: 320 },
+        height: { exact: 240 },
+        facingMode: currentFacingMode.value
+      }
+    },
+    // Minimal possible constraints
+    {
+      video: {
+        width: { ideal: 640 },
+        height: { ideal: 480 }
+      }
+    },
+    // Last resort - just video with no constraints
+    {
+      video: true
+    }
+  ]
+  
+  for (let i = 0; i < constraintSets.length; i++) {
+    try {
+      console.log(`🔄 iOS attempt ${i + 1}/5:`, constraintSets[i])
+      
+      // For iOS, we need to be more aggressive about timing
+      const stream = await Promise.race([
+        navigator.mediaDevices.getUserMedia(constraintSets[i]),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('iOS timeout')), 5000))
+      ])
+      
+      console.log(`✅ iOS Success with constraint set ${i + 1}`)
+      return stream
+    } catch (error) {
+      console.warn(`❌ iOS constraint set ${i + 1} failed:`, error.name, error.message)
+      
+      if (i === constraintSets.length - 1) {
+        throw error
+      }
+      
+      // Brief pause between attempts for iOS
+      await new Promise(resolve => setTimeout(resolve, 200))
+    }
+  }
+}
+
+// Enhanced video element setup for iOS
+const setupVideoElement = async (stream) => {
+  console.log('🎥 Setting up video element for iOS compatibility...')
+  
+  let video = videoElement.value || document.querySelector('video')
+  
+  if (!video) {
+    console.log('Video element not found, waiting for DOM...')
+    await nextTick()
+    
+    // Enhanced retry logic with longer timeout for iOS
+    let attempts = 0
+    const maxAttempts = 30 // 30 attempts * 100ms = 3 seconds
+    
+    while (!video && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+      video = videoElement.value || document.querySelector('video')
+      attempts++
+      console.log(`Attempt ${attempts}: Video element found:`, !!video)
+    }
+    
+    if (!video) {
+      throw new Error('Video element not available after extended waiting')
+    }
+  }
+  
+  console.log('📹 Video element found, configuring for iOS...')
+  
+  // Essential iOS video attributes - set before srcObject
+  video.setAttribute('webkit-playsinline', 'true')
+  video.setAttribute('playsinline', 'true')
+  video.muted = true
+  video.autoplay = true
+  video.playsInline = true
+  
+  // iOS specific styling to prevent issues
+  video.style.objectFit = 'cover'
+  video.style.width = '100%'
+  video.style.height = '100%'
+  
+  console.log('📱 iOS attributes set, assigning stream...')
+  
+  // Set stream
+  video.srcObject = stream
+  
+  // Enhanced promise for iOS video loading
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      console.error('❌ Video load timeout after 15 seconds')
+      reject(new Error('Video load timeout'))
+    }, 15000)
+    
+    const onLoadedMetadata = () => {
+      console.log('✅ Video metadata loaded successfully:', {
+        videoWidth: video.videoWidth,
+        videoHeight: video.videoHeight,
+        readyState: video.readyState
+      })
+      clearTimeout(timeout)
+      cleanup()
+      resolve(video)
+    }
+    
+    const onError = (error) => {
+      console.error('❌ Video load error:', error)
+      clearTimeout(timeout)
+      cleanup()
+      reject(new Error('Video load error'))
+    }
+    
+    const onCanPlay = () => {
+      console.log('📹 Video can play - attempting play...')
+      video.play().then(() => {
+        console.log('▶️ Video play() successful')
+      }).catch(err => {
+        console.warn('⚠️ Video play() failed but continuing:', err)
+      })
+    }
+    
+    const cleanup = () => {
+      video.removeEventListener('loadedmetadata', onLoadedMetadata)
+      video.removeEventListener('error', onError)
+      video.removeEventListener('canplay', onCanPlay)
+    }
+    
+    video.addEventListener('loadedmetadata', onLoadedMetadata)
+    video.addEventListener('error', onError)
+    video.addEventListener('canplay', onCanPlay)
+    
+    // Force load
+    video.load()
+    
+    // Also try immediate play for iOS
+    setTimeout(() => {
+      video.play().catch(err => {
+        console.log('Initial play attempt failed (normal for some iOS versions):', err)
+      })
+    }, 100)
+  })
+}
+
+// Request camera permission and initialize
+const requestPermission = async () => {
+  const startTime = Date.now()
+  console.log('🚀 Starting camera permission request at:', new Date().toISOString())
+  
+  if (!deviceInfo.value.hasMediaDevices) {
+    console.error('❌ MediaDevices not available')
+    
+    if (!navigator.mediaDevices) {
+      if (deviceInfo.value.isIOS) {
+        cameraError.value = '📱 La camera diretta non è disponibile su Safari iOS, ma puoi usare il pulsante "Scatta Foto con Camera iPhone" per fare foto.'
+      } else {
+        cameraError.value = '🚫 Le API della camera non sono disponibili su questo browser. Assicurati di essere su HTTPS.'
+      }
+    } else if (!navigator.mediaDevices.getUserMedia) {
+      if (deviceInfo.value.isIOS) {
+        cameraError.value = '📱 L\'accesso diretto alla camera non è supportato su Safari iOS, ma puoi usare il pulsante "Scatta Foto con Camera iPhone".'
+      } else {
+        cameraError.value = '🚫 La funzione camera non è supportata su questo browser.'
+      }
+    } else {
+      cameraError.value = 'Il tuo browser non supporta l\'accesso alla camera'
+    }
+    
+    permissionDenied.value = true
+    return
+  }
+
+  // Check if we're in a secure context
+  if (!window.isSecureContext) {
+    console.error('❌ Not in secure context')
+    cameraError.value = '🔒 La camera richiede una connessione sicura (HTTPS). Attualmente sei su: ' + window.location.protocol
+    permissionDenied.value = true
+    return
+  }
+
+  // Check permission status before attempting request
+  const permissionStatus = await checkCameraPermissions()
+  console.log('📋 Current permission status:', permissionStatus)
+  
+  if (permissionStatus === 'denied') {
+    console.log('❌ Camera permissions are denied - showing instructions')
+    cameraError.value = '🔒 I permessi della camera sono stati negati. Segui le istruzioni qui sotto per riattivarli.'
+    permissionDenied.value = true
+    return
+  }
+
+  isRequestingPermission.value = true
+  permissionDenied.value = false
+  cameraError.value = null
+  console.log('📋 Set isRequestingPermission to true')
+
+  try {
+    // For iOS Safari, use enhanced compatibility approach with aggressive tactics
+    if (deviceInfo.value.isIOS && deviceInfo.value.isSafari) {
+      console.log('🍎 iOS Safari detected - using AGGRESSIVE compatibility mode')
+      
+      // First try: Aggressive direct access
+      try {
+        console.log('🚀 Attempting aggressive iOS camera access...')
+        mediaStream.value = await forceIOSCameraAccess()
+        console.log('✅ Aggressive iOS access successful!')
+      } catch (aggressiveError) {
+        console.warn('⚠️ Aggressive access failed, trying enhanced iOS initialization:', aggressiveError)
+        
+        // Second try: Enhanced iOS initialization
+        try {
+          mediaStream.value = await initIOSCamera()
+          console.log('✅ Enhanced iOS camera initialization successful')
+        } catch (iosError) {
+          console.warn('⚠️ Enhanced iOS initialization failed, trying basic fallback:', iosError)
+          
+          // Final fallback: Ultra-basic constraints
+          const ultraBasicConstraints = { video: true }
+          mediaStream.value = await navigator.mediaDevices.getUserMedia(ultraBasicConstraints)
+          console.log('✅ Ultra-basic iOS fallback successful')
+        }
+      }
+      
+      // Setup video element with iOS-specific handling
+      await setupVideoElement(mediaStream.value)
+      useIOSWorkaround.value = true
+      
+    } else {
+      // Standard getUserMedia approach for all other cases
+      console.log('📹 Using standard getUserMedia approach')
+      
+      // Basic constraints that work on all devices
+      const constraints = {
+        video: {
+          facingMode: currentFacingMode.value,
+          width: { ideal: 1280, max: 1920 },
+          height: { ideal: 720, max: 1080 }
+        },
+        audio: false
+      }
+
+      console.log('Requesting camera with constraints:', constraints)
+      
+      console.log('Step 1: Calling getUserMedia...')
+      mediaStream.value = await navigator.mediaDevices.getUserMedia(constraints)
+      console.log('Step 2: getUserMedia successful, stream obtained:', !!mediaStream.value)
+      
+      // Wait for video element to be available in DOM
+      let video = videoElement.value || document.querySelector('video')
+      
+      if (!video) {
+        console.log('Video element not found, waiting for DOM...')
+        await nextTick()
+        
+        // Keep trying to find the video element for up to 2 seconds
+        let attempts = 0
+        const maxAttempts = 20 // 20 attempts * 100ms = 2 seconds
+        
+        while (!video && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 100))
+          video = videoElement.value || document.querySelector('video')
+          attempts++
+          console.log(`Attempt ${attempts}: Video element found:`, !!video)
+        }
+        
+        if (!video) {
+          throw new Error('Video element not available after waiting')
+        }
+      }
+      
+      console.log('Step 3: Video element available, setting up...')
+      
+      // Set up video element properly
+      video.srcObject = mediaStream.value
+      video.muted = true
+      video.playsInline = true
+      
+      // Wait for video to be ready and play
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Video load timeout'))
+        }, 10000)
+
+        video.onloadedmetadata = () => {
+          console.log('✅ Video metadata loaded:', {
+            videoWidth: video.videoWidth,
+            videoHeight: video.videoHeight
+          })
+          clearTimeout(timeout)
+          resolve()
+        }
+        
+        video.onerror = (error) => {
+          clearTimeout(timeout)
+          reject(new Error('Video load error'))
+        }
+        
+        if (video.load) {
+          video.load()
+        }
+      })
+
+      await video.play()
+      console.log('✅ Video play() completed successfully')
+      useIOSWorkaround.value = false
+    }
+    
+    hasPermission.value = true
+    isStreamActive.value = true
+    retryCount.value = 0
+    
+    console.log('🎉 Camera initialized successfully')
+    console.log('📊 Current state:', {
+      isStreamActive: isStreamActive.value,
+      isRequestingPermission: isRequestingPermission.value,
+      hasPermission: hasPermission.value,
+      permissionDenied: permissionDenied.value,
+      capturedImage: !!capturedImage.value,
+      useIOSWorkaround: useIOSWorkaround.value
+    })
+    
   } catch (error) {
     console.error('Camera access error:', error)
-    attemptingPermission.value = false
     
-    // For all errors, always make gallery available
-    showGalleryAlways.value = true;
+    mediaStream.value = null
+    isStreamActive.value = false
+    useIOSWorkaround.value = false
+    retryCount.value++
     
-    // For Safari/iOS, instead of showing permission denied, offer gallery
-    if (isSafariWithCameraIssues()) {
-      console.log('Safari/iOS with camera issues detected, offering gallery instead');
-      // Don't set permissionDenied to true to avoid showing that UI
-      // Just inform user about gallery option
-      toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-      return;
-    }
-    
-    // Handle NotFoundError specially - no need to show permission denied UI
-    if (error.name === 'NotFoundError') {
-      console.log('No camera device found, using gallery mode');
-      toast.info(t('camera.deviceNotFoundGallery') || 'No camera found. You can upload from your gallery instead.');
-      return;
-    }
-    
-    // For other browsers, handle permission errors as before
-    permissionDenied.value = true;
-    
-    // More specific error handling
+    // Handle different error types with enhanced iOS support
     if (error.name === 'NotAllowedError') {
-      toast.error(t('camera.permissionDenied') || 'Camera access was denied')
-    } else if (isIOS.value) {
-      toast.error(t('camera.iOSPermissionError') || 'On iOS, you need to grant camera permission in Settings')
+      if (deviceInfo.value.isIOS) {
+        cameraError.value = '🔒 Accesso camera negato su iPhone. Segui le istruzioni qui sotto per abilitare la camera, oppure usa il pulsante "Testa Permessi Camera".'
+      } else {
+        cameraError.value = 'Accesso alla camera negato. Abilita i permessi per continuare.'
+      }
+    } else if (error.name === 'NotFoundError') {
+      cameraError.value = 'Nessuna camera trovata su questo dispositivo.'
+    } else if (error.name === 'OverconstrainedError') {
+      if (deviceInfo.value.isIOS && retryCount.value < maxRetries.value) {
+        console.log('🔄 Retrying with simpler constraints for iOS...')
+        setTimeout(() => {
+          requestPermission()
+        }, 1000)
+        return
+      }
+      cameraError.value = 'Le impostazioni della camera non sono supportate.'
+    } else if (error.name === 'NotReadableError') {
+      cameraError.value = 'Camera già in uso da un\'altra applicazione.'
     } else {
-      toast.error(t('camera.generalError') || 'Could not access camera')
+      if (deviceInfo.value.isIOS && retryCount.value < maxRetries.value) {
+        console.log(`🔄 iOS retry attempt ${retryCount.value}/${maxRetries.value}...`)
+        setTimeout(() => {
+          requestPermission()
+        }, 2000)
+        return
+      }
+      
+      cameraError.value = deviceInfo.value.isIOS 
+        ? '❌ Errore camera iPhone. Prova il pulsante "Testa Permessi Camera" o usa "Carica da Galleria".'
+        : 'Errore nell\'accesso alla camera. Riprova o usa la galleria.'
     }
+    
+    permissionDenied.value = true
+  } finally {
+    const endTime = Date.now()
+    console.log(`⏱️ Camera initialization took: ${endTime - startTime}ms`)
+    isRequestingPermission.value = false
+    console.log('📋 Set isRequestingPermission to false')
   }
 }
 
-const switchToBackCamera = async () => {
-  // iOS-specific handling for switching to back camera
-  if (!isIOS.value) return
-  
+// Switch between front and back camera
+const switchCamera = async () => {
+  console.log('🔄 Switch camera button clicked')
+  console.log('📊 Current state:', {
+    hasMultipleCameras: hasMultipleCameras.value,
+    currentFacingMode: currentFacingMode.value,
+    isStreamActive: isStreamActive.value
+  })
+
+  // Save previous mode before changing it
+  const previousMode = currentFacingMode.value
+
   try {
-    // Clean up existing stream
-    if (stream.value) {
-      stream.value.getTracks().forEach(track => track.stop())
+    // Stop current stream
+    if (mediaStream.value) {
+      const tracks = mediaStream.value.getTracks()
+      tracks.forEach(track => track.stop())
+      mediaStream.value = null
     }
+
+    // Toggle facing mode
+    currentFacingMode.value = currentFacingMode.value === 'environment' ? 'user' : 'environment'
     
-    // Try multiple approaches to get the back camera on iOS
+    console.log(`🔄 Switching from ${previousMode} to ${currentFacingMode.value}`)
     
-    // First approach: try with exact constraint
-    try {
-      const backCameraConstraints = {
-        audio: false,
-        video: { 
-          facingMode: { exact: "environment" } 
-        }
-      }
-      
-      stream.value = await navigator.mediaDevices.getUserMedia(backCameraConstraints)
-    } catch (exactError) {
-      console.warn('Exact environment camera failed on iOS:', exactError)
-      
-      // Second approach: try with non-exact constraint
-      try {
-        const simpleConstraints = {
-          audio: false,
-          video: { 
-            facingMode: "environment" 
-          }
-        }
-        
-        stream.value = await navigator.mediaDevices.getUserMedia(simpleConstraints)
-      } catch (simpleError) {
-        console.warn('Simple environment camera failed on iOS:', simpleError)
-        
-        // Third approach: just get any video
-        stream.value = await navigator.mediaDevices.getUserMedia({ video: true })
+    // Reset stream state
+    isStreamActive.value = false
+    
+    // Add a small delay to ensure the stream is completely stopped
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
+    // Request new stream with new facing mode
+    await requestPermission()
+    
+    // Verify the camera actually switched (for debug purposes)
+    if (mediaStream.value) {
+      const videoTracks = mediaStream.value.getVideoTracks()
+      if (videoTracks.length > 0) {
+        const settings = videoTracks[0].getSettings()
+        console.log('📷 Camera settings after switch:', {
+          facingMode: settings.facingMode,
+          requestedMode: currentFacingMode.value,
+          width: settings.width,
+          height: settings.height
+        })
       }
     }
     
-    if (videoElement.value && stream.value) {
-      videoElement.value.srcObject = stream.value
-      videoElement.value.setAttribute('playsinline', 'true')
-      await videoElement.value.play()
-    }
+    console.log('✅ Camera switch successful')
+    
   } catch (error) {
-    console.error('Failed to switch to back camera:', error)
-    // Fall back to default camera if back camera is not available
+    console.error('❌ Error switching camera:', error)
+    
+    // Revert facing mode if switch failed
+    currentFacingMode.value = previousMode
+    console.log(`🔄 Reverted to ${previousMode} due to error`)
+    
+    // Try to restart with original camera
+    try {
+      await requestPermission()
+    } catch (restartError) {
+      console.error('❌ Failed to restart camera:', restartError)
+    }
   }
 }
 
-const onVideoLoaded = () => {
-  cameraReady.value = true
-}
-
-/* 
- * NOTE: Previously there was a duplicate requestCameraPermission function here
- * that was causing a "Identifier 'requestCameraPermission' has already been declared" error.
- * This function was removed and replaced by the improved version at line ~974.
- */
-
+// Capture photo from video stream
 const capturePhoto = () => {
-  if (!cameraReady.value) return
+  console.log('📸 Capture photo button clicked')
+  const video = videoElement.value || document.querySelector('video')
+  if (!video || !canvasElement.value || !isStreamActive.value) {
+    console.error('❌ Camera not ready:', {
+      video: !!video,
+      canvas: !!canvasElement.value,
+      isStreamActive: isStreamActive.value,
+      useIOSWorkaround: useIOSWorkaround.value
+    })
+    toast.error('Camera non pronta')
+    return
+  }
 
-  const video = videoElement.value
-  const canvas = canvasElement.value
-  const context = canvas.getContext('2d')
+  try {
+    console.log('📸 Starting photo capture...')
+    console.log('📷 Capture method:', useIOSWorkaround.value ? 'iOS Enhanced' : 'Standard')
+    
+    const canvas = canvasElement.value
+    const context = canvas.getContext('2d')
 
-  canvas.width = video.videoWidth
-  canvas.height = video.videoHeight
+    // Set canvas size to match video
+    canvas.width = video.videoWidth || video.clientWidth || 640
+    canvas.height = video.videoHeight || video.clientHeight || 480
+    console.log('📸 Canvas size set to:', canvas.width, 'x', canvas.height)
+    
+    // Additional check for valid dimensions
+    if (canvas.width === 0 || canvas.height === 0) {
+      console.warn('⚠️ Invalid video dimensions, using fallback size')
+      canvas.width = 640
+      canvas.height = 480
+    }
 
-  context.drawImage(video, 0, 0, canvas.width, canvas.height)
-  
-  capturedImage.value = canvas.toDataURL('image/jpeg', 0.8)
-  cleanup()
-  
-  // Process the image
-  processImage()
+    // Draw video frame to canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height)
+    
+    // Convert to base64 image with higher quality for iOS
+    const quality = useIOSWorkaround.value ? 0.95 : 0.9
+    capturedImage.value = canvas.toDataURL('image/jpeg', quality)
+    console.log('📸 Image captured, size:', capturedImage.value.length, 'bytes')
+    
+    // Stop camera stream
+    cleanup()
+    
+    // Process the captured image
+    processImage()
+    
+    console.log('✅ Photo captured successfully')
+    
+  } catch (error) {
+    console.error('Error capturing photo:', error)
+    toast.error('Errore nella cattura della foto')
+  }
 }
 
+// Process captured image for ingredient detection
 const processImage = async () => {
+  if (!capturedImage.value) return
+
   processing.value = true
   detectedIngredients.value = []
 
   try {
-    // Call backend API to detect ingredients
+    console.log('Processing image for ingredient detection...')
+    
+    // Call API for ingredient detection
     const response = await ingredientService.detectIngredients(capturedImage.value)
     detectedIngredients.value = response.ingredients || []
     
-    toast.success(t('notifications.camera.detectSuccess'))
-  } catch (error) {
-    console.error('Ingredient detection error:', error)
-    toast.error(t('notifications.camera.detectError'))
+    if (detectedIngredients.value.length > 0) {
+      toast.success(`Rilevati ${detectedIngredients.value.length} ingredienti`)
+    } else {
+      toast.info('Nessun ingrediente rilevato. Prova con un\'altra foto.')
+      // Mock ingredients for demo
+      detectedIngredients.value = ['Pomodori', 'Cipolla', 'Aglio', 'Basilico']
+    }
     
-    // Fallback to mock ingredients for demo
-    detectedIngredients.value = [
-      'Tomatoes',
-      'Onions', 
-      'Garlic',
-      'Basil'
-    ]
+  } catch (error) {
+    console.error('Error processing image:', error)
+    toast.error('Errore nell\'analisi dell\'immagine')
+    
+    // Fallback to mock ingredients
+    detectedIngredients.value = ['Pomodori', 'Cipolla', 'Aglio', 'Basilico']
+    
   } finally {
     processing.value = false
   }
 }
 
+// Open gallery for file selection
+const openGallery = () => {
+  console.log('🖼️ Gallery button clicked')
+  if (fileInput.value) {
+    console.log('📁 Opening file input...')
+    fileInput.value.click()
+  } else {
+    console.error('❌ File input not available')
+  }
+}
+
+// Open camera capture for iOS Safari (fallback method)
+const openCameraCapture = () => {
+  console.log('📷 iOS Camera capture button clicked')
+  if (cameraInput.value) {
+    console.log('📱 Opening camera capture input...')
+    cameraInput.value.click()
+  } else {
+    console.error('❌ Camera input not available')
+    toast.error('Errore nell\'apertura della camera')
+  }
+}
+
+// Force iOS camera request with aggressive tactics
+const forceIOSCameraRequest = async () => {
+  console.log('🚀 Force iOS Camera Request initiated by user')
+  
+  if (!deviceInfo.value.isIOS) {
+    toast.error('Questa funzione è disponibile solo su iOS')
+    return
+  }
+  
+  // Reset state
+  permissionDenied.value = false
+  cameraError.value = null
+  isRequestingPermission.value = true
+  retryCount.value = 0
+  
+  try {
+    console.log('🍎 Starting aggressive iOS camera access...')
+    
+    // Try the aggressive access method directly
+    mediaStream.value = await forceIOSCameraAccess()
+    
+    // Setup video element with iOS-specific handling
+    await setupVideoElement(mediaStream.value)
+    
+    hasPermission.value = true
+    isStreamActive.value = true
+    useIOSWorkaround.value = true
+    
+    toast.success('✅ Camera iOS attivata con successo!')
+    console.log('🎉 Forced iOS camera access successful')
+    
+  } catch (error) {
+    console.error('❌ Forced iOS camera access failed:', error)
+    
+    mediaStream.value = null
+    isStreamActive.value = false
+    useIOSWorkaround.value = false
+    
+    // Provide specific error messages
+    if (error.name === 'NotAllowedError') {
+      cameraError.value = '🔒 Permessi camera negati. Controlla le impostazioni Safari e riprova.'
+      toast.error('❌ Permessi camera negati su iOS')
+    } else if (error.name === 'NotFoundError') {
+      cameraError.value = '📷 Nessuna camera trovata su questo dispositivo iOS.'
+      toast.error('❌ Camera non trovata')
+    } else {
+      cameraError.value = '❌ Impossibile accedere alla camera iOS. Usa "Scatta Foto con Camera iPhone".'
+      toast.error('❌ Errore accesso camera iOS: ' + (error.message || 'Errore sconosciuto'))
+    }
+    
+    permissionDenied.value = true
+  } finally {
+    isRequestingPermission.value = false
+  }
+}
+
+// Open iOS Settings app (attempt)
+const openIOSSettings = () => {
+  console.log('📱 Attempting to open iOS Settings...')
+  // Try to open iOS Settings app to Camera settings
+  window.location.href = 'App-prefs:root=Privacy&path=CAMERA'
+  
+  // Fallback: show instructions alert
+  setTimeout(() => {
+    alert('Apri le Impostazioni manualmente:\nImpostazioni > Privacy e sicurezza > Camera > Safari\n\nOppure:\nImpostazioni > Safari > Camera > Consenti')
+  }, 1000)
+}
+
+// Test camera permissions specifically
+const testCameraPermissions = async () => {
+  console.log('🧪 Testing camera permissions...')
+  
+  try {
+    // First check if mediaDevices is available
+    if (!navigator.mediaDevices) {
+      console.error('❌ navigator.mediaDevices not available')
+      if (deviceInfo.value.isIOS) {
+        toast.info('📱 Camera diretta non disponibile su Safari iOS. Usa il pulsante "Scatta Foto con Camera iPhone".')
+        cameraError.value = '📱 Camera diretta non supportata. Usa il pulsante "Scatta Foto con Camera iPhone" per scattare foto.'
+      } else {
+        toast.error('❌ Le API della camera non sono disponibili su questo browser.')
+        cameraError.value = '🚫 Le API della camera non sono supportate. Assicurati di essere su HTTPS o usa "Carica da Galleria".'
+      }
+      permissionDenied.value = true
+      return
+    }
+    
+    // Check if getUserMedia is available
+    if (!navigator.mediaDevices.getUserMedia) {
+      console.error('❌ getUserMedia not available')
+      if (deviceInfo.value.isIOS) {
+        toast.info('📱 getUserMedia non disponibile su Safari iOS. Usa il pulsante "Scatta Foto con Camera iPhone".')
+        cameraError.value = '📱 Camera diretta non supportata. Usa il pulsante "Scatta Foto con Camera iPhone" per scattare foto.'
+      } else {
+        toast.error('❌ getUserMedia non è disponibile su questo browser.')
+        cameraError.value = '🚫 La funzione camera non è supportata. Usa "Carica da Galleria".'
+      }
+      permissionDenied.value = true
+      return
+    }
+    
+    // Check if we're in a secure context
+    if (!window.isSecureContext) {
+      console.error('❌ Not in secure context')
+      toast.error('❌ Connessione non sicura. La camera richiede HTTPS.')
+      cameraError.value = '🔒 La camera richiede una connessione sicura (HTTPS). Usa "Carica da Galleria".'
+      permissionDenied.value = true
+      return
+    }
+    
+    console.log('✅ All APIs are available, checking permissions...')
+    
+    // Check permission status first
+    const permissionStatus = await checkCameraPermissions()
+    console.log('📋 Permission status:', permissionStatus)
+    
+    if (permissionStatus === 'denied') {
+      toast.error('❌ Permessi camera negati. Vai nelle Impostazioni per abilitarli.')
+      return
+    }
+    
+    if (permissionStatus === 'granted') {
+      toast.success('✅ Permessi camera già concessi!')
+      // Try to initialize camera
+      setTimeout(() => requestPermission(), 500)
+      return
+    }
+    
+    // If prompt, try to request permission
+    console.log('🔐 Attempting to trigger permission popup...')
+    
+    // Create a minimal request to trigger the permission popup
+    try {
+      const testStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false
+      })
+      
+      console.log('✅ Permission granted! Stream obtained.')
+      toast.success('✅ Permessi camera concessi!')
+      
+      // Stop the test stream
+      testStream.getTracks().forEach(track => track.stop())
+      
+      // Now initialize properly
+      setTimeout(() => requestPermission(), 500)
+      
+    } catch (error) {
+      console.error('❌ Permission test failed:', error)
+      
+      if (error.name === 'NotAllowedError') {
+        toast.error('❌ Permessi camera negati. Controlla le impostazioni Safari.')
+        cameraError.value = '🔒 Permessi camera negati. Segui le istruzioni qui sopra.'
+        permissionDenied.value = true
+      } else if (error.name === 'NotFoundError') {
+        toast.error('❌ Nessuna camera trovata su questo dispositivo.')
+        cameraError.value = '📷 Nessuna camera disponibile. Usa "Carica da Galleria".'
+        permissionDenied.value = true
+      } else if (error.name === 'NotSupportedError') {
+        toast.error('❌ Camera non supportata su questo browser.')
+        cameraError.value = '🚫 Camera non supportata. Usa "Carica da Galleria".'
+        permissionDenied.value = true
+      } else {
+        toast.error('❌ Errore nel test dei permessi: ' + (error.message || 'Errore sconosciuto'))
+        cameraError.value = '❌ Errore nel test della camera. Usa "Carica da Galleria".'
+        permissionDenied.value = true
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error testing permissions:', error)
+    toast.error('Errore nel test dei permessi: ' + (error.message || 'Errore sconosciuto'))
+    cameraError.value = '❌ Errore nel test della camera. Usa "Carica da Galleria".'
+    permissionDenied.value = true
+  }
+}
+
+// Handle file selection from gallery
+const handleFileSelect = (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    toast.error('Seleziona un file immagine valido')
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    capturedImage.value = e.target.result
+    cleanup() // Stop camera if running
+    processImage()
+  }
+  reader.onerror = () => {
+    toast.error('Errore nella lettura del file')
+  }
+  reader.readAsDataURL(file)
+}
+
+// Handle camera capture from iOS Safari
+const handleCameraCapture = (event) => {
+  console.log('📷 Camera capture file received')
+  const file = event.target.files[0]
+  if (!file) {
+    console.log('❌ No file selected from camera')
+    return
+  }
+
+  console.log('📱 Camera file details:', {
+    name: file.name,
+    size: file.size,
+    type: file.type,
+    lastModified: new Date(file.lastModified)
+  })
+
+  // Log usage analytics
+  console.log('📊 Using iOS camera capture fallback method')
+
+  if (!file.type.startsWith('image/')) {
+    toast.error('File non valido dalla camera')
+    return
+  }
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    console.log('✅ Camera image loaded successfully')
+    capturedImage.value = e.target.result
+    cleanup() // Stop any running camera stream
+    toast.success('📸 Foto scattata con successo!')
+    processImage()
+  }
+  reader.onerror = () => {
+    console.error('❌ Error reading camera file')
+    toast.error('Errore nella lettura della foto')
+  }
+  
+  // Reset the input for future captures
+  event.target.value = ''
+  
+  reader.readAsDataURL(file)
+}
+
+// Retake photo
 const retakePhoto = () => {
   capturedImage.value = null
   detectedIngredients.value = []
   processing.value = false
-  initCamera()
+  
+  // For iOS devices, offer choice between methods
+  if (deviceInfo.value.isIOS && !deviceInfo.value.hasMediaDevices) {
+    // If direct camera access isn't available, just clean up
+    console.log('📱 iOS device - camera stream not available, staying in capture mode')
+    // Don't restart camera since it's not available
+    return
+  }
+  
+  // Restart camera for devices that support it
+  setTimeout(() => {
+    requestPermission()
+  }, 100)
 }
 
+// Generate recipe from detected ingredients
 const generateRecipe = async () => {
-  if (detectedIngredients.value.length === 0) return
+  if (detectedIngredients.value.length === 0) {
+    toast.error('Nessun ingrediente da utilizzare')
+    return
+  }
 
   processing.value = true
   
@@ -715,296 +1414,172 @@ const generateRecipe = async () => {
     
     // Navigate to recipes page
     router.push('/app/recipes')
+    
   } catch (error) {
-    console.error('Recipe generation error:', error)
+    console.error('Error generating recipe:', error)
+    toast.error('Errore nella generazione delle ricette')
   } finally {
     processing.value = false
   }
 }
 
-const switchCamera = async () => {
-  // Toggle between front and back camera
-  facingMode.value = facingMode.value === 'environment' ? 'user' : 'environment'
-  
-  // On iOS, we need to clean up first
+// Go back to previous page
+const goBack = () => {
   cleanup()
-
-  // Display loading indicator for camera switch
-  attemptingPermission.value = true
-  
-  try {
-    // Special handling for iOS
-    if (isIOS.value) {
-      // For iOS, try first with exact constraints
-      try {
-        const iosConstraints = {
-          audio: false,
-          video: {
-            facingMode: { exact: facingMode.value === 'environment' ? 'environment' : 'user' }
-          }
-        }
-        
-        stream.value = await navigator.mediaDevices.getUserMedia(iosConstraints)
-        
-        if (videoElement.value) {
-          videoElement.value.srcObject = stream.value
-          videoElement.value.setAttribute('playsinline', 'true')
-          await videoElement.value.play()
-        }
-        
-        cameraReady.value = true
-      } catch (iosError) {
-        console.warn('Failed with exact facingMode on iOS:', iosError)
-        
-        // Try again with less specific constraints
-        try {
-          const fallbackConstraints = {
-            audio: false,
-            video: { facingMode: facingMode.value }
-          }
-          
-          stream.value = await navigator.mediaDevices.getUserMedia(fallbackConstraints)
-          
-          if (videoElement.value) {
-            videoElement.value.srcObject = stream.value
-            videoElement.value.setAttribute('playsinline', 'true')
-            await videoElement.value.play()
-          }
-          
-          cameraReady.value = true
-        } catch (fallbackError) {
-          console.error('Fallback camera access failed:', fallbackError)
-          
-          // Last resort - just get any video stream
-          try {
-            stream.value = await navigator.mediaDevices.getUserMedia({ video: true })
-            
-            if (videoElement.value) {
-              videoElement.value.srcObject = stream.value
-              videoElement.value.setAttribute('playsinline', 'true')
-              await videoElement.value.play()
-            }
-            
-            cameraReady.value = true
-            toast.warning(t('camera.switchLimited') || 'Limited camera switching on this device')
-          } catch (lastError) {
-            console.error('Last resort camera access failed:', lastError)
-            toast.error(t('camera.switchFailed') || 'Failed to switch camera')
-            facingMode.value = facingMode.value === 'environment' ? 'user' : 'environment' // Toggle back
-          }
-        }
-      }
-    } else {
-      // Standard approach for other devices
-      await initCamera()
-    }
-  } catch (error) {
-    console.error('Error switching camera:', error)
-    toast.error(t('camera.switchFailed') || 'Failed to switch camera')
-  } finally {
-    attemptingPermission.value = false
-  }
+  router.go(-1)
 }
 
-/* 
- * NOTE: openGallery function was moved to the improved version below (line ~981)
- * NOTE: handleFileSelect function was also moved to the improved version below (line ~988)
- */
-
-const triggerSafariPermissionPrompt = async () => {
-  if (permissionAttempts.value >= 3) {
-    console.log('Maximum permission attempts reached, showing gallery instead');
-    isAskPermission.value = false;
-    showGalleryAlways.value = true;
-    toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-    return;
+// Clean up camera resources
+const cleanup = () => {
+  console.log('🧹 Cleaning up camera resources...')
+  
+  // Clean up getUserMedia stream
+  if (mediaStream.value) {
+    const tracks = mediaStream.value.getTracks()
+    tracks.forEach(track => track.stop())
+    mediaStream.value = null
+    console.log('🧹 Media stream stopped')
   }
   
-  permissionAttempts.value++;
-  attemptingPermission.value = true;
+  isStreamActive.value = false
+  hasPermission.value = false
+  useIOSWorkaround.value = false
+  retryCount.value = 0
   
-  try {
-    // Focus the dummy input first (creates a user interaction context)
-    if (dummyInput.value) {
-      dummyInput.value.focus();
-      // Wait a moment for focus to register
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
-    // Try to get camera permission with basic constraints
-    const constraints = { 
-      video: true, 
-      audio: false 
-    };
-    
-    console.log('Triggering Safari permission prompt, attempt:', permissionAttempts.value);
-    
-    try {
-      // First try with minimal constraints
-      stream.value = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      if (videoElement.value) {
-        videoElement.value.srcObject = stream.value;
-        videoElement.value.setAttribute('playsinline', 'true');
-        videoElement.value.setAttribute('webkit-playsinline', 'true');
-        videoElement.value.setAttribute('autoplay', 'true');
-        
-        try {
-          await videoElement.value.play();
-          cameraReady.value = true;
-          isAskPermission.value = false;
-          attemptingPermission.value = false;
-          console.log('Successfully got camera permission from prompt');
-          
-          // Clear fallback timer if camera successfully started
-          if (galleryFallbackTimer.value) {
-            clearTimeout(galleryFallbackTimer.value);
-            galleryFallbackTimer.value = null;
-          }
-        } catch (playError) {
-          console.error('Error playing video after permission:', playError);
-          attemptingPermission.value = false;
-          // Try again or show gallery
-          if (permissionAttempts.value < 3) {
-            toast.info(t('camera.tryAgain') || 'Please try again');
-          } else {
-            isAskPermission.value = false;
-            showGalleryAlways.value = true;
-            toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error getting user media after prompt:', error);
-      attemptingPermission.value = false;
-      
-      // Check if permission was denied
-      if (error.name === 'NotAllowedError') {
-        permissionDenied.value = true;
-        isAskPermission.value = false;
-        toast.error(t('camera.permissionDenied') || 'Camera access was denied');
-      } 
-      // Otherwise might still be in Ask mode, wait for next attempt
-      else if (permissionAttempts.value < 3) {
-        toast.info(t('camera.tapToAllowCamera') || 'Tap to allow camera access');
-      } else {
-        // Max attempts reached, show gallery option instead
-        isAskPermission.value = false;
-        showGalleryAlways.value = true;
-        toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-      }
-    }
-  } catch (error) {
-    console.error('Error in triggering Safari permission:', error);
-    attemptingPermission.value = false;
-    
-    // After multiple failed attempts, fall back to gallery
-    if (permissionAttempts.value >= 3) {
-      isAskPermission.value = false;
-      showGalleryAlways.value = true;
-      toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-    }
-  }
+  console.log('✅ Camera cleanup completed')
 }
-
-// Request camera permission with improved handling for Safari/iOS
-const requestCameraPermission = async () => {
-  try {
-    // Check if we're dealing with Safari/iOS with potential camera issues
-    if (isSafariWithCameraIssues()) {
-      // Check if mediaDevices API is available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        console.log('getUserMedia not supported in this browser/device');
-        showGalleryAlways.value = true;
-        toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-        return;
-      }
-      
-      // For Safari, initialize our special handling
-      await initCamera();
-    } else {
-      // For other browsers, proceed normally
-      await initCamera();
-    }
-  } catch (error) {
-    console.error('Error requesting camera permission:', error);
-    // Instead of showing unsupported browser message, always provide gallery fallback
-    showGalleryAlways.value = true;
-    toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-  }
-}
-
-// Improved gallery opening function
-const openGallery = () => {
-  // For Safari/iOS with potential issues, use our enhanced method
-  if (isSafariWithCameraIssues()) {
-    forceOpenGallery();
-    return;
-  }
-  
-  // For other browsers, use normal approach
-  if (fileInput.value) {
-    fileInput.value.click();
-  }
-}
-
-// Handle file selection with improved error handling
-const handleFileSelect = (event) => {
-  try {
-    const file = event.target.files[0];
-    if (!file) {
-      console.log('No file selected');
-      return;
-    }
-    
-    // Check if file is an image
-    if (!file.type.startsWith('image/')) {
-      toast.error(t('camera.notAnImage') || 'Selected file is not an image');
-      return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      capturedImage.value = e.target.result;
-      // If we have a stream active, stop it
-      if (stream.value) {
-        const tracks = stream.value.getTracks();
-        tracks.forEach(track => track.stop());
-        stream.value = null;
-      }
-    };
-    reader.onerror = () => {
-      toast.error(t('camera.fileReadError') || 'Error reading the selected file');
-    };
-    reader.readAsDataURL(file);
-  } catch (error) {
-    console.error('Error handling file selection:', error);
-    toast.error(t('camera.fileSelectionError') || 'Error selecting file');
-  }
-}
-
-// Clean up resources when component is unmounted
-onBeforeUnmount(() => {
-  if (galleryFallbackTimer.value) {
-    clearTimeout(galleryFallbackTimer.value);
-  }
-  
-  if (stream.value) {
-    const tracks = stream.value.getTracks();
-    tracks.forEach(track => track.stop());
-    stream.value = null;
-  }
-});
 
 // Component lifecycle
 onMounted(async () => {
-  try {
-    await requestCameraPermission();
-  } catch (error) {
-    console.error('Error during component initialization:', error);
-    // Fallback to gallery mode if camera initialization fails
-    showGalleryAlways.value = true;
-    toast.info(t('camera.galleryFallback') || 'Using gallery upload instead');
-  }
+  console.log('Camera component mounted')
+  
+  // Initialize device info
+  initDeviceInfo()
+  
+  // Check available cameras
+  await checkAvailableCameras()
+  
+  // Wait for DOM to be fully rendered before requesting camera
+  await nextTick()
+  
+  // Wait longer for router transitions to complete and DOM to settle
+  setTimeout(async () => {
+    console.log('Requesting camera after DOM is ready')
+    console.log('Video element exists:', !!videoElement.value)
+    console.log('Video element in DOM:', !!document.querySelector('video'))
+    await requestPermission()
+  }, 500) // Increased delay to 500ms to allow for router transition
+})
+
+onBeforeUnmount(() => {
+  console.log('Camera component unmounting')
+  cleanup()
 })
 </script>
+
+<style scoped>
+/* Mobile fullscreen styles */
+.fixed {
+  position: fixed !important;
+}
+
+.inset-0 {
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+}
+
+/* Ensure true fullscreen on mobile */
+@media screen and (max-width: 768px) {
+  .fixed.inset-0 {
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important; /* Dynamic viewport height for mobile */
+  }
+}
+
+/* Video styling */
+video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  background: #000;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* iOS specific video fixes */
+video {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Override any parent layout constraints */
+.absolute.inset-0 {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Safe area handling for iOS */
+@supports (padding: max(0px)) {
+  .pb-8 {
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  }
+  
+  /* Account for safe areas and navigation on mobile */
+  @media screen and (max-width: 768px) {
+    .fixed.inset-0 {
+      top: env(safe-area-inset-top, 0) !important;
+      /* Leave space for bottom navigation - don't override bottom */
+      left: env(safe-area-inset-left, 0) !important;
+      right: env(safe-area-inset-right, 0) !important;
+      /* Adjust height to account for navigation */
+      height: calc(100vh - 80px) !important; /* 80px is typical nav height */
+      height: calc(100dvh - 80px) !important;
+    }
+  }
+}
+
+/* Mobile responsive */
+@media screen and (max-width: 768px) {
+  .h-screen {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: 100dvh;
+  }
+  
+  /* Adjust container for navigation space */
+  .fixed.inset-0 {
+    bottom: 80px !important; /* Leave space for bottom navigation */
+    height: calc(100vh - 80px) !important;
+    height: calc(100dvh - 80px) !important;
+  }
+  
+  /* Force fullscreen video within available space */
+  video {
+    width: 100vw !important;
+    height: calc(100vh - 80px) !important;
+    height: calc(100dvh - 80px) !important;
+  }
+  
+  /* Ensure camera controls are above navigation */
+  .pointer-events-auto {
+    z-index: 40 !important;
+  }
+  
+  /* Improve touch targets for mobile */
+  button {
+    touch-action: manipulation;
+  }
+}
+</style>

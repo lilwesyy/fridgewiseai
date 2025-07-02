@@ -8,8 +8,6 @@ const router = express.Router()
 // Generate recipe from ingredients
 router.post('/generate', authenticateToken, async (req, res) => {
   try {
-    console.log('Generate recipe request body:', JSON.stringify(req.body, null, 2))
-    
     const generateSchema = Joi.object({
       ingredients: Joi.array().items(Joi.string().trim()).min(1).required(),
       preferences: Joi.object({
@@ -22,7 +20,6 @@ router.post('/generate', authenticateToken, async (req, res) => {
 
     const { error, value } = generateSchema.validate(req.body)
     if (error) {
-      console.log('Validation error:', error.details)
       return res.status(400).json({
         error: 'Validation failed',
         details: error.details.map(detail => detail.message)

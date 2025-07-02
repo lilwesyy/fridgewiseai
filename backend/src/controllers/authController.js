@@ -199,12 +199,21 @@ export const updateProfile = async (req, res) => {
           Joi.string().valid('italian', 'french', 'chinese', 'japanese', 'indian', 'mexican', 'american', 'mediterranean')
         ).optional(),
         difficulty: Joi.string().valid('easy', 'medium', 'hard', 'any').optional(),
-        maxCookingTime: Joi.number().min(1).max(480).optional()
+        maxCookingTime: Joi.number().min(1).max(480).optional(),
+        recentActivity: Joi.array().items(
+          Joi.object({
+            id: Joi.string().optional(),
+            title: Joi.string().optional(),
+            timestamp: Joi.string().optional()
+          })
+        ).max(10).optional(),
+        savedRecipes: Joi.array().items(Joi.string()).optional()
       }).optional()
     })
 
     const { error, value } = updateSchema.validate(req.body)
     if (error) {
+      console.log('Profile update validation error:', error.details)
       return res.status(400).json({
         error: 'Validation failed',
         details: error.details.map(detail => detail.message)

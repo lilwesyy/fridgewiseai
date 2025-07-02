@@ -3,8 +3,9 @@
     :class="[
       'btn',
       {
-        'btn-primary': props.variant === 'primary',
+        'btn-primary': props.variant === 'primary' || props.variant === 'default',
         'btn-secondary': props.variant === 'secondary',
+        'btn-ghost': props.variant === 'ghost',
         'opacity-50 cursor-not-allowed': props.loading || props.disabled
       }
     ]"
@@ -21,7 +22,7 @@ const props = defineProps({
   variant: {
     type: String,
     default: 'primary',
-    validator: (value) => ['primary', 'secondary'].includes(value)
+    validator: (value) => ['primary', 'secondary', 'ghost', 'default'].includes(value)
   },
   loading: {
     type: Boolean,

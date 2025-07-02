@@ -15,16 +15,34 @@
       <!-- Stats -->
       <div class="grid grid-cols-3 gap-4 mb-8">
         <div class="text-center">
-          <div class="text-2xl font-bold text-primary-600">{{ totalRecipes }}</div>
-          <div class="text-sm text-gray-500">Recipes</div>
+          <div v-if="loading" class="animate-pulse">
+            <div class="h-8 bg-gray-200 rounded mb-2"></div>
+            <div class="h-4 bg-gray-200 rounded w-12 mx-auto"></div>
+          </div>
+          <template v-else>
+            <div class="text-2xl font-bold text-primary-600">{{ totalRecipes }}</div>
+            <div class="text-sm text-gray-500">Recipes</div>
+          </template>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-green-600">{{ savedRecipes }}</div>
-          <div class="text-sm text-gray-500">Saved</div>
+          <div v-if="loading" class="animate-pulse">
+            <div class="h-8 bg-gray-200 rounded mb-2"></div>
+            <div class="h-4 bg-gray-200 rounded w-12 mx-auto"></div>
+          </div>
+          <template v-else>
+            <div class="text-2xl font-bold text-green-600">{{ savedRecipes }}</div>
+            <div class="text-sm text-gray-500">Saved</div>
+          </template>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-blue-600">{{ scansCount }}</div>
-          <div class="text-sm text-gray-500">Scans</div>
+          <div v-if="loading" class="animate-pulse">
+            <div class="h-8 bg-gray-200 rounded mb-2"></div>
+            <div class="h-4 bg-gray-200 rounded w-12 mx-auto"></div>
+          </div>
+          <template v-else>
+            <div class="text-2xl font-bold text-blue-600">{{ scansCount }}</div>
+            <div class="text-sm text-gray-500">Scans</div>
+          </template>
         </div>
       </div>
 
@@ -250,6 +268,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
+import { userService, userDataService } from '@/services/api'
 
 export default {
   name: 'ProfilePage',
@@ -270,6 +289,12 @@ export default {
         name: '',
         email: ''
       },
+      stats: {
+        totalRecipes: 0,
+        totalScans: 0
+      },
+      savedRecipesCount: 0,
+      loading: true,
       languages: [
         { code: 'en', name: 'English' },
         { code: 'it', name: 'Italiano' },
@@ -280,16 +305,13 @@ export default {
   },
   computed: {
     totalRecipes() {
-      const recipes = localStorage.getItem('generatedRecipes')
-      return recipes ? JSON.parse(recipes).length : 0
+      return this.stats.totalRecipes || 0
     },
     savedRecipes() {
-      const saved = localStorage.getItem('savedRecipes')
-      return saved ? JSON.parse(saved).length : 0
+      return this.savedRecipesCount || 0
     },
     scansCount() {
-      // Mock scan count - in real app this would come from user stats
-      return this.totalRecipes * 2 // Approximate scans vs recipes ratio
+      return this.stats.totalScans || 0
     },
     currentLanguageName() {
       const current = this.languages.find(lang => lang.code === this.$i18n.locale)
@@ -298,8 +320,40 @@ export default {
   },
   mounted() {
     this.initProfileForm()
+    this.loadUserStats()
   },
   methods: {
+    async loadUserStats() {
+      try {
+        this.loading = true
+        
+        // Load user statistics from backend
+        const stats = await userService.getUserStats()
+        this.stats = stats
+        
+        // Load saved recipes count
+        const savedRecipeIds = await userDataService.getSavedRecipeIds()
+        this.savedRecipesCount = savedRecipeIds.length
+        
+      } catch (error) {
+        console.error('Failed to load user stats:', error)
+        // Fallback to localStorage for backward compatibility
+        this.loadStatsFromLocalStorage()
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    loadStatsFromLocalStorage() {
+      // Fallback method for backward compatibility
+      const recipes = localStorage.getItem('generatedRecipes')
+      const saved = localStorage.getItem('savedRecipes')
+      
+      this.stats.totalRecipes = recipes ? JSON.parse(recipes).length : 0
+      this.savedRecipesCount = saved ? JSON.parse(saved).length : 0
+      this.stats.totalScans = this.stats.totalRecipes * 2 // Estimate
+    },
+
     initProfileForm() {
       if (this.authStore.currentUser) {
         this.profileForm.name = this.authStore.currentUser.name || ''

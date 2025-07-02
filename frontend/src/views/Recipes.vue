@@ -105,7 +105,7 @@
             </div>
 
             <BaseButton 
-              variant="outline" 
+              variant="secondary" 
               @click="viewRecipe(recipe)"
               class="w-full"
             >
@@ -331,10 +331,12 @@ export default {
       this.generating = true
 
       try {
-        console.log('Sending ingredients to API:', this.currentIngredients)
+        // Convert to plain array to avoid Proxy serialization issues
+        const plainIngredients = Array.from(this.currentIngredients)
+        console.log('Sending ingredients to API:', plainIngredients)
         
         // Call backend API to generate recipe
-        const response = await recipeService.generateRecipe(this.currentIngredients)
+        const response = await recipeService.generateRecipe(plainIngredients)
         const newRecipe = response.recipe
 
         // Add to local recipes list

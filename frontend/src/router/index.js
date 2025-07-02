@@ -9,6 +9,7 @@ import Camera from '@/views/Camera.vue'
 import Recipes from '@/views/Recipes.vue'
 import SavedRecipes from '@/views/SavedRecipes.vue'
 import Profile from '@/views/Profile.vue'
+import CookingMode from '@/views/CookingMode.vue'
 
 const routes = [
   {
@@ -58,6 +59,12 @@ const routes = [
         path: 'profile',
         name: 'Profile',
         component: Profile,
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'cooking/:recipe',
+        name: 'CookingMode',
+        component: CookingMode,
         meta: { requiresAuth: true }
       }
     ]

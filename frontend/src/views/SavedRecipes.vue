@@ -176,40 +176,78 @@
       </div>
     </div>
 
-    <!-- Recipe Detail Modal (reused from Recipes page) -->
-    <div v-if="selectedRecipe" class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50" @click="closeRecipeModal">
-      <div class="min-h-screen px-4 text-center">
-        <div class="fixed inset-0 transition-opacity"></div>
-        
-        <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-lg" @click.stop>
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">{{ selectedRecipe.title }}</h3>
-            <button @click="closeRecipeModal" class="text-gray-400 hover:text-gray-600">
+    <!-- Recipe Detail Modal (same as Recipes page) -->
+    <div 
+      v-if="selectedRecipe" 
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      @click="closeRecipeModal"
+    >
+      <div 
+        class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        @click.stop
+      >
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <h2 class="text-2xl font-bold text-gray-900">{{ selectedRecipe.title }}</h2>
+            <button 
+              @click="closeRecipeModal"
+              class="text-gray-400 hover:text-gray-600"
+            >
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
 
-          <div class="space-y-4 max-h-96 overflow-y-auto">
-            <div>
-              <h4 class="font-medium text-gray-900 mb-2">{{ $t('recipes.ingredients') }}:</h4>
-              <ul class="text-sm text-gray-600 space-y-1">
-                <li v-for="ingredient in getIngredientList(selectedRecipe.ingredients)" :key="ingredient">
-                  • {{ ingredient }}
-                </li>
-              </ul>
-            </div>
+          <p v-if="selectedRecipe.description" class="text-gray-600 mb-4">{{ selectedRecipe.description }}</p>
 
-            <div>
-              <h4 class="font-medium text-gray-900 mb-2">{{ $t('recipes.instructions') }}:</h4>
-              <ol class="text-sm text-gray-600 space-y-2">
-                <li v-for="(step, index) in getInstructionsList(selectedRecipe.instructions)" :key="index" class="flex">
-                  <span class="font-medium mr-2">{{ index + 1 }}.</span>
-                  <span>{{ step }}</span>
-                </li>
-              </ol>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
+            <div v-if="selectedRecipe.cookingTime" class="text-center p-3 bg-gray-50 rounded">
+              <div class="font-semibold">{{ $t('recipes.cookingTime') }}</div>
+              <div class="text-gray-600">{{ selectedRecipe.cookingTime.total || selectedRecipe.cookingTime }} {{ $t('recipes.minutes') }}</div>
             </div>
+            <div v-if="selectedRecipe.difficulty" class="text-center p-3 bg-gray-50 rounded">
+              <div class="font-semibold">{{ $t('recipes.difficulty.label') }}</div>
+              <div class="text-gray-600">{{ $t(`recipes.difficulty.${selectedRecipe.difficulty}`) }}</div>
+            </div>
+            <div v-if="selectedRecipe.servings" class="text-center p-3 bg-gray-50 rounded">
+              <div class="font-semibold">{{ $t('recipes.servings') }}</div>
+              <div class="text-gray-600">{{ selectedRecipe.servings }}</div>
+            </div>
+            <div v-if="selectedRecipe.nutrition || selectedRecipe.nutritionalInfo" class="text-center p-3 bg-gray-50 rounded">
+              <div class="font-semibold">{{ $t('recipes.calories') }}</div>
+              <div class="text-gray-600">{{ (selectedRecipe.nutrition?.calories || selectedRecipe.nutritionalInfo?.calories) || '-' }}</div>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">{{ $t('recipes.ingredients') }}</h3>
+            <ul class="space-y-2">
+              <li 
+                v-for="(ingredient, index) in getIngredientList(selectedRecipe.ingredients)" 
+                :key="index"
+                class="flex items-center text-gray-700"
+              >
+                <span class="w-2 h-2 bg-primary-500 rounded-full mr-3"></span>
+                {{ ingredient }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">{{ $t('recipes.instructions') }}</h3>
+            <ol class="space-y-3">
+              <li 
+                v-for="(instruction, index) in getInstructionsList(selectedRecipe.instructions)" 
+                :key="index"
+                class="flex text-gray-700"
+              >
+                <span class="flex-shrink-0 w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3 mt-0.5">
+                  {{ index + 1 }}
+                </span>
+                <span>{{ instruction }}</span>
+              </li>
+            </ol>
           </div>
 
           <div class="mt-6 flex space-x-3">
@@ -225,6 +263,9 @@
               @click="cookRecipe(selectedRecipe)"
               class="flex-1"
             >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
               Start Cooking
             </BaseButton>
           </div>
@@ -361,10 +402,13 @@ export default {
     },
 
     cookRecipe(recipe) {
-      // Start cooking mode - could open a step-by-step cooking guide
-      this.closeRecipeModal()
-      this.toast.info(this.$t('notifications.general.success'))
-      // For now, just show a toast notification
+      // Naviga alla modalità cucina con la ricetta
+      this.$router.push({
+        name: 'CookingMode',
+        params: {
+          recipe: encodeURIComponent(JSON.stringify(recipe))
+        }
+      })
     },
 
     clearSearch() {
