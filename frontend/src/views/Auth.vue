@@ -286,6 +286,14 @@ const handleLogin = async () => {
   if (result.success) {
     toast.success(t('notifications.auth.loginSuccess', { name: result.user.name }))
     router.push('/app/home')
+  } else {
+    // Show more specific error messages based on error code
+    if (result.code === 'INVALID_CREDENTIALS') {
+      loginErrors.value.email = t('auth.validation.invalidCredentials')
+      loginErrors.value.password = t('auth.validation.invalidCredentials')
+    } else if (result.code === 'ACCOUNT_DEACTIVATED') {
+      loginErrors.value.email = t('auth.validation.accountDeactivated')
+    }
   }
 }
 
@@ -320,6 +328,14 @@ const handleRegister = async () => {
   if (result.success) {
     toast.success(t('notifications.auth.registerSuccess'))
     router.push('/app/home')
+  } else {
+    // Show more specific error messages based on error code
+    if (result.code === 'USER_EXISTS') {
+      registerErrors.value.email = t('auth.validation.emailAlreadyExists')
+    } else if (result.error) {
+      // Handle validation errors if any
+      toast.error(result.error)
+    }
   }
 }
 

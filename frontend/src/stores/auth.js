@@ -37,8 +37,9 @@ export const useAuthStore = defineStore('auth', {
         
         return { success: true, user }
       } catch (error) {
-        this.error = error.response?.data?.message || 'Registration failed'
-        return { success: false, error: this.error }
+        this.error = error.response?.data?.error || 'Registration failed'
+        const errorCode = error.response?.data?.code
+        return { success: false, error: this.error, code: errorCode }
       } finally {
         this.loading = false
       }
@@ -62,8 +63,9 @@ export const useAuthStore = defineStore('auth', {
         
         return { success: true, user }
       } catch (error) {
-        this.error = error.response?.data?.message || 'Login failed'
-        return { success: false, error: this.error }
+        this.error = error.response?.data?.error || 'Login failed'
+        const errorCode = error.response?.data?.code
+        return { success: false, error: this.error, code: errorCode }
       } finally {
         this.loading = false
       }
