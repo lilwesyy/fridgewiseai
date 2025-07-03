@@ -146,6 +146,12 @@
       "subtitle": "Join thousands of users who have already discovered the magic of AI in cooking",
       "button": "Start Your Culinary Adventure"
     },
+    "support": {
+      "title": "Support FridgeWise AI",
+      "description": "If you love our app, consider supporting us to keep it free and help us continue improving it for everyone.",
+      "donateButton": "Make a Donation",
+      "note": "Every contribution helps us grow"
+    },
     "footer": {
       "description": "FridgeWise AI helps you cook intelligently, reducing waste and discovering new recipes with ingredients you already have.",
       "quickLinks": "Quick Links",
@@ -157,7 +163,8 @@
       "pricing": "Pricing",
       "rights": "All rights reserved.",
       "madeWith": "Made with",
-      "location": "in Italy"
+      "location": "in Italy",
+      "donate": "Donate"
     }
   },
   "camera": {
@@ -222,7 +229,24 @@
     "retakePhoto": "Retake",
     "generateRecipes": "Generate Recipes",
     "galleryButton": "Gallery",
-    "iPhoneCameraButton": "iPhone Camera"
+    "iPhoneCameraButton": "iPhone Camera",
+    "choiceTitle": "How would you like to add ingredients?",
+    "choiceSubtitle": "Choose the method you prefer to select your ingredients",
+    "manualSelection": "Manual Selection",
+    "useCamera": "Use Camera",
+    "selectIngredients": "Select Ingredients",
+    "generateRecipesButton": "Generate Recipes",
+    "searchIngredients": "Search ingredients...",
+    "selectedIngredients": "Selected Ingredients",
+    "searchResults": "Search results",
+    "noResults": "No results",
+    "tryAnotherSearch": "Try another search",
+    "searchPromptTitle": "Search ingredients",
+    "searchPromptSubtitle": "Type at least 2 characters to start searching",
+    "popularCategories": "Popular categories",
+    "quickAdd": "Quick add",
+    "selectAtLeastOne": "Select at least one ingredient",
+    "ingredients": "ingredients"
   },
   "recipes": {
     "title": "Your Recipes",
@@ -256,16 +280,20 @@
       "gluten-free": "Gluten Free",
       "healthy": "Healthy",
       "quick": "Quick",
+      "italian": "Italian",
+      "contorno": "Side Dish",
       "easy": "Easy",
       "homemade": "Homemade",
       "fresh": "Fresh",
-      "ai-generated": "AI Generated"
+      "ai-generated": "AI Generated",
+      "simple": "Simple"
     },
     "empty": {
       "title": "No recipes yet",
       "subtitle": "Start by scanning some ingredients to generate your first recipe!",
       "action": "Scan Ingredients"
-    }
+    },
+    "donationToast": "Enjoying the app? Consider a donation to support development! 💝"
   },
   "ingredients": {
     "tomatoes": "Tomatoes",
@@ -293,6 +321,13 @@
     "notSpecified": "Not specified",
     "donate": "Donate",
     "donateTooltip": "Support the development of FridgeWiseAI"
+  },
+  "footer": {
+    "supportDevelopment": "Support development",
+    "supportTitle": "Support FridgeWise",
+    "supportDescription": "Help us improve the app and keep it free",
+    "supportButton": "Make a donation",
+    "supportNote": "Every contribution is greatly appreciated"
   },
   "time": {
     "prepTime": "Prep Time",
@@ -339,7 +374,10 @@
     "noRecipesSubtitle": "Start by scanning your ingredients to generate your first recipe",
     "getStarted": "Get Started",
     "proTip": "Pro Tip",
-    "proTipContent": "For best results, take clear photos of your ingredients with good lighting. The AI works better when it can see individual items clearly."
+    "proTipContent": "For best results, take clear photos of your ingredients with good lighting. The AI works better when it can see individual items clearly.",
+    "supportTitle": "Support FridgeWiseAI",
+    "supportDescription": "Help us keep improving the app!",
+    "supportButton": "Donate"
   },
   "savedRecipes": {
     "title": "Saved Recipes",
@@ -377,6 +415,7 @@
     "helpSupportDescription": "Get help and report issues",
     "supportApp": "Support the App",
     "supportAppDescription": "Help us keep improving FridgeWiseAI",
+    "supportBadge": "Help",
     "logout": "Logout",
     "logoutConfirm": "Are you sure you want to logout?",
     "logoutConfirmTitle": "Logout",
@@ -395,6 +434,7 @@
     "supportEmailSubject": "FridgeWiseAI Support Request",
     "supportEmailBody": "Hi FridgeWiseAI team,\\n\\nI need help with:\\n\\n",
     "languagePreferenceSaved": "Language preference saved",
-    "languagePreferenceFailed": "Failed to save language preference"
+    "languagePreferenceFailed": "Failed to save language preference",
+    "clickToChangePhoto": "Click to change photo"
   }
 }
