@@ -1,45 +1,368 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header con controlli principali -->
-    <div class="bg-white shadow-sm border-b border-gray-200 px-4 py-4">
+    <div class="bg-white shadow-sm border-b border-gray-200 px-2 sm:px-4 py-3 sm:py-4">
       <div class="flex items-center justify-between max-w-6xl mx-auto">
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2 sm:space-x-4">
           <Button
             @click="exitCookingMode"
             variant="ghost"
-            size="lg"
-            class="text-gray-600 hover:text-gray-800"
+            size="sm"
+            class="text-gray-600 hover:text-gray-800 p-2 sm:p-3"
           >
-            <ArrowLeft class="h-6 w-6 mr-2" />
-            {{ $t('common.exit') }}
+            <ArrowLeft class="h-5 w-5 sm:h-6 sm:w-6 sm:mr-2" />
+            <span class="hidden sm:inline">{{ $t('common.exit') }}</span>
           </Button>
-          <h2 class="text-xl font-bold text-primary-600">FridgeWiseAI</h2>
+          <h2 class="text-lg sm:text-xl font-bold text-primary-600 hidden sm:block">FridgeWiseAI</h2>
         </div>
         
         <!-- Timer totale -->
         <div class="text-center">
-          <div class="text-3xl font-mono font-bold text-primary-600">
+          <div class="text-xl sm:text-3xl font-mono font-bold text-primary-600">
             {{ formatTime(totalElapsedTime) }}
           </div>
-          <p class="text-sm text-gray-500">{{ $t('cookingMode.totalTime') }}</p>
+          <p class="text-xs sm:text-sm text-gray-500">{{ $t('cookingMode.totalTime') }}</p>
         </div>
       </div>
     </div>
 
     <!-- Sezione nome ricetta e progresso -->
-    <div class="bg-gray-50 border-b border-gray-200 px-4 py-3">
+    <div class="bg-gray-50 border-b border-gray-200 px-2 sm:px-4 py-2 sm:py-3">
       <div class="max-w-6xl mx-auto">
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">
+        <h1 class="text-lg sm:text-2xl font-bold text-gray-900 mb-1 truncate">
           {{ recipe.name }}
         </h1>
-        <p class="text-sm text-gray-500">
+        <p class="text-xs sm:text-sm text-gray-500">
           {{ $t('cookingMode.stepProgress', { current: currentStep + 1, total: recipe.instructions.length }) }}
         </p>
       </div>
     </div>
 
-    <div class="max-w-6xl mx-auto p-4">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Mobile Tab Navigation -->
+    <div class="lg:hidden bg-white border-b border-gray-200">
+      <div class="flex">
+        <button 
+          @click="activeTab = 'ingredients'"
+          class="flex-1 py-3 px-4 text-center font-medium text-sm border-b-2 transition-colors"
+          :class="activeTab === 'ingredients' 
+            ? 'border-primary-500 text-primary-600 bg-primary-50' 
+            : 'border-transparent text-gray-500 hover:text-gray-700'"
+        >
+          {{ $t('cookingMode.ingredients') }}
+        </button>
+        <button 
+          @click="activeTab = 'step'"
+          class="flex-1 py-3 px-4 text-center font-medium text-sm border-b-2 transition-colors"
+          :class="activeTab === 'step' 
+            ? 'border-primary-500 text-primary-600 bg-primary-50' 
+            : 'border-transparent text-gray-500 hover:text-gray-700'"
+        >
+          {{ $t('cookingMode.currentStep') }}
+        </button>
+        <button 
+          @click="activeTab = 'overview'"
+          class="flex-1 py-3 px-4 text-center font-medium text-sm border-b-2 transition-colors"
+          :class="activeTab === 'overview' 
+            ? 'border-primary-500 text-primary-600 bg-primary-50' 
+            : 'border-transparent text-gray-500 hover:text-gray-700'"
+        >
+          {{ $t('cookingMode.overview') }}
+        </button>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto p-2 sm:p-4">
+      <!-- Mobile Content -->
+      <div class="lg:hidden">
+        <!-- Ingredients Tab -->
+        <div v-if="activeTab === 'ingredients'" class="space-y-4">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h2 class="text-lg font-bold mb-4 text-gray-900 flex items-center">
+              <CheckSquare class="h-5 w-5 mr-2 text-primary-600" />
+              {{ $t('cookingMode.ingredients') }}
+            </h2>
+            
+            <div class="space-y-2">
+              <div 
+                v-for="(ingredient, index) in recipe.ingredients" 
+                :key="index"
+                class="flex items-center space-x-3 p-2 rounded-lg border transition-all cursor-pointer"
+                :class="checkedIngredients[index] 
+                  ? 'bg-primary-50 border-primary-200' 
+                  : 'bg-gray-50 border-gray-200 hover:border-gray-300'"
+                @click="toggleIngredient(index)"
+              >
+                <div 
+                  class="w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+                  :class="checkedIngredients[index] 
+                    ? 'bg-primary-500 border-primary-500' 
+                    : 'border-gray-300'"
+                >
+                  <Check v-if="checkedIngredients[index]" class="h-3 w-3 text-white" />
+                </div>
+                <span 
+                  class="text-sm leading-relaxed transition-all"
+                  :class="checkedIngredients[index] 
+                    ? 'line-through text-gray-500' 
+                    : 'text-gray-900'"
+                >
+                  {{ ingredient }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Progresso ingredienti -->
+            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-medium text-gray-700">
+                  {{ $t('cookingMode.ingredientsProgress') }}
+                </span>
+                <span class="text-xs font-bold text-primary-600">
+                  {{ checkedIngredientsCount }}/{{ recipe.ingredients.length }}
+                </span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  class="bg-primary-500 h-2 rounded-full transition-all duration-300"
+                  :style="{ width: ingredientsProgress + '%' }"
+                ></div>
+              </div>
+              
+              <!-- Auto-start timer quando tutti gli ingredienti sono controllati -->
+              <div v-if="allIngredientsChecked && !stepTimerActive && !hasStartedCooking" 
+                   class="mt-3 p-2 bg-primary-50 border border-primary-200 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-primary-700 font-medium">
+                    {{ $t('cookingMode.allIngredientsReady') }}
+                  </span>
+                  <Button
+                    @click="startCookingProcess"
+                    size="sm"
+                    class="bg-primary-600 hover:bg-primary-700 text-white text-xs px-3 py-1"
+                  >
+                    {{ $t('cookingMode.startCooking') }}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step Tab -->
+        <div v-if="activeTab === 'step'" class="space-y-4">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4" 
+               @touchstart="handleTouchStart" 
+               @touchend="handleTouchEnd">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-bold text-gray-900">
+                {{ $t('cookingMode.currentStep') }}
+              </h2>
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">
+                  {{ currentStep + 1 }} / {{ recipe.instructions.length }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Barra di progresso generale -->
+            <div class="mb-4">
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  class="bg-primary-500 h-3 rounded-full transition-all duration-300 flex items-center justify-end pr-1"
+                  :style="{ width: overallProgress + '%' }"
+                >
+                  <span class="text-xs font-bold text-white" v-if="overallProgress > 20">
+                    {{ Math.round(overallProgress) }}%
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contenuto dello step corrente -->
+            <div class="mb-4">
+              <div class="bg-primary-50 border-l-4 border-primary-500 p-4 rounded-r-lg relative">
+                <p class="text-base leading-relaxed text-gray-900 font-medium">
+                  {{ recipe.instructions[currentStep] }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Timer dello step -->
+            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium text-gray-700">
+                  {{ $t('cookingMode.stepTimer') }}
+                </span>
+                <div class="flex space-x-1">
+                  <Button
+                    @click="addStepTime(60)"
+                    variant="ghost"
+                    size="sm"
+                    class="text-xs px-2 py-1"
+                  >
+                    +1{{ $t('cookingMode.min') }}
+                  </Button>
+                  <Button
+                    @click="addStepTime(300)"
+                    variant="ghost"
+                    size="sm"
+                    class="text-xs px-2 py-1"
+                  >
+                    +5{{ $t('cookingMode.min') }}
+                  </Button>
+                </div>
+              </div>
+              
+              <div class="text-center">
+                <div class="text-2xl font-mono font-bold mb-2"
+                     :class="stepTimer <= 10 && stepTimer > 0 
+                       ? 'text-red-600 animate-pulse' 
+                       : 'text-primary-600'"
+                >
+                  {{ formatTime(stepTimer) }}
+                </div>
+                
+                <div class="flex justify-center space-x-2">
+                  <Button
+                    @click="startStepTimer"
+                    v-if="!stepTimerActive"
+                    variant="default"
+                    size="sm"
+                    class="bg-primary-600 hover:bg-primary-700 px-3 py-2"
+                  >
+                    <Play class="h-4 w-4 mr-1" />
+                    {{ $t('cookingMode.startTimer') }}
+                  </Button>
+                  
+                  <Button
+                    @click="pauseStepTimer"
+                    v-if="stepTimerActive"
+                    variant="secondary"
+                    size="sm"
+                    class="px-3 py-2"
+                  >
+                    <Pause class="h-4 w-4 mr-1" />
+                    {{ $t('cookingMode.pauseTimer') }}
+                  </Button>
+                  
+                  <Button
+                    @click="resetStepTimer"
+                    variant="ghost"
+                    size="sm"
+                    class="px-3 py-2"
+                  >
+                    <RotateCcw class="h-4 w-4 mr-1" />
+                    {{ $t('cookingMode.resetTimer') }}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Navigazione step -->
+            <div class="flex justify-between">
+              <Button
+                @click="previousStep"
+                :disabled="currentStep === 0"
+                variant="secondary"
+                size="sm"
+                class="px-4 py-2"
+              >
+                <ChevronLeft class="h-4 w-4 mr-1" />
+                {{ $t('cookingMode.previous') }}
+              </Button>
+              
+              <Button
+                @click="nextStep"
+                v-if="currentStep < recipe.instructions.length - 1"
+                variant="default"
+                size="sm"
+                class="px-4 py-2 bg-primary-600 hover:bg-primary-700"
+              >
+                {{ $t('cookingMode.next') }}
+                <ChevronRight class="h-4 w-4 ml-1" />
+              </Button>
+              
+              <Button
+                @click="completeCooking"
+                v-if="currentStep === recipe.instructions.length - 1"
+                variant="default"
+                size="sm"
+                class="px-4 py-2 bg-primary-600 hover:bg-primary-700"
+              >
+                <CheckCircle class="h-4 w-4 mr-1" />
+                {{ $t('cookingMode.complete') }}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overview Tab -->
+        <div v-if="activeTab === 'overview'" class="space-y-4">
+          <!-- Informazioni ricetta -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 class="text-lg font-bold mb-3 text-gray-900">
+              {{ $t('cookingMode.recipeInfo') }}
+            </h3>
+            
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">{{ $t('common.prepTime') }}:</span>
+                <span class="font-medium text-gray-900">{{ recipe.prepTime || $t('common.notSpecified') }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">{{ $t('common.cookTime') }}:</span>
+                <span class="font-medium text-gray-900">{{ recipe.cookTime || $t('common.notSpecified') }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">{{ $t('common.servings') }}:</span>
+                <span class="font-medium text-gray-900">{{ recipe.servings || $t('common.notSpecified') }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">{{ $t('common.difficulty') }}:</span>
+                <span class="font-medium text-gray-900">{{ recipe.difficulty || $t('common.notSpecified') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lista di tutti gli step -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <h3 class="text-lg font-bold mb-3 text-gray-900">
+              {{ $t('cookingMode.allSteps') }}
+            </h3>
+            
+            <div class="space-y-2 max-h-64 overflow-y-auto">
+              <div 
+                v-for="(step, index) in recipe.instructions" 
+                :key="index"
+                class="p-2 rounded-lg cursor-pointer transition-all"
+                :class="index === currentStep 
+                  ? 'bg-primary-100 border border-primary-300' 
+                  : index < currentStep 
+                    ? 'bg-green-50 border border-green-200' 
+                    : 'bg-gray-50 border border-gray-200 hover:border-gray-300'"
+                @click="goToStep(index)"
+              >
+                <div class="flex items-start space-x-2">
+                  <span class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                        :class="index === currentStep 
+                          ? 'bg-primary-500 text-white' 
+                          : index < currentStep 
+                            ? 'bg-green-500 text-white' 
+                            : 'bg-gray-300 text-gray-600'"
+                  >
+                    <CheckCircle v-if="index < currentStep" class="h-3 w-3" />
+                    <span v-else>{{ index + 1 }}</span>
+                  </span>
+                  <p class="text-xs text-gray-700 leading-relaxed">{{ step }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Layout -->
+      <div class="hidden lg:grid grid-cols-3 gap-6">
         
         <!-- Colonna sinistra: Lista ingredienti -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -455,6 +778,9 @@ const hasStartedCooking = ref(false)
 
 // Stato per il modale di uscita
 const showExitModal = ref(false)
+
+// Mobile tab navigation
+const activeTab = ref('step')
 
 // Computed properties
 const checkedIngredientsCount = computed(() => {

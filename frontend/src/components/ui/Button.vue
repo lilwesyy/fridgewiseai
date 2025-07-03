@@ -6,7 +6,8 @@
         'btn-primary': props.variant === 'primary' || props.variant === 'default',
         'btn-secondary': props.variant === 'secondary',
         'btn-ghost': props.variant === 'ghost',
-        'opacity-50 cursor-not-allowed': props.loading || props.disabled
+        'opacity-50 cursor-not-allowed': props.loading || props.disabled,
+        'w-full': props.fullWidth
       }
     ]"
     :disabled="props.loading || props.disabled"
@@ -29,6 +30,10 @@ const props = defineProps({
     default: false
   },
   disabled: {
+    type: Boolean,
+    default: false
+  },
+  fullWidth: {
     type: Boolean,
     default: false
   }

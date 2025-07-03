@@ -32,8 +32,8 @@
                 : 'text-gray-500 hover:text-gray-700'
             ]"
           >
-            <span class="flex items-center justify-center space-x-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span class="flex items-center justify-center space-x-2 h-5">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
               </svg>
               <span>{{ t('auth.login') }}</span>
@@ -48,8 +48,8 @@
                 : 'text-gray-500 hover:text-gray-700'
             ]"
           >
-            <span class="flex items-center justify-center space-x-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span class="flex items-center justify-center space-x-2 h-5">
+              <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
               </svg>
               <span>{{ t('auth.register') }}</span>
@@ -93,17 +93,17 @@
               <BaseButton
                 type="submit"
                 variant="primary"
-                full-width
+                :full-width="true"
                 :loading="authStore.loading"
                 :disabled="!isLoginFormValid"
                 class="transform hover:scale-105 active:scale-95 transition-all duration-200 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800"
               >
-                <span class="flex items-center justify-center space-x-2">
+                <div class="flex items-center justify-center space-x-2">
                   <svg v-if="!authStore.loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                   </svg>
                   <span>{{ t('auth.login') }}</span>
-                </span>
+                </div>
               </BaseButton>
             </div>
 
@@ -168,23 +168,94 @@
                   class="transform hover:scale-[1.02] transition-transform duration-200"
                 />
               </div>
+
+              <!-- Honeypot field - hidden from users but visible to bots -->
+              <div class="hidden">
+                <input
+                  type="text"
+                  name="website"
+                  v-model="registerForm.honeypot"
+                  tabindex="-1"
+                  autocomplete="off"
+                />
+              </div>
+
+              <!-- Math CAPTCHA -->
+              <div class="animate-slide-in-left" style="animation-delay: 0.45s">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ t('auth.securityCheck') }}
+                  </label>
+                  <div class="flex items-center space-x-3">
+                    <span class="text-lg font-mono bg-white px-3 py-2 rounded border">
+                      {{ mathCaptcha.question }}
+                    </span>
+                    <span class="text-lg">=</span>
+                    <BaseInput
+                      id="captcha-answer"
+                      v-model="registerForm.captchaAnswer"
+                      type="number"
+                      :placeholder="t('auth.enterAnswer')"
+                      :error="registerErrors.captchaAnswer"
+                      required
+                      class="w-20"
+                      @input="validateCaptcha"
+                    />
+                    <button
+                      type="button"
+                      @click="generateMathCaptcha"
+                      class="text-primary-600 hover:text-primary-700 p-1"
+                      :title="t('auth.refreshCaptcha')"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Terms and Privacy checkbox -->
+              <div class="animate-slide-in-left" style="animation-delay: 0.5s">
+                <label class="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    v-model="registerForm.acceptTerms"
+                    class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 flex-shrink-0"
+                    required
+                  />
+                  <span class="text-sm text-gray-600 leading-relaxed">
+                    {{ t('auth.acceptTerms') }}
+                    <a href="#" class="text-primary-600 hover:text-primary-700 underline">
+                      {{ t('auth.termsOfService') }}
+                    </a>
+                    {{ t('auth.and') }}
+                    <a href="#" class="text-primary-600 hover:text-primary-700 underline">
+                      {{ t('auth.privacyPolicy') }}
+                    </a>
+                  </span>
+                </label>
+                <div v-if="registerErrors.acceptTerms" class="text-sm text-red-600 mt-1">
+                  {{ registerErrors.acceptTerms }}
+                </div>
+              </div>
             </div>
 
             <div class="animate-slide-in-up" style="animation-delay: 0.5s">
               <BaseButton
                 type="submit"
                 variant="primary"
-                full-width
+                :full-width="true"
                 :loading="authStore.loading"
                 :disabled="!isRegisterFormValid"
                 class="transform hover:scale-105 active:scale-95 transition-all duration-200 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800"
               >
-                <span class="flex items-center justify-center space-x-2">
+                <div class="flex items-center justify-center space-x-2">
                   <svg v-if="!authStore.loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
                   </svg>
                   <span>{{ t('auth.register') }}</span>
-                </span>
+                </div>
               </BaseButton>
             </div>
 
@@ -220,7 +291,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
@@ -243,10 +314,27 @@ const registerForm = ref({
   name: '',
   email: '',
   password: '',
-  confirmPassword: ''
+  confirmPassword: '',
+  honeypot: '', // Anti-bot honeypot field
+  captchaAnswer: '',
+  acceptTerms: false
 })
 const loginErrors = ref({})
 const registerErrors = ref({})
+
+// Anti-bot measures
+const mathCaptcha = ref({
+  question: '',
+  answer: 0
+})
+const formStartTime = ref(null)
+const interactionCount = ref(0)
+const lastSubmissionTime = ref(0)
+
+// Rate limiting - minimum time between submissions (in milliseconds)
+const RATE_LIMIT_MS = 5000 // 5 seconds
+const MIN_FORM_TIME_MS = 3000 // Minimum 3 seconds to fill form
+const MAX_FORM_TIME_MS = 1800000 // Maximum 30 minutes
 
 // Computed properties
 const isLoginFormValid = computed(() => {
@@ -259,7 +347,11 @@ const isRegisterFormValid = computed(() => {
     registerForm.value.email &&
     registerForm.value.password &&
     registerForm.value.confirmPassword &&
-    registerForm.value.password === registerForm.value.confirmPassword
+    registerForm.value.password === registerForm.value.confirmPassword &&
+    registerForm.value.captchaAnswer &&
+    parseInt(registerForm.value.captchaAnswer) === mathCaptcha.value.answer &&
+    registerForm.value.acceptTerms &&
+    !registerForm.value.honeypot // Honeypot should be empty
   )
 })
 
@@ -301,6 +393,11 @@ const handleRegister = async () => {
   registerErrors.value = {}
   authStore.clearMessages()
 
+  // Anti-bot validation checks
+  if (!validateAntiBot()) {
+    return
+  }
+
   // Basic validation
   if (!registerForm.value.name) {
     registerErrors.value.name = t('auth.validation.nameRequired')
@@ -316,6 +413,10 @@ const handleRegister = async () => {
   }
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
     registerErrors.value.confirmPassword = t('auth.validation.passwordsDoNotMatch')
+    return
+  }
+  if (!registerForm.value.acceptTerms) {
+    registerErrors.value.acceptTerms = t('auth.validation.termsRequired')
     return
   }
 
@@ -337,13 +438,135 @@ const handleRegister = async () => {
       toast.error(result.error)
     }
   }
+  
+  // Update last submission time for rate limiting
+  lastSubmissionTime.value = Date.now()
+}
+
+// Anti-bot functions
+const generateMathCaptcha = () => {
+  // Semplifichiamo il captcha: solo addizioni con numeri piccoli (1-5)
+  const num1 = Math.floor(Math.random() * 5) + 1  // 1-5
+  const num2 = Math.floor(Math.random() * 5) + 1  // 1-5
+  
+  // Solo addizioni per mantenere semplicità
+  const answer = num1 + num2
+  
+  mathCaptcha.value.question = `${num1} + ${num2}`
+  mathCaptcha.value.answer = answer
+  registerForm.value.captchaAnswer = ''
+}
+
+const validateCaptcha = () => {
+  if (registerForm.value.captchaAnswer) {
+    const userAnswer = parseInt(registerForm.value.captchaAnswer)
+    if (userAnswer !== mathCaptcha.value.answer) {
+      registerErrors.value.captchaAnswer = t('auth.validation.incorrectCaptcha')
+    } else {
+      registerErrors.value.captchaAnswer = ''
+    }
+  }
+}
+
+const validateAntiBot = () => {
+  const currentTime = Date.now()
+  
+  // 1. Honeypot check - if filled, it's likely a bot
+  if (registerForm.value.honeypot) {
+    toast.error(t('auth.validation.suspiciousActivity'))
+    return false
+  }
+  
+  // 2. Rate limiting check
+  if (lastSubmissionTime.value && (currentTime - lastSubmissionTime.value) < RATE_LIMIT_MS) {
+    registerErrors.value.general = t('auth.validation.tooManyAttempts')
+    return false
+  }
+  
+  // 3. Form completion time check
+  if (formStartTime.value) {
+    const formTime = currentTime - formStartTime.value
+    if (formTime < MIN_FORM_TIME_MS) {
+      registerErrors.value.general = t('auth.validation.formTooFast')
+      return false
+    }
+    if (formTime > MAX_FORM_TIME_MS) {
+      registerErrors.value.general = t('auth.validation.formExpired')
+      return false
+    }
+  }
+  
+  // 4. CAPTCHA validation
+  if (!registerForm.value.captchaAnswer || parseInt(registerForm.value.captchaAnswer) !== mathCaptcha.value.answer) {
+    registerErrors.value.captchaAnswer = t('auth.validation.incorrectCaptcha')
+    return false
+  }
+  
+  // 5. Interaction count check (basic behavioral analysis)
+  if (interactionCount.value < 5) {
+    registerErrors.value.general = t('auth.validation.insufficientInteraction')
+    return false
+  }
+  
+  return true
+}
+
+const trackInteraction = () => {
+  interactionCount.value++
+}
+
+const initializeForm = () => {
+  formStartTime.value = Date.now()
+  interactionCount.value = 0
+  generateMathCaptcha()
+}
+
+// Add interaction tracking to form inputs
+const addInteractionListeners = () => {
+  // Track interactions on form fields
+  const formInputs = ['register-name', 'register-email', 'register-password', 'register-confirm-password', 'captcha-answer']
+  formInputs.forEach(id => {
+    const element = document.getElementById(id)
+    if (element) {
+      element.addEventListener('focus', trackInteraction)
+      element.addEventListener('input', trackInteraction)
+    }
+  })
 }
 
 // Watchers
-watch(activeTab, () => {
+watch(activeTab, (newTab) => {
   loginErrors.value = {}
   registerErrors.value = {}
   authStore.clearMessages()
+  
+  // Initialize anti-bot measures when switching to register tab
+  if (newTab === 'register') {
+    setTimeout(() => {
+      initializeForm()
+      addInteractionListeners()
+    }, 100)
+  }
+})
+
+// Initialize on component mount
+onMounted(() => {
+  if (activeTab.value === 'register') {
+    initializeForm()
+    setTimeout(addInteractionListeners, 100)
+  }
+})
+
+onUnmounted(() => {
+  // Clean up event listeners
+  const formInputs = ['register-name', 'register-email', 'register-password', 'register-confirm-password', 'captcha-answer']
+  formInputs.forEach(id => {
+    const element = document.getElementById(id)
+    if (element) {
+      element.removeEventListener('focus', trackInteraction)
+      element.removeEventListener('input', trackInteraction)
+    }
+  })
 })
 </script>
 

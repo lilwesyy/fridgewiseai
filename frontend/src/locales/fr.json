@@ -21,6 +21,13 @@
     "newPassword": "Nouveau mot de passe",
     "confirmNewPassword": "Confirmer le nouveau mot de passe",
     "passwordChangeSuccess": "Mot de passe modifié avec succès !",
+    "securityCheck": "Vérification de Sécurité",
+    "enterAnswer": "Réponse",
+    "refreshCaptcha": "Actualiser",
+    "acceptTerms": "J'accepte les",
+    "termsOfService": "Conditions d'Utilisation",
+    "and": "et la",
+    "privacyPolicy": "Politique de Confidentialité",
     "validation": {
       "emailRequired": "L'email est requis",
       "passwordRequired": "Le mot de passe est requis",
@@ -33,7 +40,14 @@
       "newPasswordRequired": "Le nouveau mot de passe est requis",
       "newPasswordMinLength": "Le nouveau mot de passe doit contenir au moins 6 caractères",
       "newPasswordsDoNotMatch": "Les nouveaux mots de passe ne correspondent pas",
-      "wrongCurrentPassword": "Le mot de passe actuel est incorrect"
+      "wrongCurrentPassword": "Le mot de passe actuel est incorrect",
+      "incorrectCaptcha": "Réponse incorrecte. Veuillez réessayer.",
+      "suspiciousActivity": "Activité suspecte détectée. Veuillez réessayer.",
+      "tooManyAttempts": "Trop de tentatives. Veuillez attendre avant de réessayer.",
+      "formTooFast": "Formulaire soumis trop rapidement. Prenez votre temps.",
+      "formExpired": "Session du formulaire expirée. Veuillez actualiser et réessayer.",
+      "insufficientInteraction": "Veuillez interagir correctement avec le formulaire.",
+      "termsRequired": "Vous devez accepter les termes et conditions"
     }
   },
   "navigation": {
@@ -373,6 +387,7 @@
     "exitConfirmTitle": "Quitter le Mode Cuisine?",
     "exitConfirmMessage": "Êtes-vous sûr de vouloir quitter le mode cuisine? Votre progression sera perdue.",
     "allIngredientsReady": "Tous les ingrédients vérifiés! Prêt à commencer la cuisine?",
+    "overview": "Aperçu",
     "startCooking": "Commencer à Cuisiner"
   },
   "home": {

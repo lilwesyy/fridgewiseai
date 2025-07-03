@@ -21,6 +21,13 @@
     "newPassword": "Nuova Password",
     "confirmNewPassword": "Conferma Nuova Password",
     "passwordChangeSuccess": "Password cambiata con successo!",
+    "securityCheck": "Controllo di Sicurezza",
+    "enterAnswer": "Risposta",
+    "refreshCaptcha": "Aggiorna",
+    "acceptTerms": "Accetto i",
+    "termsOfService": "Termini di Servizio",
+    "and": "e la",
+    "privacyPolicy": "Privacy Policy",
     "validation": {
       "emailRequired": "L'email è obbligatoria",
       "passwordRequired": "La password è obbligatoria",
@@ -33,7 +40,14 @@
       "newPasswordRequired": "La nuova password è obbligatoria",
       "newPasswordMinLength": "La nuova password deve essere di almeno 6 caratteri",
       "newPasswordsDoNotMatch": "Le nuove password non corrispondono",
-      "wrongCurrentPassword": "La password attuale non è corretta"
+      "wrongCurrentPassword": "La password attuale non è corretta",
+      "incorrectCaptcha": "Risposta errata. Riprova.",
+      "suspiciousActivity": "Attività sospetta rilevata. Riprova.",
+      "tooManyAttempts": "Troppi tentativi. Attendi prima di riprovare.",
+      "formTooFast": "Form inviato troppo velocemente. Prenditi il tuo tempo.",
+      "formExpired": "Sessione form scaduta. Aggiorna e riprova.",
+      "insufficientInteraction": "Interagisci correttamente con il form.",
+      "termsRequired": "Devi accettare i termini e condizioni"
     }
   },
   "navigation": {
@@ -373,6 +387,7 @@
     "exitConfirmTitle": "Uscire dalla Modalità Cucina?",
     "exitConfirmMessage": "Sei sicuro di voler uscire dalla modalità cucina? I tuoi progressi andranno persi.",
     "allIngredientsReady": "Tutti gli ingredienti controllati! Pronto per iniziare a cucinare?",
+    "overview": "Panoramica",
     "startCooking": "Inizia a Cucinare"
   },
   "home": {

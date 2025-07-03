@@ -21,6 +21,13 @@
     "newPassword": "Neues Passwort",
     "confirmNewPassword": "Neues Passwort bestätigen",
     "passwordChangeSuccess": "Passwort erfolgreich geändert!",
+    "securityCheck": "Sicherheitsprüfung",
+    "enterAnswer": "Antwort",
+    "refreshCaptcha": "Aktualisieren",
+    "acceptTerms": "Ich akzeptiere die",
+    "termsOfService": "Nutzungsbedingungen",
+    "and": "und die",
+    "privacyPolicy": "Datenschutzrichtlinie",
     "validation": {
       "emailRequired": "E-Mail ist erforderlich",
       "passwordRequired": "Passwort ist erforderlich",
@@ -33,7 +40,14 @@
       "newPasswordRequired": "Neues Passwort ist erforderlich",
       "newPasswordMinLength": "Neues Passwort muss mindestens 6 Zeichen lang sein",
       "newPasswordsDoNotMatch": "Neue Passwörter stimmen nicht überein",
-      "wrongCurrentPassword": "Aktuelles Passwort ist falsch"
+      "wrongCurrentPassword": "Aktuelles Passwort ist falsch",
+      "incorrectCaptcha": "Falsche Antwort. Bitte versuchen Sie es erneut.",
+      "suspiciousActivity": "Verdächtige Aktivität erkannt. Bitte versuchen Sie es erneut.",
+      "tooManyAttempts": "Zu viele Versuche. Bitte warten Sie, bevor Sie es erneut versuchen.",
+      "formTooFast": "Formular zu schnell gesendet. Bitte nehmen Sie sich Zeit.",
+      "formExpired": "Formular-Sitzung abgelaufen. Bitte aktualisieren und erneut versuchen.",
+      "insufficientInteraction": "Bitte interagieren Sie ordnungsgemäß mit dem Formular.",
+      "termsRequired": "Sie müssen die Geschäftsbedingungen akzeptieren"
     }
   },
   "navigation": {
@@ -372,6 +386,7 @@
     "exitConfirmTitle": "Koch-Modus verlassen?",
     "exitConfirmMessage": "Möchten Sie wirklich den Koch-Modus verlassen? Ihr Fortschritt geht verloren.",
     "allIngredientsReady": "Alle Zutaten überprüft! Bereit zum Kochen?",
+    "overview": "Übersicht",
     "startCooking": "Mit Kochen beginnen"
   },
   "home": {

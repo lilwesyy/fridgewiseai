@@ -21,6 +21,13 @@
     "newPassword": "New Password",
     "confirmNewPassword": "Confirm New Password",
     "passwordChangeSuccess": "Password changed successfully!",
+    "securityCheck": "Security Check",
+    "enterAnswer": "Answer",
+    "refreshCaptcha": "Refresh",
+    "acceptTerms": "I accept the",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
     "validation": {
       "emailRequired": "Email is required",
       "passwordRequired": "Password is required",
@@ -33,7 +40,14 @@
       "newPasswordRequired": "New password is required",
       "newPasswordMinLength": "New password must be at least 6 characters",
       "newPasswordsDoNotMatch": "New passwords do not match",
-      "wrongCurrentPassword": "Current password is incorrect"
+      "wrongCurrentPassword": "Current password is incorrect",
+      "incorrectCaptcha": "Incorrect answer. Please try again.",
+      "suspiciousActivity": "Suspicious activity detected. Please try again.",
+      "tooManyAttempts": "Too many attempts. Please wait before trying again.",
+      "formTooFast": "Form submitted too quickly. Please take your time.",
+      "formExpired": "Form session expired. Please refresh and try again.",
+      "insufficientInteraction": "Please interact with the form properly.",
+      "termsRequired": "You must accept the terms and conditions"
     }
   },
   "navigation": {
@@ -361,6 +375,7 @@
     "exitConfirmTitle": "Exit Cooking Mode?",
     "exitConfirmMessage": "Are you sure you want to exit cooking mode? Your progress will be lost.",
     "allIngredientsReady": "All ingredients checked! Ready to start cooking?",
+    "overview": "Overview",
     "startCooking": "Start Cooking"
   },
   "home": {
