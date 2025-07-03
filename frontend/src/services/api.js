@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { geminiService } from './geminiService.js'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
@@ -49,50 +50,85 @@ axios.interceptors.response.use(
 )
 
 class RecipeService {
-  // Generate a new recipe from ingredients
+  // Generate a new recipe from ingredients using Gemini
   async generateRecipe(ingredients, preferences = {}) {
     try {
-      const response = await axios.post('/recipes/generate', {
-        ingredients,
-        preferences
-      })
-      return response.data
+      // Use Gemini service instead of backend API
+      const recipe = await geminiService.generateRecipe(ingredients, preferences)
+      
+      // Save the recipe to the database (no fallback)
+      const savedRecipe = await this.saveRecipeToDatabase(recipe)
+      return { recipe: savedRecipe }
     } catch (error) {
-      throw new Error(error.response?.data?.error || 'Failed to generate recipe')
+      console.error('Recipe generation failed:', error.message)
+      throw new Error(error.message || 'Failed to generate recipe')
     }
   }
 
-  // Get user's recipes with pagination
-  async getUserRecipes(page = 1, limit = 10) {
+
+  // Save recipe to database
+  async saveRecipeToDatabase(recipe) {
     try {
-      const response = await axios.get('/recipes/my', {
-        params: { page, limit }
+      const response = await axios.post('/recipes', {
+        title: recipe.title,
+        description: recipe.description,
+        ingredients: recipe.ingredients,
+        instructions: recipe.instructions,
+        cookingTime: recipe.cookingTime,
+        servings: recipe.servings,
+        difficulty: recipe.difficulty,
+        calories: recipe.calories,
+        tags: recipe.tags,
+        tips: recipe.tips,
+        sourceIngredients: recipe.sourceIngredients,
+        isGenerated: recipe.isGenerated
       })
       return response.data
     } catch (error) {
-      throw new Error(error.response?.data?.error || 'Failed to fetch recipes')
+      console.error('Database save failed:', error)
+      throw error
+    }
+  }
+
+
+  // Get user's recipes with pagination (from database only)
+  async getUserRecipes(page = 1, limit = 10) {
+    try {
+      const response = await axios.get(`/recipes?page=${page}&limit=${limit}`)
+      return response.data
+    } catch (error) {
+      console.warn('Database not available for paginated recipes:', error.message)
+      // Return empty result instead of throwing error
+      return {
+        recipes: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 0
+      }
     }
   }
 
   // Get all user's recipes (no pagination)
   async getAllUserRecipes() {
     try {
-      const response = await axios.get('/recipes/my', {
-        params: { limit: 1000 } // Large limit to get all recipes
-      })
-      return response.data.recipes || []
+      const response = await axios.get('/recipes/all')
+      return response.data
     } catch (error) {
-      throw new Error(error.response?.data?.error || 'Failed to fetch all recipes')
+      console.warn('Database not available for recipes:', error.message)
+      // Return empty array instead of throwing error
+      return []
     }
   }
 
-  // Get a single recipe by ID
+  // Get a single recipe by ID (from database)
   async getRecipe(recipeId) {
     try {
       const response = await axios.get(`/recipes/${recipeId}`)
-      return response.data.recipe
+      return response.data
     } catch (error) {
-      throw new Error(error.response?.data?.error || 'Failed to fetch recipe')
+      console.error('Failed to fetch recipe from database:', error)
+      throw new Error('Failed to fetch recipe from database')
     }
   }
 
@@ -136,7 +172,12 @@ class UserService {
       const response = await axios.get('/users/stats')
       return response.data.stats
     } catch (error) {
-      throw new Error(error.response?.data?.error || 'Failed to fetch user stats')
+      console.warn('Database not available for user stats:', error.message)
+      // Return default stats instead of throwing error
+      return {
+        totalRecipes: 0,
+        totalScans: 0
+      }
     }
   }
 
@@ -224,88 +265,71 @@ class UserDataService {
   // Saved Recipes Management
   async getSavedRecipeIds() {
     try {
-      // Get user's saved recipes from their profile or preferences
-      const response = await axios.get('/auth/me')
-      return response.data.user.preferences?.savedRecipes || []
+      const savedRecipes = await this.getSavedRecipes()
+      return savedRecipes.map(recipe => recipe._id || recipe.id)
     } catch (error) {
-      console.warn('Failed to fetch saved recipes from server, using fallback')
+      console.warn('Failed to fetch saved recipe IDs:', error.message)
       return []
     }
   }
 
   async addSavedRecipe(recipeId) {
     try {
-      const currentSaved = await this.getSavedRecipeIds()
-      if (!currentSaved.includes(recipeId)) {
-        const updatedSaved = [...currentSaved, recipeId]
-        await axios.put('/auth/profile', {
-          preferences: { savedRecipes: updatedSaved }
-        })
-      }
+      await axios.post(`/recipes/${recipeId}/save`)
       return true
     } catch (error) {
-      throw new Error('Failed to save recipe')
+      console.warn('Failed to save recipe:', error.message)
+      return false
     }
   }
 
   async removeSavedRecipe(recipeId) {
     try {
-      const currentSaved = await this.getSavedRecipeIds()
-      const updatedSaved = currentSaved.filter(id => id !== recipeId)
-      await axios.put('/auth/profile', {
-        preferences: { savedRecipes: updatedSaved }
-      })
+      await axios.delete(`/recipes/${recipeId}/save`)
       return true
     } catch (error) {
-      throw new Error('Failed to remove saved recipe')
+      console.warn('Failed to remove saved recipe:', error.message)
+      return false
     }
   }
 
   async getSavedRecipes() {
     try {
-      const savedIds = await this.getSavedRecipeIds()
-      if (savedIds.length === 0) return []
-
-      // Fetch full recipe data for saved IDs
-      const recipes = await Promise.all(
-        savedIds.map(async (id) => {
-          try {
-            return await this.recipeService.getRecipe(id)
-          } catch (error) {
-            console.warn(`Failed to fetch recipe ${id}:`, error)
-            return null
-          }
-        })
-      )
-
-      return recipes.filter(recipe => recipe !== null)
+      const response = await axios.get('/recipes/saved')
+      return response.data
     } catch (error) {
-      throw new Error('Failed to fetch saved recipes')
+      console.warn('Failed to get saved recipes:', error.message)
+      return []
     }
   }
 
-  // Recent Activity Management (stored in user preferences)
+  // Recent Activity Management (using new database endpoints)
   async getRecentActivity() {
     try {
-      const response = await axios.get('/auth/me')
-      return response.data.user.preferences?.recentActivity || []
+      const response = await axios.get('/activity')
+      return response.data
     } catch (error) {
-      console.warn('Failed to fetch recent activity from server')
+      console.warn('Failed to fetch recent activity:', error.message)
       return []
     }
   }
 
   async addRecentActivity(activity) {
     try {
-      const currentActivity = await this.getRecentActivity()
-      const updatedActivity = [activity, ...currentActivity].slice(0, 10) // Keep only last 10
-      
-      await axios.put('/auth/profile', {
-        preferences: { recentActivity: updatedActivity }
+      await axios.post('/activity', {
+        type: 'recipe_generated',
+        title: activity.title || 'Recipe Generated',
+        description: activity.description || '',
+        relatedId: activity.id || null,
+        metadata: {
+          timestamp: activity.timestamp || new Date().toISOString()
+        }
       })
       return true
     } catch (error) {
-      throw new Error('Failed to update recent activity')
+      // Log the error but don't throw - allow app to continue working
+      console.warn('Backend not available for recent activity update:', error.message)
+      return false
     }
   }
 
