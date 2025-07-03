@@ -66,10 +66,10 @@
         <div 
           v-for="recipe in filteredRecipes" 
           :key="recipe._id || recipe.id"
-          class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+          class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all transform hover:-translate-y-1 duration-200"
         >
-          <div class="p-4">
-            <div class="flex items-start justify-between mb-2">
+          <div class="p-5">
+            <div class="flex items-start justify-between mb-3">
               <h3 class="text-lg font-semibold text-gray-900">{{ recipe.title }}</h3>
               <button 
                 @click="toggleSaved(recipe._id || recipe.id)"
@@ -88,17 +88,32 @@
             
             <p class="text-gray-600 text-sm mb-3">{{ recipe.description }}</p>
             
-            <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
-              <span v-if="recipe.cookingTime">⏱️ {{ recipe.cookingTime.total || recipe.cookingTime }} {{ $t('recipes.minutes') }}</span>
-              <span v-if="recipe.difficulty">📊 {{ $t(`recipes.difficulty.${recipe.difficulty}`) }}</span>
-              <span v-if="recipe.servings">👥 {{ recipe.servings }} {{ $t('recipes.servings') }}</span>
+            <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+              <span v-if="recipe.cookingTime" class="flex items-center">
+                <svg class="w-4 h-4 text-primary-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {{ recipe.cookingTime.total || recipe.cookingTime }} {{ $t('recipes.minutes') }}
+              </span>
+              <span v-if="recipe.difficulty" class="flex items-center">
+                <svg class="w-4 h-4 text-blue-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                {{ $t(`recipes.difficulty.${recipe.difficulty}`) }}
+              </span>
+              <span v-if="recipe.servings" class="flex items-center">
+                <svg class="w-4 h-4 text-green-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                {{ recipe.servings }} {{ $t('recipes.servings') }}
+              </span>
             </div>
 
-            <div v-if="recipe.tags && recipe.tags.length" class="flex flex-wrap gap-1 mb-3">
+            <div v-if="recipe.tags && recipe.tags.length" class="flex flex-wrap gap-1 mb-4">
               <span 
                 v-for="tag in recipe.tags" 
                 :key="tag"
-                class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
+                class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-gray-200 transition-colors"
               >
                 {{ $t(`recipes.tags.${tag}`, tag) }}
               </span>
@@ -107,7 +122,7 @@
             <BaseButton 
               variant="secondary" 
               @click="viewRecipe(recipe)"
-              class="w-full"
+              class="w-full shadow-sm hover:shadow transition-shadow"
             >
               {{ $t('recipes.viewRecipe') }}
             </BaseButton>
@@ -142,10 +157,10 @@
       @click="closeRecipeModal"
     >
       <div 
-        class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl"
         @click.stop
       >
-        <div class="p-6">
+        <div class="p-7">
           <div class="flex items-start justify-between mb-4">
             <h2 class="text-2xl font-bold text-gray-900">{{ selectedRecipe.title }}</h2>
             <button 
@@ -161,19 +176,19 @@
           <p v-if="selectedRecipe.description" class="text-gray-600 mb-4">{{ selectedRecipe.description }}</p>
 
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
-            <div v-if="selectedRecipe.cookingTime" class="text-center p-3 bg-gray-50 rounded">
+            <div v-if="selectedRecipe.cookingTime" class="text-center p-3 bg-gradient-to-br from-primary-50 to-blue-50 rounded-lg shadow-sm">
               <div class="font-semibold">{{ $t('recipes.cookingTime') }}</div>
               <div class="text-gray-600">{{ selectedRecipe.cookingTime.total || selectedRecipe.cookingTime }} {{ $t('recipes.minutes') }}</div>
             </div>
-            <div v-if="selectedRecipe.difficulty" class="text-center p-3 bg-gray-50 rounded">
+            <div v-if="selectedRecipe.difficulty" class="text-center p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-sm">
               <div class="font-semibold">{{ $t('recipes.difficulty.label') }}</div>
               <div class="text-gray-600">{{ $t(`recipes.difficulty.${selectedRecipe.difficulty}`) }}</div>
             </div>
-            <div v-if="selectedRecipe.servings" class="text-center p-3 bg-gray-50 rounded">
+            <div v-if="selectedRecipe.servings" class="text-center p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-sm">
               <div class="font-semibold">{{ $t('recipes.servings') }}</div>
               <div class="text-gray-600">{{ selectedRecipe.servings }}</div>
             </div>
-            <div v-if="selectedRecipe.nutritionalInfo" class="text-center p-3 bg-gray-50 rounded">
+            <div v-if="selectedRecipe.nutritionalInfo" class="text-center p-3 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg shadow-sm">
               <div class="font-semibold">{{ $t('recipes.calories') }}</div>
               <div class="text-gray-600">{{ selectedRecipe.nutritionalInfo.calories || '-' }}</div>
             </div>
@@ -187,7 +202,7 @@
                 :key="index"
                 class="flex items-center text-gray-700"
               >
-                <span class="w-2 h-2 bg-primary-500 rounded-full mr-3"></span>
+              <span class="w-2 h-2 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full mr-3 shadow-sm"></span>
                 {{ ingredient }}
               </li>
             </ul>
@@ -201,7 +216,7 @@
                 :key="index"
                 class="flex text-gray-700"
               >
-                <span class="flex-shrink-0 w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3 mt-0.5">
+                <span class="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3 mt-0.5 shadow-sm">
                   {{ index + 1 }}
                 </span>
                 <span>{{ instruction }}</span>

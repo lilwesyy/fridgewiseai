@@ -55,13 +55,13 @@
       </div>
 
       <!-- Saved Recipes Grid -->
-      <div v-else-if="filteredSavedRecipes.length > 0" class="grid grid-cols-1 gap-4">
+      <div v-else-if="filteredSavedRecipes.length > 0" class="grid grid-cols-1 gap-5">
         <div 
           v-for="recipe in filteredSavedRecipes" 
           :key="recipe._id || recipe.id"
-          class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+          class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all transform hover:-translate-y-1 duration-200"
         >
-          <div class="p-4">
+          <div class="p-5">
             <div class="flex items-start justify-between mb-2">
               <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">{{ recipe.title }}</h3>
               <div class="flex space-x-1 ml-2">
@@ -84,15 +84,15 @@
               </div>
             </div>
 
-            <div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
+            <div class="flex items-center space-x-4 text-sm text-gray-500 mb-4">
               <div class="flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 mr-1 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 {{ recipe.cookingTime?.total || recipe.cookingTime }}{{ typeof recipe.cookingTime?.total === 'number' ? ' min' : '' }}
               </div>
               <div class="flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
                 {{ recipe.difficulty }}
@@ -107,13 +107,13 @@
                 <span 
                   v-for="tag in recipe.tags.slice(0, 3)" 
                   :key="tag"
-                  class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                  class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200 transition-colors"
                 >
                   #{{ tag }}
                 </span>
                 <span 
                   v-if="recipe.tags.length > 3"
-                  class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                  class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200 transition-colors"
                 >
                   +{{ recipe.tags.length - 3 }}
                 </span>
@@ -145,9 +145,9 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="text-center py-12">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div v-else class="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
+        <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+          <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
           </svg>
         </div>
@@ -183,10 +183,10 @@
       @click="closeRecipeModal"
     >
       <div 
-        class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl"
         @click.stop
       >
-        <div class="p-6">
+        <div class="p-7">
           <div class="flex items-start justify-between mb-4">
             <h2 class="text-2xl font-bold text-gray-900">{{ selectedRecipe.title }}</h2>
             <button 
@@ -202,19 +202,19 @@
           <p v-if="selectedRecipe.description" class="text-gray-600 mb-4">{{ selectedRecipe.description }}</p>
 
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
-            <div v-if="selectedRecipe.cookingTime" class="text-center p-3 bg-gray-50 rounded">
+            <div v-if="selectedRecipe.cookingTime" class="text-center p-3 bg-gradient-to-br from-primary-50 to-blue-50 rounded-lg shadow-sm">
               <div class="font-semibold">{{ $t('recipes.cookingTime') }}</div>
               <div class="text-gray-600">{{ selectedRecipe.cookingTime.total || selectedRecipe.cookingTime }} {{ $t('recipes.minutes') }}</div>
             </div>
-            <div v-if="selectedRecipe.difficulty" class="text-center p-3 bg-gray-50 rounded">
+            <div v-if="selectedRecipe.difficulty" class="text-center p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-sm">
               <div class="font-semibold">{{ $t('recipes.difficulty.label') }}</div>
               <div class="text-gray-600">{{ $t(`recipes.difficulty.${selectedRecipe.difficulty}`) }}</div>
             </div>
-            <div v-if="selectedRecipe.servings" class="text-center p-3 bg-gray-50 rounded">
+            <div v-if="selectedRecipe.servings" class="text-center p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-sm">
               <div class="font-semibold">{{ $t('recipes.servings') }}</div>
               <div class="text-gray-600">{{ selectedRecipe.servings }}</div>
             </div>
-            <div v-if="selectedRecipe.nutrition || selectedRecipe.nutritionalInfo" class="text-center p-3 bg-gray-50 rounded">
+            <div v-if="selectedRecipe.nutrition || selectedRecipe.nutritionalInfo" class="text-center p-3 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg shadow-sm">
               <div class="font-semibold">{{ $t('recipes.calories') }}</div>
               <div class="text-gray-600">{{ (selectedRecipe.nutrition?.calories || selectedRecipe.nutritionalInfo?.calories) || '-' }}</div>
             </div>
@@ -228,7 +228,7 @@
                 :key="index"
                 class="flex items-center text-gray-700"
               >
-                <span class="w-2 h-2 bg-primary-500 rounded-full mr-3"></span>
+                <span class="w-2 h-2 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full mr-3 shadow-sm"></span>
                 {{ ingredient }}
               </li>
             </ul>
@@ -242,7 +242,7 @@
                 :key="index"
                 class="flex text-gray-700"
               >
-                <span class="flex-shrink-0 w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3 mt-0.5">
+                <span class="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3 mt-0.5 shadow-sm">
                   {{ index + 1 }}
                 </span>
                 <span>{{ instruction }}</span>
