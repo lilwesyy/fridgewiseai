@@ -149,6 +149,56 @@ class UserService {
       throw new Error(error.response?.data?.error || 'Failed to update profile')
     }
   }
+
+  // Update user preferences
+  async updatePreferences(preferences) {
+    try {
+      const response = await axios.put('/users/preferences', { preferences })
+      return response.data
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to update preferences')
+    }
+  }
+
+  // Upload avatar
+  async uploadAvatar(file) {
+    try {
+      const formData = new FormData()
+      formData.append('avatar', file)
+      
+      const response = await axios.post('/auth/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      return response.data
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to upload avatar')
+    }
+  }
+
+  // Remove avatar
+  async removeAvatar() {
+    try {
+      const response = await axios.delete('/auth/avatar')
+      return response.data
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to remove avatar')
+    }
+  }
+
+  // Change password
+  async changePassword(currentPassword, newPassword) {
+    try {
+      const response = await axios.put('/auth/change-password', {
+        currentPassword,
+        newPassword
+      })
+      return response.data
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to change password')
+    }
+  }
 }
 
 class IngredientService {

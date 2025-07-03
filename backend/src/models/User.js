@@ -26,11 +26,40 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  avatarPublicId: {
+    type: String,
+    default: null
+  },
   preferences: {
     language: {
       type: String,
       enum: ['en', 'it', 'fr', 'de'],
       default: 'en'
+    },
+    detectedLanguage: {
+      type: String,
+      enum: ['en', 'it', 'fr', 'de'],
+      default: null
+    },
+    languageDetectionMetadata: {
+      source: {
+        type: String,
+        enum: ['ip', 'browser', 'fallback'],
+        default: null
+      },
+      confidence: {
+        type: String,
+        enum: ['high', 'medium', 'low'],
+        default: null
+      },
+      country: {
+        type: String,
+        default: null
+      },
+      detectedAt: {
+        type: Date,
+        default: null
+      }
     },
     dietaryRestrictions: [{
       type: String,

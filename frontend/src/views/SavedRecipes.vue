@@ -1,10 +1,10 @@
 <template>
   <AuthenticatedLayout>
-    <div class="px-4 py-6">
+    <div class="px-4 py-6 mx-auto max-w-3xl w-full">
       <!-- Header -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">Saved Recipes</h1>
-        <p class="text-gray-600">Your favorite recipes collection</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ $t('savedRecipes.title') }}</h1>
+        <p class="text-gray-600">{{ $t('savedRecipes.subtitle') }}</p>
       </div>
 
       <!-- Search Bar -->
@@ -13,7 +13,7 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Search saved recipes..."
+            :placeholder="$t('savedRecipes.searchPlaceholder')"
             class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -38,13 +38,13 @@
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             ]"
           >
-            {{ filter.label }}
+            {{ $t(`savedRecipes.filters.${filter.key}`) }}
           </button>
         </div>
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div v-if="loading" class="grid grid-cols-1 gap-4">
         <div v-for="i in 4" :key="i" class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
           <div class="animate-pulse">
             <div class="h-4 bg-gray-200 rounded mb-2"></div>
@@ -55,7 +55,7 @@
       </div>
 
       <!-- Saved Recipes Grid -->
-      <div v-else-if="filteredSavedRecipes.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div v-else-if="filteredSavedRecipes.length > 0" class="grid grid-cols-1 gap-4">
         <div 
           v-for="recipe in filteredSavedRecipes" 
           :key="recipe._id || recipe.id"
@@ -127,7 +127,7 @@
                 @click="viewRecipe(recipe)"
                 class="flex-1"
               >
-                View Recipe
+                {{ $t('recipes.viewRecipe') }}
               </BaseButton>
               <BaseButton 
                 variant="secondary" 
@@ -137,7 +137,7 @@
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                Cook
+                {{ $t('cookingMode.startCooking') }}
               </BaseButton>
             </div>
           </div>
@@ -152,10 +152,10 @@
           </svg>
         </div>
         <h3 class="text-lg font-medium text-gray-900 mb-2">
-          {{ searchQuery ? 'No recipes found' : 'No saved recipes yet' }}
+          {{ searchQuery ? $t('savedRecipes.noRecipesFound') : $t('savedRecipes.empty') }}
         </h3>
         <p class="text-gray-500 mb-4">
-          {{ searchQuery ? 'Try adjusting your search terms' : 'Save your favorite recipes to see them here' }}
+          {{ searchQuery ? $t('savedRecipes.tryAdjustSearch') : $t('savedRecipes.saveToSee') }}
         </p>
         <div class="flex justify-center">
           <BaseButton 
@@ -163,14 +163,14 @@
             variant="primary"
             @click="$router.push('/app/recipes')"
           >
-            Browse Recipes
+            {{ $t('savedRecipes.browseRecipes') }}
           </BaseButton>
         <BaseButton 
           v-else
           variant="secondary"
           @click="clearSearch"
         >
-          Clear Search
+          {{ $t('savedRecipes.clearSearch') }}
         </BaseButton>
         </div>
       </div>
@@ -262,11 +262,10 @@
               variant="primary" 
               @click="cookRecipe(selectedRecipe)"
               class="flex-1"
-            >
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              Start Cooking
+            >                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {{ $t('cookingMode.startCooking') }}
             </BaseButton>
           </div>
         </div>
@@ -299,11 +298,11 @@ export default {
       activeFilter: 'all',
       selectedRecipe: null,
       filters: [
-        { key: 'all', label: 'All' },
-        { key: 'quick', label: 'Quick' },
-        { key: 'easy', label: 'Easy' },
-        { key: 'vegetarian', label: 'Vegetarian' },
-        { key: 'healthy', label: 'Healthy' }
+        { key: 'all' },
+        { key: 'quick' },
+        { key: 'easy' },
+        { key: 'vegetarian' },
+        { key: 'healthy' }
       ]
     }
   },

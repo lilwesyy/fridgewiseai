@@ -14,8 +14,8 @@
         
         <div class="text-center">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">Inizializzazione Camera</h3>
-          <p class="text-gray-600">Attendere prego...</p>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ t('camera.initializingCamera') }}</h3>
+          <p class="text-gray-600">{{ t('camera.pleaseWait') }}</p>
         </div>
       </div>
 
@@ -30,7 +30,7 @@
           </svg>
         </button>
         
-        <div class="text-center max-w-lg mx-auto px-6 py-8">
+        <div class="text-center max-w-lg mx-auto px-6 py-8 w-full">
           <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -38,7 +38,7 @@
             </svg>
           </div>
           
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">Accesso Camera Limitato</h3>
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ t('camera.cameraAccessLimited') }}</h3>
           <p class="text-gray-600 mb-6">{{ cameraError }}</p>
           
           <!-- iOS Fallback Notice -->
@@ -47,10 +47,10 @@
               <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span class="font-semibold text-green-800">Soluzione Alternativa Disponibile</span>
+              <span class="font-semibold text-green-800">{{ t('camera.alternativeSolutionAvailable') }}</span>
             </div>
             <p class="text-green-700 text-sm">
-              Puoi comunque scattare foto usando il pulsante <strong>"📷 Scatta Foto con Camera iPhone"</strong> qui sotto. Questo aprirà direttamente la camera del tuo iPhone per scattare una foto.
+              {{ t('camera.alternativeSolutionDescription') }}
             </p>
           </div>
           
@@ -60,56 +60,56 @@
               <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
               </svg>
-              Istruzioni per iPhone
+              {{ t('camera.iOSInstructionsTitle') }}
             </h4>
             <div class="space-y-3 text-sm text-blue-800">
               <div class="flex items-start">
                 <span class="font-semibold mr-2">1.</span>
-                <span>Vai su <strong>Impostazioni</strong> > <strong>Safari</strong></span>
+                <span>{{ t('camera.iOSInstructions1') }}</span>
               </div>
               <div class="flex items-start">
                 <span class="font-semibold mr-2">2.</span>
-                <span>Scorri fino a "Privacy e sicurezza"</span>
+                <span>{{ t('camera.iOSInstructions2') }}</span>
               </div>
               <div class="flex items-start">
                 <span class="font-semibold mr-2">3.</span>
-                <span>Attiva <strong>Camera</strong> ✅</span>
+                <span>{{ t('camera.iOSInstructions3') }}</span>
               </div>
               <div class="flex items-start">
                 <span class="font-semibold mr-2">4.</span>
-                <span>Vai su <strong>Impostazioni</strong> > <strong>Privacy e sicurezza</strong> > <strong>Camera</strong></span>
+                <span>{{ t('camera.iOSInstructions4') }}</span>
               </div>
               <div class="flex items-start">
                 <span class="font-semibold mr-2">5.</span>
-                <span>Attiva <strong>Safari</strong> ✅</span>
+                <span>{{ t('camera.iOSInstructions5') }}</span>
               </div>
               <div class="flex items-start">
                 <span class="font-semibold mr-2">6.</span>
-                <span>Torna su Safari e ricarica la pagina</span>
+                <span>{{ t('camera.iOSInstructions6') }}</span>
               </div>
             </div>
           </div>
           
-          <div class="space-y-3">
+          <div class="space-y-3 mx-auto w-full max-w-md">
             <!-- iOS Camera Capture Button -->
             <BaseButton v-if="deviceInfo.isIOS" variant="primary" full-width @click="openCameraCapture">
-              📷 Scatta Foto con Camera iPhone
+              {{ t('camera.takePhotoWithiPhone') }}
             </BaseButton>
             <!-- iOS Force Camera Button -->
             <BaseButton v-if="deviceInfo.isIOS && deviceInfo.hasMediaDevices" variant="primary" full-width @click="forceIOSCameraRequest">
-              🚀 Forza Accesso Camera iOS
+              {{ t('camera.forceIOSCameraAccess') }}
             </BaseButton>
             <BaseButton variant="primary" full-width @click="requestPermission">
-              {{ deviceInfo.isIOS ? 'Prova Dopo Aver Cambiato Impostazioni' : 'Riprova' }}
+              {{ deviceInfo.isIOS ? t('camera.tryAfterChangingSettings') : t('camera.tryAgain') }}
             </BaseButton>
             <BaseButton variant="secondary" full-width @click="testCameraPermissions" v-if="deviceInfo.isIOS">
-              Testa Permessi Camera
+              {{ t('camera.testCameraPermissions') }}
             </BaseButton>
             <BaseButton variant="secondary" full-width @click="openGallery">
-              Carica da Galleria
+              {{ t('camera.uploadFromGallery') }}
             </BaseButton>
             <BaseButton v-if="deviceInfo.isIOS" variant="outline" full-width @click="openIOSSettings">
-              Apri Impostazioni iPhone
+              {{ t('camera.openIPhoneSettings') }}
             </BaseButton>
           </div>
         </div>
@@ -131,17 +131,17 @@
         <div v-if="!isStreamActive || isRequestingPermission" class="absolute inset-0 flex items-center justify-center bg-black">
           <div class="text-center px-6">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-            <h3 class="text-lg font-semibold text-white mb-2">{{ isRequestingPermission ? 'Inizializzazione Camera' : 'Avvio Camera' }}</h3>
-            <p class="text-gray-300 mb-6">{{ isRequestingPermission ? 'Attendere prego...' : 'Connessione in corso...' }}</p>
+            <h3 class="text-lg font-semibold text-white mb-2">{{ isRequestingPermission ? t('camera.initializingCamera') : t('camera.startingCamera') }}</h3>
+            <p class="text-gray-300 mb-6">{{ isRequestingPermission ? t('camera.pleaseWait') : t('camera.connecting') }}</p>
             
             <!-- iOS fallback option during loading -->
-            <div v-if="deviceInfo.isIOS && !isRequestingPermission" class="space-y-3">
-              <p class="text-sm text-gray-400 mb-3">Problemi con la camera? Prova l'alternativa:</p>
+            <div v-if="deviceInfo.isIOS && !isRequestingPermission" class="space-y-3 mx-auto w-full max-w-md">
+              <p class="text-sm text-gray-400 mb-3">{{ t('camera.cameraProblems') }}</p>
               <BaseButton variant="primary" @click="openCameraCapture" class="bg-white/20 border-white/30 text-white hover:bg-white/30">
-                📷 Scatta Foto con Camera iPhone
+                {{ t('camera.takePhotoWithiPhone') }}
               </BaseButton>
               <BaseButton variant="secondary" @click="openGallery" class="bg-transparent border-white/30 text-white hover:bg-white/10">
-                🖼️ Carica da Galleria
+                {{ t('camera.uploadFromGallery') }}
               </BaseButton>
             </div>
           </div>
@@ -185,7 +185,7 @@
           
           <!-- Bottom controls -->
           <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 pb-24 pointer-events-auto">
-            <div class="flex items-center justify-center space-x-8">
+            <div class="flex items-center justify-center space-x-8 mx-auto max-w-sm">
               <button @click="openGallery" class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center transition-all active:scale-95 touch-manipulation">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -238,17 +238,17 @@
           <div v-if="processing" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div class="text-white text-center">
               <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-              <h3 class="text-lg font-semibold mb-2">Scansione in corso...</h3>
-              <p class="text-sm opacity-80">Analizzando gli ingredienti...</p>
+              <h3 class="text-lg font-semibold mb-2">{{ t('camera.scanningInProgress') }}</h3>
+              <p class="text-sm opacity-80">{{ t('camera.analyzingIngredients') }}</p>
             </div>
           </div>
         </div>
 
         <!-- Preview Controls - scrollable section -->
         <div class="bg-white flex-shrink-0 max-h-80 overflow-y-auto">
-          <div class="p-4 space-y-4">
+          <div class="p-4 space-y-4 mx-auto max-w-3xl w-full">
             <div v-if="detectedIngredients.length > 0" class="mb-4">
-              <h3 class="font-semibold text-gray-900 mb-2">Ingredienti Rilevati:</h3>
+              <h3 class="font-semibold text-gray-900 mb-2">{{ t('camera.detectedIngredientsLabel') }}</h3>
               <div class="flex flex-wrap gap-2">
                 <span 
                   v-for="ingredient in detectedIngredients" 
@@ -268,7 +268,7 @@
                 @click="retakePhoto"
                 :disabled="processing"
               >
-                {{ deviceInfo.isIOS && !deviceInfo.hasMediaDevices ? 'Scatta Altra Foto' : 'Scatta di nuovo' }}
+                {{ deviceInfo.isIOS && !deviceInfo.hasMediaDevices ? t('camera.takeAnotherPhoto') : t('camera.retakePhoto') }}
               </BaseButton>
               <BaseButton 
                 variant="primary" 
@@ -277,7 +277,7 @@
                 :loading="processing"
                 :disabled="detectedIngredients.length === 0"
               >
-                Genera Ricette
+                {{ t('camera.generateRecipes') }}
               </BaseButton>
             </div>
             
@@ -289,7 +289,7 @@
                 @click="openCameraCapture"
                 :disabled="processing"
               >
-                📷 Camera iPhone
+                {{ t('camera.iPhoneCameraButton') }}
               </BaseButton>
               <BaseButton 
                 variant="outline" 
@@ -297,7 +297,7 @@
                 @click="openGallery"
                 :disabled="processing"
               >
-                🖼️ Galleria
+                {{ t('camera.galleryButton') }}
               </BaseButton>
             </div>
             
@@ -336,12 +336,14 @@
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import { useI18n } from 'vue-i18n'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
 import { ingredientService, userDataService } from '@/services/api'
 
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 
 // Template refs
 const videoElement = ref(null)
@@ -396,16 +398,16 @@ const initDeviceInfo = () => {
   }
   
   console.log('Device info:', deviceInfo.value)
-  console.log('🌐 Protocol:', window.location.protocol)
-  console.log('🔗 Host:', window.location.host)
-  console.log('📱 MediaDevices available:', !!navigator.mediaDevices)
-  console.log('🎥 getUserMedia available:', !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia))
-  console.log('🔒 Secure context:', window.isSecureContext)
-  console.log('🍎 iOS + Safari detected:', isIOSDevice && isSafariBrowser)
+  console.log('Protocol:', window.location.protocol)
+  console.log('Host:', window.location.host)
+  console.log('MediaDevices available:', !!navigator.mediaDevices)
+  console.log('getUserMedia available:', !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia))
+  console.log('Secure context:', window.isSecureContext)
+  console.log('iOS + Safari detected:', isIOSDevice && isSafariBrowser)
   
   // Additional iOS-specific checks
   if (isIOSDevice) {
-    console.log('📱 iOS Version info:', {
+    console.log('iOS Version info:', {
       userAgent: navigator.userAgent,
       platform: navigator.platform,
       maxTouchPoints: navigator.maxTouchPoints,
@@ -419,12 +421,12 @@ const initDeviceInfo = () => {
 const checkCameraPermissions = async () => {
   try {
     if (!navigator.permissions) {
-      console.log('🔍 Permissions API not available')
+      console.log('Permissions API not available')
       return 'prompt'
     }
     
     const result = await navigator.permissions.query({ name: 'camera' })
-    console.log('📋 Camera permission status:', result.state)
+    console.log('Camera permission status:', result.state)
     return result.state // 'granted', 'denied', 'prompt'
   } catch (error) {
     console.warn('Could not check camera permissions:', error)
@@ -451,34 +453,34 @@ const checkAvailableCameras = async () => {
 
 // Force permission request with explicit user interaction
 const forcePermissionRequest = async () => {
-  console.log('🔐 Forcing permission request with user interaction...')
+  console.log('Forcing permission request with user interaction...')
   
   // Check current permission status first
   const permissionStatus = await checkCameraPermissions()
-  console.log('📋 Current permission status before request:', permissionStatus)
+  console.log('Current permission status before request:', permissionStatus)
   
   if (permissionStatus === 'denied') {
-    console.log('❌ Camera permissions previously denied - user must enable manually')
-    cameraError.value = '🔒 I permessi della camera sono stati negati in precedenza. Segui le istruzioni qui sotto per riattivarli.'
+    console.log('Camera permissions previously denied - user must enable manually')
+    cameraError.value = 'I permessi della camera sono stati negati in precedenza. Segui le istruzioni qui sotto per riattivarli.'
     permissionDenied.value = true
     return false
   }
   
   // For iOS, we need to make sure we're in a user gesture context
   if (deviceInfo.value.isIOS) {
-    console.log('📱 iOS detected - ensuring user gesture context and trying immediate access')
+    console.log('iOS detected - ensuring user gesture context and trying immediate access')
     
     // Try to immediately request camera access within user gesture
     try {
-      console.log('🚀 Attempting immediate iOS camera access...')
+      console.log('Attempting immediate iOS camera access...')
       const testStream = await navigator.mediaDevices.getUserMedia({ video: true })
-      console.log('✅ iOS immediate access successful!')
+      console.log('iOS immediate access successful!')
       
       // Stop the test stream and return success
       testStream.getTracks().forEach(track => track.stop())
       return true
     } catch (error) {
-      console.warn('⚠️ iOS immediate access failed:', error.name)
+      console.warn('iOS immediate access failed:', error.name)
       
       // If it's a permission issue, let the user know
       if (error.name === 'NotAllowedError') {
@@ -495,8 +497,8 @@ const forcePermissionRequest = async () => {
 
 // iOS-specific aggressive camera request
 const forceIOSCameraAccess = async () => {
-  console.log('🍎 Forcing iOS camera access with aggressive tactics...')
-  console.log('📱 Requested facing mode:', currentFacingMode.value)
+  console.log('Forcing iOS camera access with aggressive tactics...')
+  console.log('Requested facing mode:', currentFacingMode.value)
   
   if (!deviceInfo.value.isIOS) {
     return false
@@ -506,7 +508,7 @@ const forceIOSCameraAccess = async () => {
   const strategies = [
     // Strategy 1: Use current facing mode
     async () => {
-      console.log(`📱 iOS Strategy 1: Current facing mode (${currentFacingMode.value})`)
+      console.log(`iOS Strategy 1: Current facing mode (${currentFacingMode.value})`)
       return await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: currentFacingMode.value } 
       })
@@ -514,7 +516,7 @@ const forceIOSCameraAccess = async () => {
     
     // Strategy 2: Use current facing mode with exact constraint
     async () => {
-      console.log(`📱 iOS Strategy 2: Exact facing mode (${currentFacingMode.value})`)
+      console.log(`iOS Strategy 2: Exact facing mode (${currentFacingMode.value})`)
       return await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: { exact: currentFacingMode.value } } 
       })
@@ -522,13 +524,13 @@ const forceIOSCameraAccess = async () => {
     
     // Strategy 3: Ultra-minimal request (fallback)
     async () => {
-      console.log('📱 iOS Strategy 3: Ultra-minimal request')
+      console.log('iOS Strategy 3: Ultra-minimal request')
       return await navigator.mediaDevices.getUserMedia({ video: true })
     },
     
     // Strategy 4: Low resolution with facing mode
     async () => {
-      console.log(`📱 iOS Strategy 4: Low resolution with ${currentFacingMode.value}`)
+      console.log(`iOS Strategy 4: Low resolution with ${currentFacingMode.value}`)
       return await navigator.mediaDevices.getUserMedia({ 
         video: { 
           facingMode: currentFacingMode.value,
@@ -541,12 +543,12 @@ const forceIOSCameraAccess = async () => {
   
   for (let i = 0; i < strategies.length; i++) {
     try {
-      console.log(`🔄 Trying iOS strategy ${i + 1}...`)
+      console.log(`Trying iOS strategy ${i + 1}...`)
       const stream = await strategies[i]()
-      console.log(`✅ iOS strategy ${i + 1} successful!`)
+      console.log(`iOS strategy ${i + 1} successful!`)
       return stream
     } catch (error) {
-      console.warn(`❌ iOS strategy ${i + 1} failed:`, error.name)
+      console.warn(`iOS strategy ${i + 1} failed:`, error.name)
       
       // Brief pause between strategies
       if (i < strategies.length - 1) {
@@ -560,8 +562,8 @@ const forceIOSCameraAccess = async () => {
 
 // Enhanced iOS Safari camera initialization with aggressive tactics
 const initIOSCamera = async () => {
-  console.log('🍎 Initializing camera for iOS Safari with aggressive tactics...')
-  console.log('📱 Requested facing mode:', currentFacingMode.value)
+  console.log('Initializing camera for iOS Safari with aggressive tactics...')
+  console.log('Requested facing mode:', currentFacingMode.value)
   
   // Force permission request first
   const canRequest = await forcePermissionRequest()
@@ -606,7 +608,7 @@ const initIOSCamera = async () => {
   
   for (let i = 0; i < constraintSets.length; i++) {
     try {
-      console.log(`🔄 iOS attempt ${i + 1}/5:`, constraintSets[i])
+      console.log(`iOS attempt ${i + 1}/5:`, constraintSets[i])
       
       // For iOS, we need to be more aggressive about timing
       const stream = await Promise.race([
@@ -614,10 +616,10 @@ const initIOSCamera = async () => {
         new Promise((_, reject) => setTimeout(() => reject(new Error('iOS timeout')), 5000))
       ])
       
-      console.log(`✅ iOS Success with constraint set ${i + 1}`)
+      console.log(`iOS Success with constraint set ${i + 1}`)
       return stream
     } catch (error) {
-      console.warn(`❌ iOS constraint set ${i + 1} failed:`, error.name, error.message)
+      console.warn(`iOS constraint set ${i + 1} failed:`, error.name, error.message)
       
       if (i === constraintSets.length - 1) {
         throw error
@@ -631,7 +633,7 @@ const initIOSCamera = async () => {
 
 // Enhanced video element setup for iOS
 const setupVideoElement = async (stream) => {
-  console.log('🎥 Setting up video element for iOS compatibility...')
+  console.log('Setting up video element for iOS compatibility...')
   
   let video = videoElement.value || document.querySelector('video')
   
@@ -655,7 +657,7 @@ const setupVideoElement = async (stream) => {
     }
   }
   
-  console.log('📹 Video element found, configuring for iOS...')
+  console.log('Video element found, configuring for iOS...')
   
   // Essential iOS video attributes - set before srcObject
   video.setAttribute('webkit-playsinline', 'true')
@@ -669,7 +671,7 @@ const setupVideoElement = async (stream) => {
   video.style.width = '100%'
   video.style.height = '100%'
   
-  console.log('📱 iOS attributes set, assigning stream...')
+  console.log('iOS attributes set, assigning stream...')
   
   // Set stream
   video.srcObject = stream
@@ -677,12 +679,12 @@ const setupVideoElement = async (stream) => {
   // Enhanced promise for iOS video loading
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
-      console.error('❌ Video load timeout after 15 seconds')
+      console.error('Video load timeout after 15 seconds')
       reject(new Error('Video load timeout'))
     }, 15000)
     
     const onLoadedMetadata = () => {
-      console.log('✅ Video metadata loaded successfully:', {
+      console.log('Video metadata loaded successfully:', {
         videoWidth: video.videoWidth,
         videoHeight: video.videoHeight,
         readyState: video.readyState
@@ -693,18 +695,18 @@ const setupVideoElement = async (stream) => {
     }
     
     const onError = (error) => {
-      console.error('❌ Video load error:', error)
+      console.error('Video load error:', error)
       clearTimeout(timeout)
       cleanup()
       reject(new Error('Video load error'))
     }
     
     const onCanPlay = () => {
-      console.log('📹 Video can play - attempting play...')
+      console.log('Video can play - attempting play...')
       video.play().then(() => {
-        console.log('▶️ Video play() successful')
+        console.log('Video play() successful')
       }).catch(err => {
-        console.warn('⚠️ Video play() failed but continuing:', err)
+        console.warn('Video play() failed but continuing:', err)
       })
     }
     
@@ -733,23 +735,22 @@ const setupVideoElement = async (stream) => {
 // Request camera permission and initialize
 const requestPermission = async () => {
   const startTime = Date.now()
-  console.log('🚀 Starting camera permission request at:', new Date().toISOString())
+  console.log('Starting camera permission request at:', new Date().toISOString())
   
   if (!deviceInfo.value.hasMediaDevices) {
-    console.error('❌ MediaDevices not available')
-    
+    console.error('MediaDevices not available')
     if (!navigator.mediaDevices) {
-      if (deviceInfo.value.isIOS) {
-        cameraError.value = '📱 La camera diretta non è disponibile su Safari iOS, ma puoi usare il pulsante "Scatta Foto con Camera iPhone" per fare foto.'
-      } else {
-        cameraError.value = '🚫 Le API della camera non sono disponibili su questo browser. Assicurati di essere su HTTPS.'
-      }
-    } else if (!navigator.mediaDevices.getUserMedia) {
-      if (deviceInfo.value.isIOS) {
-        cameraError.value = '📱 L\'accesso diretto alla camera non è supportato su Safari iOS, ma puoi usare il pulsante "Scatta Foto con Camera iPhone".'
-      } else {
-        cameraError.value = '🚫 La funzione camera non è supportata su questo browser.'
-      }
+        if (deviceInfo.value.isIOS) {
+          cameraError.value = 'La camera diretta non è disponibile su Safari iOS, ma puoi usare il pulsante "Scatta Foto con Camera iPhone" per fare foto.'
+        } else {
+          cameraError.value = 'Le API della camera non sono disponibili su questo browser. Assicurati di essere su HTTPS.'
+        }
+      } else if (!navigator.mediaDevices.getUserMedia) {
+        if (deviceInfo.value.isIOS) {
+          cameraError.value = 'L\'accesso diretto alla camera non è supportato su Safari iOS, ma puoi usare il pulsante "Scatta Foto con Camera iPhone".'
+        } else {
+          cameraError.value = 'La funzione camera non è supportata su questo browser.'
+        }
     } else {
       cameraError.value = 'Il tuo browser non supporta l\'accesso alla camera'
     }
@@ -760,19 +761,19 @@ const requestPermission = async () => {
 
   // Check if we're in a secure context
   if (!window.isSecureContext) {
-    console.error('❌ Not in secure context')
-    cameraError.value = '🔒 La camera richiede una connessione sicura (HTTPS). Attualmente sei su: ' + window.location.protocol
+    console.error('Not in secure context')
+    cameraError.value = 'La camera richiede una connessione sicura (HTTPS). Attualmente sei su: ' + window.location.protocol
     permissionDenied.value = true
     return
   }
 
   // Check permission status before attempting request
   const permissionStatus = await checkCameraPermissions()
-  console.log('📋 Current permission status:', permissionStatus)
+  console.log('Current permission status:', permissionStatus)
   
   if (permissionStatus === 'denied') {
-    console.log('❌ Camera permissions are denied - showing instructions')
-    cameraError.value = '🔒 I permessi della camera sono stati negati. Segui le istruzioni qui sotto per riattivarli.'
+    console.log('Camera permissions are denied - showing instructions')
+    cameraError.value = 'I permessi della camera sono stati negati. Segui le istruzioni qui sotto per riattivarli.'
     permissionDenied.value = true
     return
   }
@@ -780,32 +781,32 @@ const requestPermission = async () => {
   isRequestingPermission.value = true
   permissionDenied.value = false
   cameraError.value = null
-  console.log('📋 Set isRequestingPermission to true')
+  console.log('Set isRequestingPermission to true')
 
   try {
     // For iOS Safari, use enhanced compatibility approach with aggressive tactics
     if (deviceInfo.value.isIOS && deviceInfo.value.isSafari) {
-      console.log('🍎 iOS Safari detected - using AGGRESSIVE compatibility mode')
+      console.log('iOS Safari detected - using AGGRESSIVE compatibility mode')
       
       // First try: Aggressive direct access
       try {
-        console.log('🚀 Attempting aggressive iOS camera access...')
+        console.log('Attempting aggressive iOS camera access...')
         mediaStream.value = await forceIOSCameraAccess()
-        console.log('✅ Aggressive iOS access successful!')
+        console.log('Aggressive iOS access successful!')
       } catch (aggressiveError) {
-        console.warn('⚠️ Aggressive access failed, trying enhanced iOS initialization:', aggressiveError)
+        console.warn('Aggressive access failed, trying enhanced iOS initialization:', aggressiveError)
         
         // Second try: Enhanced iOS initialization
         try {
           mediaStream.value = await initIOSCamera()
-          console.log('✅ Enhanced iOS camera initialization successful')
+          console.log('Enhanced iOS camera initialization successful')
         } catch (iosError) {
-          console.warn('⚠️ Enhanced iOS initialization failed, trying basic fallback:', iosError)
+          console.warn('Enhanced iOS initialization failed, trying basic fallback:', iosError)
           
           // Final fallback: Ultra-basic constraints
           const ultraBasicConstraints = { video: true }
           mediaStream.value = await navigator.mediaDevices.getUserMedia(ultraBasicConstraints)
-          console.log('✅ Ultra-basic iOS fallback successful')
+          console.log('Ultra-basic iOS fallback successful')
         }
       }
       
@@ -897,8 +898,8 @@ const requestPermission = async () => {
     isStreamActive.value = true
     retryCount.value = 0
     
-    console.log('🎉 Camera initialized successfully')
-    console.log('📊 Current state:', {
+    console.log('Camera initialized successfully')
+    console.log('Current state:', {
       isStreamActive: isStreamActive.value,
       isRequestingPermission: isRequestingPermission.value,
       hasPermission: hasPermission.value,
@@ -918,7 +919,7 @@ const requestPermission = async () => {
     // Handle different error types with enhanced iOS support
     if (error.name === 'NotAllowedError') {
       if (deviceInfo.value.isIOS) {
-        cameraError.value = '🔒 Accesso camera negato su iPhone. Segui le istruzioni qui sotto per abilitare la camera, oppure usa il pulsante "Testa Permessi Camera".'
+        cameraError.value = 'Accesso camera negato su iPhone. Segui le istruzioni qui sotto per abilitare la camera, oppure usa il pulsante "Testa Permessi Camera".'
       } else {
         cameraError.value = 'Accesso alla camera negato. Abilita i permessi per continuare.'
       }
@@ -1009,27 +1010,27 @@ const switchCamera = async () => {
     console.log('✅ Camera switch successful')
     
   } catch (error) {
-    console.error('❌ Error switching camera:', error)
+    console.error('Error switching camera:', error)
     
     // Revert facing mode if switch failed
     currentFacingMode.value = previousMode
-    console.log(`🔄 Reverted to ${previousMode} due to error`)
+    console.log(`Reverted to ${previousMode} due to error`)
     
     // Try to restart with original camera
     try {
       await requestPermission()
     } catch (restartError) {
-      console.error('❌ Failed to restart camera:', restartError)
+      console.error('Failed to restart camera:', restartError)
     }
   }
 }
 
 // Capture photo from video stream
 const capturePhoto = () => {
-  console.log('📸 Capture photo button clicked')
+  console.log('Capture photo button clicked')
   const video = videoElement.value || document.querySelector('video')
   if (!video || !canvasElement.value || !isStreamActive.value) {
-    console.error('❌ Camera not ready:', {
+    console.error('Camera not ready:', {
       video: !!video,
       canvas: !!canvasElement.value,
       isStreamActive: isStreamActive.value,
@@ -1040,8 +1041,8 @@ const capturePhoto = () => {
   }
 
   try {
-    console.log('📸 Starting photo capture...')
-    console.log('📷 Capture method:', useIOSWorkaround.value ? 'iOS Enhanced' : 'Standard')
+    console.log('Starting photo capture...')
+    console.log('Capture method:', useIOSWorkaround.value ? 'iOS Enhanced' : 'Standard')
     
     const canvas = canvasElement.value
     const context = canvas.getContext('2d')
@@ -1049,11 +1050,11 @@ const capturePhoto = () => {
     // Set canvas size to match video
     canvas.width = video.videoWidth || video.clientWidth || 640
     canvas.height = video.videoHeight || video.clientHeight || 480
-    console.log('📸 Canvas size set to:', canvas.width, 'x', canvas.height)
+    console.log('Canvas size set to:', canvas.width, 'x', canvas.height)
     
     // Additional check for valid dimensions
     if (canvas.width === 0 || canvas.height === 0) {
-      console.warn('⚠️ Invalid video dimensions, using fallback size')
+      console.warn('Invalid video dimensions, using fallback size')
       canvas.width = 640
       canvas.height = 480
     }
@@ -1064,7 +1065,7 @@ const capturePhoto = () => {
     // Convert to base64 image with higher quality for iOS
     const quality = useIOSWorkaround.value ? 0.95 : 0.9
     capturedImage.value = canvas.toDataURL('image/jpeg', quality)
-    console.log('📸 Image captured, size:', capturedImage.value.length, 'bytes')
+    console.log('Image captured, size:', capturedImage.value.length, 'bytes')
     
     // Stop camera stream
     cleanup()
@@ -1072,7 +1073,7 @@ const capturePhoto = () => {
     // Process the captured image
     processImage()
     
-    console.log('✅ Photo captured successfully')
+    console.log('Photo captured successfully')
     
   } catch (error) {
     console.error('Error capturing photo:', error)
@@ -1116,30 +1117,30 @@ const processImage = async () => {
 
 // Open gallery for file selection
 const openGallery = () => {
-  console.log('🖼️ Gallery button clicked')
+  console.log('Gallery button clicked')
   if (fileInput.value) {
-    console.log('📁 Opening file input...')
+    console.log('Opening file input...')
     fileInput.value.click()
   } else {
-    console.error('❌ File input not available')
+    console.error('File input not available')
   }
 }
 
 // Open camera capture for iOS Safari (fallback method)
 const openCameraCapture = () => {
-  console.log('📷 iOS Camera capture button clicked')
+  console.log('iOS Camera capture button clicked')
   if (cameraInput.value) {
     console.log('📱 Opening camera capture input...')
     cameraInput.value.click()
   } else {
-    console.error('❌ Camera input not available')
+    console.error('Camera input not available')
     toast.error('Errore nell\'apertura della camera')
   }
 }
 
 // Force iOS camera request with aggressive tactics
 const forceIOSCameraRequest = async () => {
-  console.log('🚀 Force iOS Camera Request initiated by user')
+  console.log('Force iOS Camera Request initiated by user')
   
   if (!deviceInfo.value.isIOS) {
     toast.error('Questa funzione è disponibile solo su iOS')
@@ -1153,7 +1154,7 @@ const forceIOSCameraRequest = async () => {
   retryCount.value = 0
   
   try {
-    console.log('🍎 Starting aggressive iOS camera access...')
+    console.log('Starting aggressive iOS camera access...')
     
     // Try the aggressive access method directly
     mediaStream.value = await forceIOSCameraAccess()
@@ -1165,11 +1166,11 @@ const forceIOSCameraRequest = async () => {
     isStreamActive.value = true
     useIOSWorkaround.value = true
     
-    toast.success('✅ Camera iOS attivata con successo!')
-    console.log('🎉 Forced iOS camera access successful')
+    toast.success('Camera iOS attivata con successo!')
+    console.log('Forced iOS camera access successful')
     
   } catch (error) {
-    console.error('❌ Forced iOS camera access failed:', error)
+    console.error('Forced iOS camera access failed:', error)
     
     mediaStream.value = null
     isStreamActive.value = false
@@ -1177,14 +1178,14 @@ const forceIOSCameraRequest = async () => {
     
     // Provide specific error messages
     if (error.name === 'NotAllowedError') {
-      cameraError.value = '🔒 Permessi camera negati. Controlla le impostazioni Safari e riprova.'
-      toast.error('❌ Permessi camera negati su iOS')
+      cameraError.value = 'Permessi camera negati. Controlla le impostazioni Safari e riprova.'
+      toast.error('Permessi camera negati su iOS')
     } else if (error.name === 'NotFoundError') {
-      cameraError.value = '📷 Nessuna camera trovata su questo dispositivo iOS.'
-      toast.error('❌ Camera non trovata')
+      cameraError.value = 'Nessuna camera trovata su questo dispositivo iOS.'
+      toast.error('Camera non trovata')
     } else {
-      cameraError.value = '❌ Impossibile accedere alla camera iOS. Usa "Scatta Foto con Camera iPhone".'
-      toast.error('❌ Errore accesso camera iOS: ' + (error.message || 'Errore sconosciuto'))
+      cameraError.value = 'Impossibile accedere alla camera iOS. Usa "Scatta Foto con Camera iPhone".'
+      toast.error('Errore accesso camera iOS: ' + (error.message || 'Errore sconosciuto'))
     }
     
     permissionDenied.value = true
@@ -1195,7 +1196,7 @@ const forceIOSCameraRequest = async () => {
 
 // Open iOS Settings app (attempt)
 const openIOSSettings = () => {
-  console.log('📱 Attempting to open iOS Settings...')
+  console.log('Attempting to open iOS Settings...')
   // Try to open iOS Settings app to Camera settings
   window.location.href = 'App-prefs:root=Privacy&path=CAMERA'
   
@@ -1207,18 +1208,18 @@ const openIOSSettings = () => {
 
 // Test camera permissions specifically
 const testCameraPermissions = async () => {
-  console.log('🧪 Testing camera permissions...')
+  console.log('Testing camera permissions...')
   
   try {
     // First check if mediaDevices is available
     if (!navigator.mediaDevices) {
-      console.error('❌ navigator.mediaDevices not available')
+      console.error('navigator.mediaDevices not available')
       if (deviceInfo.value.isIOS) {
-        toast.info('📱 Camera diretta non disponibile su Safari iOS. Usa il pulsante "Scatta Foto con Camera iPhone".')
-        cameraError.value = '📱 Camera diretta non supportata. Usa il pulsante "Scatta Foto con Camera iPhone" per scattare foto.'
+        toast.info('Camera diretta non disponibile su Safari iOS. Usa il pulsante "Scatta Foto con Camera iPhone".')
+        cameraError.value = 'Camera diretta non supportata. Usa il pulsante "Scatta Foto con Camera iPhone" per scattare foto.'
       } else {
-        toast.error('❌ Le API della camera non sono disponibili su questo browser.')
-        cameraError.value = '🚫 Le API della camera non sono supportate. Assicurati di essere su HTTPS o usa "Carica da Galleria".'
+        toast.error('Le API della camera non sono disponibili su questo browser.')
+        cameraError.value = 'Le API della camera non sono supportate. Assicurati di essere su HTTPS o usa "Carica da Galleria".'
       }
       permissionDenied.value = true
       return
@@ -1226,13 +1227,13 @@ const testCameraPermissions = async () => {
     
     // Check if getUserMedia is available
     if (!navigator.mediaDevices.getUserMedia) {
-      console.error('❌ getUserMedia not available')
+      console.error('getUserMedia not available')
       if (deviceInfo.value.isIOS) {
-        toast.info('📱 getUserMedia non disponibile su Safari iOS. Usa il pulsante "Scatta Foto con Camera iPhone".')
-        cameraError.value = '📱 Camera diretta non supportata. Usa il pulsante "Scatta Foto con Camera iPhone" per scattare foto.'
+        toast.info('getUserMedia non disponibile su Safari iOS. Usa il pulsante "Scatta Foto con Camera iPhone".')
+        cameraError.value = 'Camera diretta non supportata. Usa il pulsante "Scatta Foto con Camera iPhone" per scattare foto.'
       } else {
-        toast.error('❌ getUserMedia non è disponibile su questo browser.')
-        cameraError.value = '🚫 La funzione camera non è supportata. Usa "Carica da Galleria".'
+        toast.error('getUserMedia non è disponibile su questo browser.')
+        cameraError.value = 'La funzione camera non è supportata. Usa "Carica da Galleria".'
       }
       permissionDenied.value = true
       return
@@ -1240,33 +1241,33 @@ const testCameraPermissions = async () => {
     
     // Check if we're in a secure context
     if (!window.isSecureContext) {
-      console.error('❌ Not in secure context')
-      toast.error('❌ Connessione non sicura. La camera richiede HTTPS.')
-      cameraError.value = '🔒 La camera richiede una connessione sicura (HTTPS). Usa "Carica da Galleria".'
+      console.error('Not in secure context')
+      toast.error('Connessione non sicura. La camera richiede HTTPS.')
+      cameraError.value = 'La camera richiede una connessione sicura (HTTPS). Usa "Carica da Galleria".'
       permissionDenied.value = true
       return
     }
     
-    console.log('✅ All APIs are available, checking permissions...')
+    console.log('All APIs are available, checking permissions...')
     
     // Check permission status first
     const permissionStatus = await checkCameraPermissions()
-    console.log('📋 Permission status:', permissionStatus)
+    console.log('Permission status:', permissionStatus)
     
     if (permissionStatus === 'denied') {
-      toast.error('❌ Permessi camera negati. Vai nelle Impostazioni per abilitarli.')
+      toast.error('Permessi camera negati. Vai nelle Impostazioni per abilitarli.')
       return
     }
     
     if (permissionStatus === 'granted') {
-      toast.success('✅ Permessi camera già concessi!')
+      toast.success('Permessi camera già concessi!')
       // Try to initialize camera
       setTimeout(() => requestPermission(), 500)
       return
     }
     
     // If prompt, try to request permission
-    console.log('🔐 Attempting to trigger permission popup...')
+    console.log('Attempting to trigger permission popup...')
     
     // Create a minimal request to trigger the permission popup
     try {
@@ -1275,8 +1276,8 @@ const testCameraPermissions = async () => {
         audio: false
       })
       
-      console.log('✅ Permission granted! Stream obtained.')
-      toast.success('✅ Permessi camera concessi!')
+      console.log('Permission granted! Stream obtained.')
+      toast.success('Permessi camera concessi!')
       
       // Stop the test stream
       testStream.getTracks().forEach(track => track.stop())
@@ -1285,23 +1286,23 @@ const testCameraPermissions = async () => {
       setTimeout(() => requestPermission(), 500)
       
     } catch (error) {
-      console.error('❌ Permission test failed:', error)
+      console.error('Permission test failed:', error)
       
       if (error.name === 'NotAllowedError') {
-        toast.error('❌ Permessi camera negati. Controlla le impostazioni Safari.')
-        cameraError.value = '🔒 Permessi camera negati. Segui le istruzioni qui sopra.'
+        toast.error('Permessi camera negati. Controlla le impostazioni Safari.')
+        cameraError.value = 'Permessi camera negati. Segui le istruzioni qui sopra.'
         permissionDenied.value = true
       } else if (error.name === 'NotFoundError') {
-        toast.error('❌ Nessuna camera trovata su questo dispositivo.')
-        cameraError.value = '📷 Nessuna camera disponibile. Usa "Carica da Galleria".'
+        toast.error('Nessuna camera trovata su questo dispositivo.')
+        cameraError.value = 'Nessuna camera disponibile. Usa "Carica da Galleria".'
         permissionDenied.value = true
       } else if (error.name === 'NotSupportedError') {
-        toast.error('❌ Camera non supportata su questo browser.')
-        cameraError.value = '🚫 Camera non supportata. Usa "Carica da Galleria".'
+        toast.error('Camera non supportata su questo browser.')
+        cameraError.value = 'Camera non supportata. Usa "Carica da Galleria".'
         permissionDenied.value = true
       } else {
-        toast.error('❌ Errore nel test dei permessi: ' + (error.message || 'Errore sconosciuto'))
-        cameraError.value = '❌ Errore nel test della camera. Usa "Carica da Galleria".'
+        toast.error('Errore nel test dei permessi: ' + (error.message || 'Errore sconosciuto'))
+        cameraError.value = 'Errore nel test della camera. Usa "Carica da Galleria".'
         permissionDenied.value = true
       }
     }
@@ -1309,7 +1310,7 @@ const testCameraPermissions = async () => {
   } catch (error) {
     console.error('Error testing permissions:', error)
     toast.error('Errore nel test dei permessi: ' + (error.message || 'Errore sconosciuto'))
-    cameraError.value = '❌ Errore nel test della camera. Usa "Carica da Galleria".'
+    cameraError.value = 'Errore nel test della camera. Usa "Carica da Galleria".'
     permissionDenied.value = true
   }
 }
@@ -1338,14 +1339,14 @@ const handleFileSelect = (event) => {
 
 // Handle camera capture from iOS Safari
 const handleCameraCapture = (event) => {
-  console.log('📷 Camera capture file received')
+  console.log('Camera capture file received')
   const file = event.target.files[0]
   if (!file) {
-    console.log('❌ No file selected from camera')
+    console.log('No file selected from camera')
     return
   }
 
-  console.log('📱 Camera file details:', {
+  console.log('Camera file details:', {
     name: file.name,
     size: file.size,
     type: file.type,
@@ -1353,7 +1354,7 @@ const handleCameraCapture = (event) => {
   })
 
   // Log usage analytics
-  console.log('📊 Using iOS camera capture fallback method')
+  console.log('Using iOS camera capture fallback method')
 
   if (!file.type.startsWith('image/')) {
     toast.error('File non valido dalla camera')
@@ -1362,14 +1363,14 @@ const handleCameraCapture = (event) => {
 
   const reader = new FileReader()
   reader.onload = (e) => {
-    console.log('✅ Camera image loaded successfully')
+    console.log('Camera image loaded successfully')
     capturedImage.value = e.target.result
     cleanup() // Stop any running camera stream
-    toast.success('📸 Foto scattata con successo!')
+    toast.success('Foto scattata con successo!')
     processImage()
   }
   reader.onerror = () => {
-    console.error('❌ Error reading camera file')
+    console.error('Error reading camera file')
     toast.error('Errore nella lettura della foto')
   }
   
@@ -1388,7 +1389,7 @@ const retakePhoto = () => {
   // For iOS devices, offer choice between methods
   if (deviceInfo.value.isIOS && !deviceInfo.value.hasMediaDevices) {
     // If direct camera access isn't available, just clean up
-    console.log('📱 iOS device - camera stream not available, staying in capture mode')
+    console.log('iOS device - camera stream not available, staying in capture mode')
     // Don't restart camera since it's not available
     return
   }
@@ -1431,14 +1432,14 @@ const goBack = () => {
 
 // Clean up camera resources
 const cleanup = () => {
-  console.log('🧹 Cleaning up camera resources...')
+  console.log('Cleaning up camera resources...')
   
   // Clean up getUserMedia stream
   if (mediaStream.value) {
     const tracks = mediaStream.value.getTracks()
     tracks.forEach(track => track.stop())
     mediaStream.value = null
-    console.log('🧹 Media stream stopped')
+    console.log('Media stream stopped')
   }
   
   isStreamActive.value = false
@@ -1446,7 +1447,7 @@ const cleanup = () => {
   useIOSWorkaround.value = false
   retryCount.value = 0
   
-  console.log('✅ Camera cleanup completed')
+  console.log('Camera cleanup completed')
 }
 
 // Component lifecycle

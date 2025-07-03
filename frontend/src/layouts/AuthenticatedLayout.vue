@@ -3,7 +3,9 @@
     <MobileHeader 
       :show-back="props.showHeader && props.showBack"
       :show-menu="props.showHeader && props.showMenu"
+      :show-donate-button="props.showHeader"
       @menu-toggle="emit('menu-toggle')"
+      @donate-click="handleDonation"
     />
     
     <main 
@@ -24,6 +26,9 @@
 <script setup>
 import MobileHeader from '../components/layout/MobileHeader.vue'
 import BottomNavigation from '../components/layout/BottomNavigation.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   showHeader: {
@@ -45,4 +50,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['menu-toggle'])
+
+const handleDonation = () => {
+  // Apre il messaggio di donazione usando lo stesso metodo della pagina Profile
+  alert(t('profile.donationMessage'))
+}
 </script>

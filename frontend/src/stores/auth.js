@@ -1,7 +1,17 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { getCurrentLanguage, getLanguageDetectionMetadata } from '@/services/languageDetectionService'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+// Helper function to set language
+const setGlobalLanguage = (languageCode) => {
+  // Access the global app instance's i18n
+  if (typeof window !== 'undefined' && window.__VUE_I18N__) {
+    window.__VUE_I18N__.global.locale.value = languageCode
+  }
+  localStorage.setItem('selectedLanguage', languageCode)
+}
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -25,7 +35,28 @@ export const useAuthStore = defineStore('auth', {
       this.successMessage = null
       
       try {
-        const response = await axios.post('/auth/register', userData)
+        // Aggiungi la lingua corrente e i metadata del rilevamento
+        const currentLanguage = getCurrentLanguage()
+        const detectionMetadata = getLanguageDetectionMetadata()
+        
+        const registrationData = {
+          ...userData,
+          detectedLanguage: currentLanguage
+        }
+        
+        // Includi i metadata se disponibili
+        if (detectionMetadata) {
+          registrationData.languageDetectionMetadata = {
+            source: detectionMetadata.source,
+            confidence: detectionMetadata.confidence,
+            country: detectionMetadata.locationData?.country,
+            timezone: detectionMetadata.locationData?.timezone
+          }
+        }
+        
+        console.log('🌍 Registering user with language:', currentLanguage)
+        
+        const response = await axios.post('/auth/register', registrationData)
         const { token, user } = response.data
         
         this.token = token
@@ -34,6 +65,14 @@ export const useAuthStore = defineStore('auth', {
         
         // Set default authorization header
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        
+        // Aggiorna la lingua globale se l'utente ha una preferenza diversa
+        if (user.preferences?.language && user.preferences.language !== currentLanguage) {
+          if (typeof window !== 'undefined' && window.__VUE_I18N__) {
+            window.__VUE_I18N__.global.locale.value = user.preferences.language
+          }
+          localStorage.setItem('selectedLanguage', user.preferences.language)
+        }
         
         return { success: true, user }
       } catch (error) {
@@ -61,6 +100,15 @@ export const useAuthStore = defineStore('auth', {
         // Set default authorization header
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
         
+        // Set user's preferred language if available
+        if (user.preferences?.language) {
+          console.log(`🌍 Setting user language to ${user.preferences.language} from profile`)
+          if (typeof window !== 'undefined' && window.__VUE_I18N__) {
+            window.__VUE_I18N__.global.locale.value = user.preferences.language
+          }
+          localStorage.setItem('selectedLanguage', user.preferences.language)
+        }
+        
         return { success: true, user }
       } catch (error) {
         this.error = error.response?.data?.error || 'Login failed'
@@ -81,6 +129,12 @@ export const useAuthStore = defineStore('auth', {
         axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
         const response = await axios.get('/auth/me')
         this.user = response.data.user
+        
+        // Set user's preferred language if available
+        if (this.user.preferences?.language) {
+          setGlobalLanguage(this.user.preferences.language)
+        }
+        
         this.initialized = true
       } catch (error) {
         console.warn('Token validation failed:', error.response?.data?.message)

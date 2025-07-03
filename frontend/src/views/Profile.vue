@@ -1,6 +1,6 @@
 <template>
   <AuthenticatedLayout>
-    <div class="px-4 py-6">
+    <div class="px-4 py-6 mx-auto max-w-3xl w-full">
       <!-- Profile Header -->
       <div class="text-center mb-8">
         <div class="relative inline-block">
@@ -45,7 +45,7 @@
           </button>
         </div>
         
-        <h1 class="text-2xl font-bold text-gray-900">{{ authStore.currentUser?.name || 'User' }}</h1>
+        <h1 class="text-2xl font-bold text-gray-900">{{ authStore.currentUser?.name || $t('profile.user') }}</h1>
         <p class="text-gray-600">{{ authStore.currentUser?.email }}</p>
       </div>
 
@@ -58,7 +58,7 @@
           </div>
           <template v-else>
             <div class="text-2xl font-bold text-primary-600">{{ totalRecipes }}</div>
-            <div class="text-sm text-gray-500">Recipes</div>
+            <div class="text-sm text-gray-500">{{ $t('profile.recipes') }}</div>
           </template>
         </div>
         <div class="text-center">
@@ -68,7 +68,7 @@
           </div>
           <template v-else>
             <div class="text-2xl font-bold text-green-600">{{ savedRecipes }}</div>
-            <div class="text-sm text-gray-500">Saved</div>
+            <div class="text-sm text-gray-500">{{ $t('profile.saved') }}</div>
           </template>
         </div>
         <div class="text-center">
@@ -78,7 +78,7 @@
           </div>
           <template v-else>
             <div class="text-2xl font-bold text-blue-600">{{ scansCount }}</div>
-            <div class="text-sm text-gray-500">Scans</div>
+            <div class="text-sm text-gray-500">{{ $t('profile.scans') }}</div>
           </template>
         </div>
       </div>
@@ -97,8 +97,8 @@
             </svg>
           </div>
           <div class="flex-1 text-left">
-            <h3 class="font-medium text-gray-900">Account Settings</h3>
-            <p class="text-sm text-gray-500">Manage your profile and preferences</p>
+            <h3 class="font-medium text-gray-900">{{ $t('profile.accountSettings') }}</h3>
+            <p class="text-sm text-gray-500">{{ $t('profile.accountSettingsDescription') }}</p>
           </div>
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -117,8 +117,8 @@
             </svg>
           </div>
           <div class="flex-1 text-left">
-            <h3 class="font-medium text-gray-900">Change Password</h3>
-            <p class="text-sm text-gray-500">Update your account password</p>
+            <h3 class="font-medium text-gray-900">{{ $t('profile.changePassword') }}</h3>
+            <p class="text-sm text-gray-500">{{ $t('profile.changePasswordDescription') }}</p>
           </div>
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -136,7 +136,7 @@
             </svg>
           </div>
           <div class="flex-1 text-left">
-            <h3 class="font-medium text-gray-900">Language</h3>
+            <h3 class="font-medium text-gray-900">{{ $t('profile.language') }}</h3>
             <p class="text-sm text-gray-500">{{ currentLanguageName }}</p>
           </div>
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,8 +155,8 @@
             </svg>
           </div>
           <div class="flex-1 text-left">
-            <h3 class="font-medium text-gray-900">Export Data</h3>
-            <p class="text-sm text-gray-500">Download your recipes and data</p>
+            <h3 class="font-medium text-gray-900">{{ $t('profile.exportData') }}</h3>
+            <p class="text-sm text-gray-500">{{ $t('profile.exportDataDescription') }}</p>
           </div>
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -174,8 +174,8 @@
             </svg>
           </div>
           <div class="flex-1 text-left">
-            <h3 class="font-medium text-gray-900">Help & Support</h3>
-            <p class="text-sm text-gray-500">Get help and report issues</p>
+            <h3 class="font-medium text-gray-900">{{ $t('profile.helpSupport') }}</h3>
+            <p class="text-sm text-gray-500">{{ $t('profile.helpSupportDescription') }}</p>
           </div>
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -193,8 +193,8 @@
             </svg>
           </div>
           <div class="flex-1 text-left">
-            <h3 class="font-medium text-gray-900">Support the App</h3>
-            <p class="text-sm text-gray-500">Help us keep improving FridgeWiseAI</p>
+            <h3 class="font-medium text-gray-900">{{ $t('profile.supportApp') }}</h3>
+            <p class="text-sm text-gray-500">{{ $t('profile.supportAppDescription') }}</p>
           </div>
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -203,22 +203,23 @@
       </div>
 
       <!-- Logout Button -->
-      <div class="mt-8 pt-6 border-t border-gray-200">
+      <div class="mt-8 pt-6 border-t border-gray-200 text-center">
         <BaseButton 
           variant="secondary" 
           full-width
           @click="handleLogout"
+          class="flex items-center justify-center text-center mx-auto"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
           </svg>
-          Logout
+          {{ $t('profile.logout') }}
         </BaseButton>
       </div>
 
       <!-- App Version -->
       <div class="mt-6 text-center">
-        <p class="text-xs text-gray-400">FridgeWiseAI v1.0.0</p>
+        <p class="text-xs text-gray-400">{{ $t('profile.appVersion') }}</p>
       </div>
     </div>
 
@@ -227,7 +228,7 @@
       <div class="min-h-screen px-4 text-center">
         <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-lg" @click.stop>
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Account Settings</h3>
+            <h3 class="text-lg font-semibold text-gray-900">{{ $t('profile.accountSettings') }}</h3>
             <button @click="showAccountSettings = false" class="text-gray-400 hover:text-gray-600">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -237,21 +238,21 @@
 
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('profile.name') }}</label>
               <input
                 v-model="profileForm.name"
                 type="text"
                 class="input"
-                placeholder="Your name"
+                :placeholder="$t('profile.yourName')"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('profile.email') }}</label>
               <input
                 v-model="profileForm.email"
                 type="email"
                 class="input"
-                placeholder="Your email"
+                :placeholder="$t('profile.yourEmail')"
               />
             </div>
           </div>
@@ -262,14 +263,14 @@
               @click="showAccountSettings = false"
               class="flex-1"
             >
-              Cancel
+              {{ $t('common.cancel') }}
             </BaseButton>
             <BaseButton 
               variant="primary" 
               @click="updateProfile"
               class="flex-1"
             >
-              Save
+              {{ $t('common.save') }}
             </BaseButton>
           </div>
         </div>
@@ -281,7 +282,7 @@
       <div class="min-h-screen px-4 text-center">
         <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-lg" @click.stop>
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Change Profile Picture</h3>
+            <h3 class="text-lg font-semibold text-gray-900">{{ $t('profile.changeProfilePicture') }}</h3>
             <button @click="showProfilePictureModal = false" class="text-gray-400 hover:text-gray-600">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -328,11 +329,11 @@
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
-              Choose from Gallery
+              {{ $t('profile.chooseFromGallery') }}
             </BaseButton>
             
             <BaseButton 
-              variant="outline" 
+              variant="secondary" 
               full-width
               @click="openCamera"
               :disabled="uploadingProfilePicture"
@@ -341,7 +342,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
-              Take Photo
+              {{ $t('profile.takePhoto') }}
             </BaseButton>
 
             <BaseButton 
@@ -354,7 +355,7 @@
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
               </svg>
-              Remove Photo
+              {{ $t('profile.removePhoto') }}
             </BaseButton>
           </div>
 
@@ -366,7 +367,7 @@
               class="flex-1"
               :disabled="uploadingProfilePicture"
             >
-              Cancel
+              {{ $t('common.cancel') }}
             </BaseButton>
             <BaseButton 
               variant="primary" 
@@ -374,7 +375,7 @@
               class="flex-1"
               :loading="uploadingProfilePicture"
             >
-              Save
+              {{ $t('common.save') }}
             </BaseButton>
           </div>
         </div>
@@ -386,7 +387,7 @@
       <div class="min-h-screen px-4 text-center">
         <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-lg" @click.stop>
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Language Settings</h3>
+            <h3 class="text-lg font-semibold text-gray-900">{{ $t('profile.languageSettings') }}</h3>
             <button @click="showLanguageSettings = false" class="text-gray-400 hover:text-gray-600">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -416,7 +417,7 @@
               @click="showLanguageSettings = false"
               full-width
             >
-              Done
+              {{ $t('profile.done') }}
             </BaseButton>
           </div>
         </div>
@@ -503,7 +504,7 @@
                 @click="cancelPasswordChange"
                 class="flex-1"
               >
-                Cancel
+                {{ $t('common.cancel') }}
               </BaseButton>
               <BaseButton 
                 type="submit"
@@ -511,7 +512,7 @@
                 class="flex-1"
                 :loading="changingPassword"
               >
-                Change Password
+                {{ $t('auth.changePassword') }}
               </BaseButton>
             </div>
           </form>
@@ -536,6 +537,40 @@
       class="hidden"
       @change="handleProfilePictureSelect"
     />
+
+    <!-- Logout Confirmation Modal -->
+    <div v-if="showLogoutConfirm" class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50" @click="showLogoutConfirm = false">
+      <div class="min-h-screen px-4 text-center">
+        <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-lg" @click.stop>
+          <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('profile.logoutConfirmTitle') }}</h3>
+            <p class="text-gray-600">{{ $t('profile.logoutConfirmMessage') }}</p>
+          </div>
+
+          <div class="flex space-x-3">
+            <BaseButton 
+              variant="secondary" 
+              @click="cancelLogout"
+              class="flex-1"
+            >
+              {{ $t('common.cancel') }}
+            </BaseButton>
+            <BaseButton 
+              variant="primary" 
+              @click="confirmLogout"
+              class="flex-1 bg-red-600 hover:bg-red-700 focus:ring-red-500"
+            >
+              {{ $t('profile.logout') }}
+            </BaseButton>
+          </div>
+        </div>
+      </div>
+    </div>
   </AuthenticatedLayout>
 </template>
 
@@ -563,6 +598,7 @@ export default {
       showLanguageSettings: false,
       showProfilePictureModal: false,
       showChangePassword: false,
+      showLogoutConfirm: false,
       profileForm: {
         name: '',
         email: ''
@@ -583,6 +619,7 @@ export default {
       // Profile picture management
       profilePicturePreview: null,
       uploadingProfilePicture: false,
+      selectedFile: null,
       languages: [
         { code: 'en', name: 'English' },
         { code: 'it', name: 'Italiano' },
@@ -669,9 +706,20 @@ export default {
       }
     },
 
-    changeLanguage(languageCode) {
-      this.$i18n.locale = languageCode
-      localStorage.setItem('selectedLanguage', languageCode)
+    async changeLanguage(languageCode) {
+      try {
+        // Update the UI immediately
+        this.$i18n.locale = languageCode
+        localStorage.setItem('selectedLanguage', languageCode)
+        
+        // Save to database
+        await userService.updatePreferences({ language: languageCode })
+        
+        this.toast.success(this.$t('profile.languagePreferenceSaved'))
+      } catch (error) {
+        console.error('Failed to save language preference:', error)
+        this.toast.error(this.$t('profile.languagePreferenceFailed'))
+      }
     },
 
     exportData() {
@@ -703,22 +751,29 @@ export default {
     openSupport() {
       // In a real app, this might open a help center or contact form
       const supportEmail = 'support@fridgewiseai.com'
-      const subject = 'FridgeWiseAI Support Request'
-      const body = 'Hi FridgeWiseAI team,\n\nI need help with:\n\n'
+      const subject = this.$t('profile.supportEmailSubject')
+      const body = this.$t('profile.supportEmailBody')
       window.location.href = `mailto:${supportEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
     },
 
     openDonation() {
       // In a real app, this would open PayPal donation modal
-      alert('Thank you for considering supporting FridgeWiseAI! PayPal integration coming soon.')
+      alert(this.$t('profile.donationMessage'))
     },
 
     handleLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        this.authStore.logout()
-        this.toast.info(this.$t('notifications.auth.logoutSuccess'))
-        this.$router.push('/')
-      }
+      this.showLogoutConfirm = true
+    },
+
+    confirmLogout() {
+      this.authStore.logout()
+      this.toast.info(this.$t('notifications.auth.logoutSuccess'))
+      this.$router.push('/')
+      this.showLogoutConfirm = false
+    },
+
+    cancelLogout() {
+      this.showLogoutConfirm = false
     },
 
     // Profile Picture Management Methods
@@ -756,6 +811,9 @@ export default {
         return
       }
 
+      // Store the file for upload
+      this.selectedFile = file
+
       // Create preview
       const reader = new FileReader()
       reader.onload = (e) => {
@@ -771,28 +829,23 @@ export default {
     },
 
     async saveProfilePicture() {
-      if (!this.profilePicturePreview) return
+      if (!this.selectedFile) return
 
       try {
         this.uploadingProfilePicture = true
 
-        // In a real app, you would upload to your API
-        // For now, we'll simulate an API call and save to localStorage
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Upload to Cloudinary via our API
+        const result = await userService.uploadAvatar(this.selectedFile)
 
         // Update the user's avatar in the auth store
         if (this.authStore.currentUser) {
-          this.authStore.currentUser.avatar = this.profilePicturePreview
-          
-          // Save to localStorage for persistence in demo
-          const userData = JSON.parse(localStorage.getItem('user') || '{}')
-          userData.avatar = this.profilePicturePreview
-          localStorage.setItem('user', JSON.stringify(userData))
+          this.authStore.currentUser.avatar = result.avatar
         }
 
         this.toast.success('Profile picture updated successfully!')
         this.showProfilePictureModal = false
         this.profilePicturePreview = null
+        this.selectedFile = null
 
       } catch (error) {
         console.error('Error uploading profile picture:', error)
@@ -806,17 +859,12 @@ export default {
       try {
         this.uploadingProfilePicture = true
 
-        // In a real app, you would call your API to remove the avatar
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // Remove avatar via API
+        await userService.removeAvatar()
 
         // Remove avatar from auth store
         if (this.authStore.currentUser) {
           this.authStore.currentUser.avatar = null
-          
-          // Update localStorage
-          const userData = JSON.parse(localStorage.getItem('user') || '{}')
-          delete userData.avatar
-          localStorage.setItem('user', JSON.stringify(userData))
         }
 
         this.toast.success('Profile picture removed successfully!')
@@ -833,6 +881,7 @@ export default {
 
     cancelProfilePictureChange() {
       this.profilePicturePreview = null
+      this.selectedFile = null
       this.showProfilePictureModal = false
     },
 
@@ -867,23 +916,11 @@ export default {
       try {
         this.changingPassword = true
 
-        // In a real app, you would call your API to change the password
-        // For now, we'll simulate an API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // Simulate checking current password
-        // In a real app, the backend would verify this
-        const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
-        if (storedUser.password && storedUser.password !== this.passwordForm.currentPassword) {
-          this.passwordErrors.currentPassword = this.$t('auth.validation.wrongCurrentPassword')
-          return
-        }
-
-        // Update password in localStorage for demo purposes
-        if (storedUser) {
-          storedUser.password = this.passwordForm.newPassword
-          localStorage.setItem('user', JSON.stringify(storedUser))
-        }
+        // Call the real API to change password
+        await userService.changePassword(
+          this.passwordForm.currentPassword,
+          this.passwordForm.newPassword
+        )
 
         this.toast.success(this.$t('auth.passwordChangeSuccess'))
         this.resetPasswordForm()
@@ -891,7 +928,13 @@ export default {
 
       } catch (error) {
         console.error('Error changing password:', error)
-        this.toast.error('Failed to change password')
+        
+        // Handle specific error cases
+        if (error.message.includes('Current password is incorrect')) {
+          this.passwordErrors.currentPassword = this.$t('auth.validation.wrongCurrentPassword')
+        } else {
+          this.toast.error('Failed to change password')
+        }
       } finally {
         this.changingPassword = false
       }

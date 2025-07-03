@@ -1,6 +1,25 @@
 import User from '../models/User.js'
 import { generateToken } from '../middleware/auth.js'
+import { uploadImage, deleteImage } from '../services/cloudinaryService.js'
 import Joi from 'joi'
+import multer from 'multer'
+
+// Configure multer for memory storage
+const storage = multer.memoryStorage()
+export const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept only image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true)
+    } else {
+      cb(new Error('Only image files are allowed'), false)
+    }
+  }
+})
 
 // Validation schemas
 const registerSchema = Joi.object({
@@ -16,7 +35,16 @@ const registerSchema = Joi.object({
   password: Joi.string().min(6).required().messages({
     'string.min': 'Password must be at least 6 characters',
     'any.required': 'Password is required'
-  })
+  }),
+  // Lingua rilevata automaticamente dal frontend
+  detectedLanguage: Joi.string().valid('en', 'it', 'fr', 'de').optional(),
+  // Metadata del rilevamento per analytics
+  languageDetectionMetadata: Joi.object({
+    source: Joi.string().valid('localStorage', 'ip-geolocation', 'browser', 'browser-accepted', 'default').optional(),
+    confidence: Joi.string().valid('high', 'medium', 'low').optional(),
+    country: Joi.string().length(2).optional(),
+    timezone: Joi.string().optional()
+  }).optional()
 })
 
 const loginSchema = Joi.object({
@@ -40,7 +68,7 @@ export const register = async (req, res) => {
       })
     }
 
-    const { name, email, password } = value
+    const { name, email, password, detectedLanguage, languageDetectionMetadata } = value
 
     // Check if user already exists
     const existingUser = await User.findByEmail(email)
@@ -51,12 +79,37 @@ export const register = async (req, res) => {
       })
     }
 
-    // Create new user
-    const user = new User({
+    // Prepara i dati utente con la lingua rilevata
+    const userData = {
       name: name.trim(),
       email: email.toLowerCase().trim(),
       password
-    })
+    }
+
+    // Se è stata rilevata una lingua valida, impostala come preferenza
+    if (detectedLanguage && ['en', 'it', 'fr', 'de'].includes(detectedLanguage)) {
+      userData.preferences = {
+        language: detectedLanguage,
+        detectedLanguage: detectedLanguage
+      }
+      
+      // Aggiungi i metadata della rilevazione se disponibili
+      if (languageDetectionMetadata) {
+        userData.preferences.languageDetectionMetadata = {
+          source: languageDetectionMetadata.source,
+          confidence: languageDetectionMetadata.confidence,
+          country: languageDetectionMetadata.country,
+          detectedAt: new Date()
+        }
+        
+        console.log(`🌍 Language detection metadata saved:`, userData.preferences.languageDetectionMetadata)
+      }
+      
+      console.log(`🌍 Setting user language to ${detectedLanguage} based on detection`)
+    }
+
+    // Create new user
+    const user = new User(userData)
 
     await user.save()
 
@@ -267,6 +320,142 @@ export const refreshToken = async (req, res) => {
     res.status(500).json({
       error: 'Failed to refresh token',
       code: 'REFRESH_ERROR'
+    })
+  }
+}
+
+// Avatar upload and management
+export const uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        error: 'No image file provided',
+        code: 'NO_FILE'
+      })
+    }
+
+    const user = req.user
+
+    // Upload new avatar to Cloudinary
+    const uploadResult = await uploadImage(req.file.buffer, {
+      public_id: `avatar_${user._id}`,
+      overwrite: true
+    })
+
+    // If user had a previous avatar, delete it (optional since we're overwriting)
+    // if (user.avatar && user.avatarPublicId) {
+    //   await deleteImage(user.avatarPublicId)
+    // }
+
+    // Update user with new avatar
+    user.avatar = uploadResult.secure_url
+    user.avatarPublicId = uploadResult.public_id
+    await user.save()
+
+    res.json({
+      message: 'Avatar uploaded successfully',
+      avatar: uploadResult.secure_url,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        preferences: user.preferences,
+        stats: user.stats,
+        lastLogin: user.lastLogin,
+        createdAt: user.createdAt
+      }
+    })
+  } catch (error) {
+    console.error('Avatar upload error:', error)
+    res.status(500).json({
+      error: 'Failed to upload avatar',
+      code: 'UPLOAD_ERROR'
+    })
+  }
+}
+
+export const removeAvatar = async (req, res) => {
+  try {
+    const user = req.user
+
+    // Delete from Cloudinary if exists
+    if (user.avatarPublicId) {
+      await deleteImage(user.avatarPublicId)
+    }
+
+    // Remove avatar from user
+    user.avatar = null
+    user.avatarPublicId = null
+    await user.save()
+
+    res.json({
+      message: 'Avatar removed successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        preferences: user.preferences,
+        stats: user.stats,
+        lastLogin: user.lastLogin,
+        createdAt: user.createdAt
+      }
+    })
+  } catch (error) {
+    console.error('Avatar removal error:', error)
+    res.status(500).json({
+      error: 'Failed to remove avatar',
+      code: 'REMOVAL_ERROR'
+    })
+  }
+}
+
+// Change password
+export const changePassword = async (req, res) => {
+  try {
+    const changePasswordSchema = Joi.object({
+      currentPassword: Joi.string().required().messages({
+        'any.required': 'Current password is required'
+      }),
+      newPassword: Joi.string().min(6).required().messages({
+        'string.min': 'New password must be at least 6 characters',
+        'any.required': 'New password is required'
+      })
+    })
+
+    const { error, value } = changePasswordSchema.validate(req.body)
+    if (error) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: error.details.map(detail => detail.message)
+      })
+    }
+
+    const { currentPassword, newPassword } = value
+    const user = await User.findById(req.user._id)
+
+    // Verify current password
+    const isCurrentPasswordValid = await user.comparePassword(currentPassword)
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({
+        error: 'Current password is incorrect',
+        code: 'INVALID_CURRENT_PASSWORD'
+      })
+    }
+
+    // Update password
+    user.password = newPassword
+    await user.save()
+
+    res.json({
+      message: 'Password changed successfully'
+    })
+  } catch (error) {
+    console.error('Change password error:', error)
+    res.status(500).json({
+      error: 'Failed to change password',
+      code: 'PASSWORD_CHANGE_ERROR'
     })
   }
 }

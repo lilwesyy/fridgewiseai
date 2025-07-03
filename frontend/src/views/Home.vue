@@ -1,13 +1,13 @@
 <template>
   <AuthenticatedLayout>
-    <div class="px-4 py-6">
+    <div class="px-4 py-6 mx-auto max-w-3xl w-full">
       <!-- Welcome Section -->
       <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">
-          Welcome back, {{ authStore.currentUser?.name || 'User' }}!
+          {{ $t('home.welcome', { name: authStore.currentUser?.name || $t('auth.name') }) }}
         </h1>
         <p class="text-gray-600">
-          Ready to discover new recipes from your ingredients?
+          {{ $t('home.subtitle') }}
         </p>
       </div>
 
@@ -23,7 +23,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
           </div>
-          <h3 class="font-medium text-gray-900 text-center">Scan Ingredients</h3>
+          <h3 class="font-medium text-gray-900 text-center">{{ $t('home.scanIngredients') }}</h3>
         </button>
 
         <button 
@@ -35,13 +35,13 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
             </svg>
           </div>
-          <h3 class="font-medium text-gray-900 text-center">View Recipes</h3>
+          <h3 class="font-medium text-gray-900 text-center">{{ $t('home.viewRecipes') }}</h3>
         </button>
       </div>
 
       <!-- Recent Activity -->
       <div class="mb-8">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ $t('home.recentActivity') }}</h2>
         <div v-if="recentItems.length > 0" class="space-y-3">
           <div 
             v-for="item in recentItems" 
@@ -67,14 +67,14 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">No recipes yet</h3>
-          <p class="text-gray-500 mb-4">Start by scanning your ingredients to generate your first recipe</p>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('home.noRecipesYet') }}</h3>
+          <p class="text-gray-500 mb-4">{{ $t('home.noRecipesSubtitle') }}</p>
           <div class="flex justify-center">
             <BaseButton 
               variant="primary"
               @click="$router.push('/app/camera')"
             >
-              Get Started
+              {{ $t('home.getStarted') }}
             </BaseButton>
           </div>
         </div>
@@ -89,10 +89,9 @@
             </svg>
           </div>
           <div>
-            <h3 class="font-medium text-blue-900 mb-1">Pro Tip</h3>
+            <h3 class="font-medium text-blue-900 mb-1">{{ $t('home.proTip') }}</h3>
             <p class="text-sm text-blue-800">
-              For best results, take clear photos of your ingredients with good lighting. 
-              The AI works better when it can see individual items clearly.
+              {{ $t('home.proTipContent') }}
             </p>
           </div>
         </div>

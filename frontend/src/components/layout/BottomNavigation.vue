@@ -1,6 +1,6 @@
 <template>
   <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 safe-area-bottom">
-    <div class="flex justify-around py-2">
+    <div class="flex justify-around py-2 mx-auto max-w-3xl w-full">
       <router-link 
         v-for="tab in tabs" 
         :key="tab.name"

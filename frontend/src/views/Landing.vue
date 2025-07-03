@@ -23,10 +23,41 @@
           </div>
           
           <!-- Navigation Links -->
-          <div class="hidden md:flex items-center space-x-8">
+          <div class="hidden md:flex items-center space-x-6">
             <a href="#features" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.features') }}</a>
             <a href="#how-it-works" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.howItWorks') }}</a>
             <a href="#about" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.about') }}</a>
+            
+            <!-- Language Selector -->
+            <div class="relative">
+              <button 
+                @click="showLanguageDropdown = !showLanguageDropdown"
+                class="flex items-center space-x-1 text-gray-700 hover:text-primary-600 font-medium"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                </svg>
+                <span>{{ getCurrentLanguageName() }}</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+              
+              <!-- Language Dropdown -->
+              <div v-if="showLanguageDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                <button 
+                  v-for="language in availableLanguages" 
+                  :key="language.code"
+                  @click="changeLanguage(language.code)"
+                  class="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center justify-between"
+                  :class="{ 'bg-primary-50 text-primary-600': $i18n.locale === language.code }"
+                >
+                  <span>{{ language.name }}</span>
+                  <span v-if="$i18n.locale === language.code" class="text-primary-600">✓</span>
+                </button>
+              </div>
+            </div>
+            
             <BaseButton variant="primary" @click="router.push('/auth')">
               {{ t('landing.nav.getStarted') }}
             </BaseButton>
@@ -48,6 +79,25 @@
             <a href="#features" @click="mobileMenuOpen = false" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.features') }}</a>
             <a href="#how-it-works" @click="mobileMenuOpen = false" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.howItWorks') }}</a>
             <a href="#about" @click="mobileMenuOpen = false" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.about') }}</a>
+            
+            <!-- Mobile Language Selector -->
+            <div class="border-t border-gray-200 pt-4">
+              <p class="text-sm font-medium text-gray-900 mb-2">{{ t('landing.nav.language') }}</p>
+              <div class="grid grid-cols-2 gap-2">
+                <button 
+                  v-for="language in availableLanguages" 
+                  :key="language.code"
+                  @click="changeLanguage(language.code)"
+                  class="px-3 py-2 text-sm rounded-lg border transition-colors"
+                  :class="$i18n.locale === language.code 
+                    ? 'border-primary-500 bg-primary-50 text-primary-700' 
+                    : 'border-gray-200 hover:bg-gray-50'"
+                >
+                  {{ language.name }}
+                </button>
+              </div>
+            </div>
+            
             <BaseButton variant="primary" @click="router.push('/auth')" class="w-full">
               {{ t('landing.nav.getStarted') }}
             </BaseButton>
@@ -453,16 +503,50 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/components/ui/Button.vue'
+import { saveLanguagePreference } from '@/services/languageDetectionService'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const mobileMenuOpen = ref(false)
 const showScrollToTop = ref(false)
+const showLanguageDropdown = ref(false)
 const navbarShadow = ref(false)
 const navbarVisible = ref(true)
 const lastScrollY = ref(0)
 
+// Lingue disponibili
+const availableLanguages = [
+  { code: 'en', name: 'English' },
+  { code: 'it', name: 'Italiano' },
+  { code: 'fr', name: 'Français' },
+  { code: 'de', name: 'Deutsch' }
+]
+
+// Ottiene il nome della lingua corrente
+const getCurrentLanguageName = () => {
+  const current = availableLanguages.find(lang => lang.code === locale.value)
+  return current ? current.name : 'English'
+}
+
+// Cambia la lingua
+const changeLanguage = (languageCode) => {
+  console.log(`🌍 Changing language to: ${languageCode}`)
+  
+  // Aggiorna la locale di i18n
+  locale.value = languageCode
+  
+  // Salva la preferenza (nei cookie per la landing page)
+  saveLanguagePreference(languageCode, 'user')
+  
+  // Chiudi i dropdown
+  showLanguageDropdown.value = false
+  mobileMenuOpen.value = false
+  
+  console.log(`🌍 Language changed to: ${languageCode}`)
+}
+
+// Funzioni di gestione navbar e scroll
 const handleScroll = () => {
   const currentScrollY = window.scrollY
   
@@ -499,11 +583,20 @@ const toggleMobileMenu = () => {
   }
 }
 
+// Chiudi dropdown quando si clicca fuori
+const handleClickOutside = (event) => {
+  if (showLanguageDropdown.value && !event.target.closest('.relative')) {
+    showLanguageDropdown.value = false
+  }
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
