@@ -30,20 +30,10 @@
               </svg>
             </div>
           </div>
-          
-          <!-- Change Photo Button -->
-          <button 
-            @click="triggerProfilePictureChange"
-            class="absolute bottom-0 right-0 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-primary-700 transition-all duration-200 hover:scale-110 border-2 border-white"
-            style="width: 32px; height: 32px; min-width: 32px; min-height: 32px;"
-            title="Change profile picture"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-          </button>
         </div>
+        
+        <!-- Hint text -->
+        <p class="text-xs text-gray-500 mb-3 opacity-75">{{ $t('profile.clickToChangePhoto') }}</p>
         
         <h1 class="text-2xl font-bold text-gray-900">{{ authStore.currentUser?.name || $t('profile.user') }}</h1>
         <p class="text-gray-600">{{ authStore.currentUser?.email }}</p>
@@ -182,19 +172,22 @@
           </svg>
         </button>
 
-        <!-- Donate -->
+        <!-- Donate - Enhanced -->
         <button 
           @click="openDonation"
-          class="w-full bg-white rounded-lg p-4 shadow-sm border border-gray-200 flex items-center space-x-3 hover:shadow-md transition-shadow"
+          class="w-full bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-4 shadow-sm border-2 border-yellow-200 flex items-center space-x-3 hover:shadow-lg hover:border-yellow-300 transition-all duration-300 transform hover:scale-[1.02]"
         >
-          <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+          <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-lg flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
             </svg>
           </div>
           <div class="flex-1 text-left">
-            <h3 class="font-medium text-gray-900">{{ $t('profile.supportApp') }}</h3>
-            <p class="text-sm text-gray-500">{{ $t('profile.supportAppDescription') }}</p>
+            <h3 class="font-semibold text-gray-900 flex items-center">
+              {{ $t('profile.supportApp') }}
+              <span class="ml-2 px-2 py-1 bg-yellow-200 text-yellow-800 text-xs font-bold rounded-full">{{ $t('profile.supportBadge') }}</span>
+            </h3>
+            <p class="text-sm text-gray-600">{{ $t('profile.supportAppDescription') }}</p>
           </div>
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -579,7 +572,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
-import { userService, userDataService } from '@/services/api'
+import { userService, userDataService, recipeService } from '@/services/api'
 
 export default {
   name: 'ProfilePage',
@@ -659,7 +652,7 @@ export default {
       try {
         this.loading = true
         
-        // Load user statistics from backend
+        // Load user statistics from backend only
         const stats = await userService.getUserStats()
         this.stats = stats
         
@@ -668,22 +661,16 @@ export default {
         this.savedRecipesCount = savedRecipeIds.length
         
       } catch (error) {
-        console.error('Failed to load user stats:', error)
-        // Fallback to localStorage for backward compatibility
-        this.loadStatsFromLocalStorage()
+        console.warn('Database not available, showing zero stats:', error.message)
+        // Set default stats without throwing error
+        this.stats = {
+          totalRecipes: 0,
+          totalScans: 0
+        }
+        this.savedRecipesCount = 0
       } finally {
         this.loading = false
       }
-    },
-    
-    loadStatsFromLocalStorage() {
-      // Fallback method for backward compatibility
-      const recipes = localStorage.getItem('generatedRecipes')
-      const saved = localStorage.getItem('savedRecipes')
-      
-      this.stats.totalRecipes = recipes ? JSON.parse(recipes).length : 0
-      this.savedRecipesCount = saved ? JSON.parse(saved).length : 0
-      this.stats.totalScans = this.stats.totalRecipes * 2 // Estimate
     },
 
     initProfileForm() {

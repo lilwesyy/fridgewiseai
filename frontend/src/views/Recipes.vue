@@ -188,9 +188,9 @@
               <div class="font-semibold">{{ $t('recipes.servings') }}</div>
               <div class="text-gray-600">{{ selectedRecipe.servings }}</div>
             </div>
-            <div v-if="selectedRecipe.nutritionalInfo" class="text-center p-3 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg shadow-sm">
+            <div v-if="selectedRecipe.calories || selectedRecipe.nutritionalInfo" class="text-center p-3 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg shadow-sm">
               <div class="font-semibold">{{ $t('recipes.calories') }}</div>
-              <div class="text-gray-600">{{ selectedRecipe.nutritionalInfo.calories || '-' }}</div>
+              <div class="text-gray-600">{{ selectedRecipe.calories || selectedRecipe.nutritionalInfo?.calories || '-' }}</div>
             </div>
           </div>
 
@@ -252,6 +252,7 @@ import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
 import { recipeService, userDataService } from '@/services/api'
+import { DonationHelper } from '@/utils/donationHelper'
 
 export default {
   name: 'RecipesPage',
@@ -323,8 +324,8 @@ export default {
         // Load user's recipes from database
         this.recipes = await recipeService.getAllUserRecipes()
       } catch (error) {
-        console.error('Failed to load recipes:', error)
-        this.toast.error(this.$t('notifications.recipes.loadError'))
+        console.warn('Database not available, showing empty state:', error.message)
+        // Set empty recipes without showing error toast
         this.recipes = []
       } finally {
         this.loading = false
@@ -361,14 +362,22 @@ export default {
         userDataService.clearCurrentIngredients()
         this.currentIngredients = []
 
-        // Add to recent activity
-        await userDataService.addRecentActivity({
-          id: newRecipe._id,
-          title: `Generated: ${newRecipe.title}`,
-          timestamp: new Date().toLocaleDateString()
-        })
+        // Add to recent activity (skip if backend not available)
+        try {
+          await userDataService.addRecentActivity({
+            id: newRecipe.id,
+            title: `Generated: ${newRecipe.title}`,
+            timestamp: new Date().toLocaleDateString()
+          })
+        } catch (error) {
+          console.warn('Failed to update recent activity (backend not available):', error.message)
+          // Continue without failing the recipe generation
+        }
 
         this.toast.success(this.$t('notifications.recipes.generateSuccess'))
+
+        // Check if should show donation toast
+        this.checkDonationToast()
 
       } catch (error) {
         console.error('Recipe generation error:', error)
@@ -388,7 +397,7 @@ export default {
 
     async saveRecipe(recipe) {
       try {
-        const recipeId = recipe._id || recipe.id
+        const recipeId = recipe.id
         if (!this.savedRecipes.includes(recipeId)) {
           await userDataService.addSavedRecipe(recipeId)
           this.savedRecipes.push(recipeId)
@@ -424,7 +433,12 @@ export default {
       if (Array.isArray(ingredients)) {
         return ingredients.map(ing => {
           if (typeof ing === 'string') return ing
-          if (ing.name) return `${ing.amount || ''} ${ing.unit || ''} ${ing.name}`.trim()
+          if (ing.name) {
+            // Handle new OpenRouter format: {name, amount, emoji}
+            const amount = ing.amount || ''
+            const emoji = ing.emoji || ''
+            return `${emoji} ${amount} ${ing.name}`.trim()
+          }
           return ing.toString()
         })
       }
@@ -441,6 +455,30 @@ export default {
         })
       }
       return []
+    },
+
+    checkDonationToast() {
+      // Increment recipe count and check if should show donation toast
+      DonationHelper.incrementRecipeCount()
+      
+      if (DonationHelper.shouldShowDonationToast()) {
+        // Show toast after a small delay
+        setTimeout(() => {
+          this.toast.info(this.$t('recipes.donationToast'), {
+            timeout: 8000,
+            closeOnClick: false,
+            pauseOnFocusLoss: false,
+            pauseOnHover: true,
+            draggable: false,
+            showCloseButtonOnHover: true,
+            hideProgressBar: false,
+            closeButton: "button",
+            icon: true,
+            rtl: false
+          })
+          DonationHelper.markDonationToastShown()
+        }, 2000)
+      }
     }
   }
 }

@@ -9,6 +9,37 @@
         </p>
       </div>
 
+      <!-- Donation Banner (show occasionally) -->
+      <div v-if="showDonationBanner" class="bg-gradient-to-r from-yellow-400 to-orange-400 text-white p-4 rounded-xl mb-6 shadow-lg">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center mb-2">
+              <svg class="w-6 h-6 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+              </svg>
+              <h3 class="font-bold text-lg">{{ $t('home.supportTitle') }}</h3>
+            </div>
+            <p class="text-white/90 text-sm">{{ $t('home.supportDescription') }}</p>
+          </div>
+          <div class="flex items-center space-x-2 ml-4">
+            <button 
+              @click="openDonation"
+              class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+            >
+              {{ $t('home.supportButton') }}
+            </button>
+            <button 
+              @click="dismissDonationBanner"
+              class="text-white/70 hover:text-white p-1"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Quick Actions -->
       <div class="grid grid-cols-2 gap-6 mb-10">
         <button 
@@ -98,6 +129,9 @@
           </div>
         </div>
       </div>
+
+      <!-- Donation Footer -->
+      <DonationFooter @donate-click="openDonation" />
     </div>
   </AuthenticatedLayout>
 </template>
@@ -106,13 +140,15 @@
 import { useAuthStore } from '@/stores/auth'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
+import DonationFooter from '@/components/layout/DonationFooter.vue'
 import { userDataService } from '@/services/api'
 
 export default {
   name: 'HomePage',
   components: {
     AuthenticatedLayout,
-    BaseButton
+    BaseButton,
+    DonationFooter,
   },
   setup() {
     const authStore = useAuthStore()
@@ -121,7 +157,8 @@ export default {
   data() {
     return {
       recentItems: [],
-      loading: false
+      loading: false,
+      showDonationBanner: false
     }
   },
   computed: {
@@ -133,6 +170,7 @@ export default {
   },
   mounted() {
     this.loadRecentActivity()
+    this.checkDonationBanner()
   },
   methods: {
     async loadRecentActivity() {
@@ -147,6 +185,28 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    checkDonationBanner() {
+      // Show banner occasionally - every 5th visit to home
+      const lastShown = localStorage.getItem('donationBannerLastShown')
+      const visitCount = parseInt(localStorage.getItem('homeVisitCount') || '0') + 1
+      localStorage.setItem('homeVisitCount', visitCount.toString())
+      
+      const daysSinceLastShown = lastShown ? (Date.now() - parseInt(lastShown)) / (1000 * 60 * 60 * 24) : 999
+      
+      // Show if: never shown before OR 7+ days since last shown OR every 5th visit
+      if (!lastShown || daysSinceLastShown >= 7 || visitCount % 5 === 0) {
+        this.showDonationBanner = true
+      }
+    },
+    dismissDonationBanner() {
+      this.showDonationBanner = false
+      localStorage.setItem('donationBannerLastShown', Date.now().toString())
+    },
+    openDonation() {
+      // Same logic as in Profile.vue
+      this.$toast.info(this.$t('profile.donationMessage'))
+      this.dismissDonationBanner()
     }
   }
 }

@@ -372,6 +372,35 @@
       </div>
     </section>
 
+    <!-- Support Section -->
+    <section class="py-16 bg-gradient-to-r from-purple-50 to-pink-50">
+      <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-6">
+          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          {{ t('landing.support.title') }}
+        </h2>
+        <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          {{ t('landing.support.description') }}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <button 
+            @click="openDonation"
+            class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+            </svg>
+            {{ t('landing.support.donateButton') }}
+          </button>
+          <p class="text-sm text-gray-500">{{ t('landing.support.note') }}</p>
+        </div>
+      </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="py-20 bg-gradient-to-r from-primary-600 to-primary-700">
       <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -463,8 +492,17 @@
           </p>
           <div class="flex items-center space-x-4 mt-4 md:mt-0">
             <span class="text-gray-400 text-sm">{{ t('landing.footer.madeWith') }}</span>
-            <span class="text-red-500">❤️</span>
+            <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+            </svg>
             <span class="text-gray-400 text-sm">{{ t('landing.footer.location') }}</span>
+            <span class="text-gray-600">•</span>
+            <button 
+              @click="openDonation"
+              class="text-gray-400 hover:text-white text-sm font-medium transition-colors"
+            >
+              {{ t('landing.footer.donate') }}
+            </button>
           </div>
         </div>
       </div>
@@ -594,6 +632,25 @@ onMounted(() => {
   window.addEventListener('scroll', handleScroll)
   document.addEventListener('click', handleClickOutside)
 })
+
+// Gestione donazioni
+const openDonation = () => {
+  // Simula il messaggio di donazione come nelle altre pagine
+  alert(getCurrentDonationMessage())
+}
+
+const getCurrentDonationMessage = () => {
+  switch (locale.value) {
+    case 'it':
+      return 'Grazie per aver considerato di supportare FridgeWiseAI! L\'integrazione PayPal arriverà presto.'
+    case 'fr':
+      return 'Merci d\'avoir envisagé de soutenir FridgeWiseAI! L\'intégration PayPal arrivera bientôt.'
+    case 'de':
+      return 'Danke, dass Sie erwägen, FridgeWiseAI zu unterstützen! Die PayPal-Integration kommt bald.'
+    default:
+      return 'Thank you for considering supporting FridgeWiseAI! PayPal integration coming soon.'
+  }
+}
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)

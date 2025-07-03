@@ -1,6 +1,198 @@
 <template>
-  <AuthenticatedLayout :show-header="false" :show-navigation="true">
-    <div class="fixed inset-0 flex flex-col relative overflow-hidden bg-black z-30">
+  <AuthenticatedLayout :show-header="showHeader" :show-navigation="true">
+    <div class="flex flex-col relative overflow-hidden bg-black z-30" :class="showHeader ? 'fixed top-16 left-0 right-0 bottom-0' : 'fixed inset-0'">
+      <!-- Choice Screen -->
+      <div v-if="showChoiceScreen" class="absolute inset-0 flex items-center justify-center bg-white z-50">
+        <div class="text-center max-w-lg mx-auto px-6 py-8 w-full">
+          <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+          
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ $t('camera.choiceTitle') }}</h2>
+          <p class="text-gray-600 mb-8">{{ $t('camera.choiceSubtitle') }}</p>
+          
+          <div class="space-y-4">
+            <button 
+              @click="showManualSelection"
+              class="w-full bg-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-3"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+              </svg>
+              <span>{{ $t('camera.manualSelection') }}</span>
+            </button>
+            
+            <button 
+              @click="startCameraMode"
+              class="w-full bg-green-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-3"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span>{{ $t('camera.useCamera') }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manual Selection Screen -->
+      <div v-if="showManualSelectionScreen" class="absolute inset-0 flex flex-col bg-white z-50">
+        <div class="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-3">
+          <div class="flex items-center justify-between">
+            <button 
+              @click="backToChoice"
+              class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center transition-all active:scale-95"
+            >
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            <h2 class="text-lg font-semibold text-gray-900">{{ $t('camera.selectIngredients') }}</h2>
+            <button 
+              @click="generateRecipeFromManual"
+              :disabled="selectedIngredients.length === 0"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
+            >
+              {{ $t('camera.generateRecipesButton') }}
+            </button>
+          </div>
+          
+          <!-- Search Bar -->
+          <div class="mt-4 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input
+              v-model="searchQuery"
+              type="text"
+              :placeholder="$t('camera.searchIngredients')"
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
+          </div>
+        </div>
+        
+        <!-- Selected Ingredients -->
+        <div v-if="selectedIngredients.length > 0" class="flex-shrink-0 bg-blue-50 border-b border-blue-200 px-4 py-3">
+          <h3 class="text-sm font-medium text-blue-900 mb-2">{{ $t('camera.selectedIngredients') }} ({{ selectedIngredients.length }})</h3>
+          <div class="flex flex-wrap gap-2">
+            <span 
+              v-for="ingredient in selectedIngredients" 
+              :key="ingredient"
+              class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+            >
+              {{ ingredient }}
+              <button 
+                @click="removeIngredient(ingredient)"
+                class="ml-2 text-blue-600 hover:text-blue-800"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </span>
+          </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="flex-1 overflow-y-auto">
+          <div class="p-4">
+            <!-- Search Results or Popular Ingredients -->
+            <div v-if="searchQuery.length >= 2" class="space-y-3">
+              <h3 class="text-sm font-medium text-gray-700 mb-3">{{ $t('camera.searchResults') }}</h3>
+              <div v-if="filteredIngredients.length > 0" class="grid grid-cols-2 gap-3">
+                <div 
+                  v-for="ingredient in filteredIngredients.slice(0, 20)" 
+                  :key="ingredient"
+                  @click="toggleIngredient(ingredient)"
+                  class="relative bg-white border-2 border-gray-200 rounded-xl p-4 hover:border-blue-300 cursor-pointer transition-all duration-200 transform hover:scale-105"
+                  :class="{ 'border-blue-500 bg-blue-50': selectedIngredients.includes(ingredient) }"
+                >
+                  <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                      <div class="text-lg mb-1">{{ getIngredientEmoji(ingredient) }}</div>
+                      <div class="text-sm font-medium text-gray-900 leading-tight">{{ ingredient }}</div>
+                    </div>
+                    <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center ml-2"
+                         :class="{ 'bg-blue-600 border-blue-600': selectedIngredients.includes(ingredient) }">
+                      <svg v-if="selectedIngredients.includes(ingredient)" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="text-center py-12">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">{{ $t('camera.noResults') }}</h3>
+                <p class="text-gray-500">{{ $t('camera.tryAnotherSearch') }}</p>
+              </div>
+            </div>
+            
+            <!-- Popular Ingredients (shown when not searching) -->
+            <div v-else class="space-y-6">
+              <!-- Search Prompt -->
+              <div class="text-center py-8">
+                <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $t('camera.searchPromptTitle') }}</h3>
+                <p class="text-gray-600 mb-4">{{ $t('camera.searchPromptSubtitle') }}</p>
+              </div>
+              
+              <!-- Popular Categories -->
+              <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-3">{{ $t('camera.popularCategories') }}</h3>
+                <div class="grid grid-cols-2 gap-3">
+                  <div 
+                    v-for="category in popularCategories" 
+                    :key="category.name"
+                    @click="searchByCategory(category.name)"
+                    class="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-4 hover:from-blue-50 hover:to-blue-100 hover:border-blue-300 cursor-pointer transition-all duration-200 transform hover:scale-105"
+                  >
+                    <div class="text-center">
+                      <div class="text-2xl mb-2">{{ category.emoji }}</div>
+                      <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
+                      <div class="text-xs text-gray-500 mt-1">{{ category.count }} {{ $t('camera.ingredients') }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Quick Add (Most Used) -->
+              <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-3">{{ $t('camera.quickAdd') }}</h3>
+                <div class="flex flex-wrap gap-2">
+                  <button 
+                    v-for="ingredient in quickAddIngredients" 
+                    :key="ingredient"
+                    @click="toggleIngredient(ingredient)"
+                    class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                    :class="{ 'bg-blue-100 border-blue-300 text-blue-800': selectedIngredients.includes(ingredient) }"
+                  >
+                    <span class="mr-2">{{ getIngredientEmoji(ingredient) }}</span>
+                    {{ ingredient }}
+                    <svg v-if="selectedIngredients.includes(ingredient)" class="w-4 h-4 ml-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Loading State -->
       <div v-if="isRequestingPermission" class="absolute inset-0 flex items-center justify-center bg-white z-50">
         <button 
@@ -333,13 +525,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useI18n } from 'vue-i18n'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
 import { ingredientService, userDataService } from '@/services/api'
+import { DonationHelper } from '@/utils/donationHelper'
 
 const router = useRouter()
 const toast = useToast()
@@ -360,6 +553,34 @@ const cameraError = ref(null)
 const currentFacingMode = ref('environment')
 const detectedIngredients = ref([])
 
+// Manual selection state
+const showChoiceScreen = ref(true)
+const showManualSelectionScreen = ref(false)
+const selectedIngredients = ref([])
+const searchQuery = ref('')
+const availableIngredients = ref([
+  'Pomodori', 'Cipolla', 'Aglio', 'Basilico', 'Origano', 'Mozzarella', 'Parmigiano',
+  'Olio d\'oliva', 'Sale', 'Pepe', 'Carote', 'Sedano', 'Prezzemolo', 'Rosmarino',
+  'Salvia', 'Timo', 'Peperoni', 'Zucchine', 'Melanzane', 'Spinaci', 'Rucola',
+  'Lattuga', 'Cetrioli', 'Pomodorini', 'Funghi', 'Patate', 'Pasta', 'Riso',
+  'Pane', 'Uova', 'Latte', 'Burro', 'Yogurt', 'Prosciutto', 'Salame', 'Tonno',
+  'Salmone', 'Pollo', 'Manzo', 'Maiale', 'Limoni', 'Arance', 'Mele', 'Banane',
+  'Fragole', 'Pesche', 'Pere', 'Uva', 'Fagioli', 'Lenticchie', 'Ceci'
+])
+
+const popularCategories = ref([
+  { name: 'Verdure', emoji: '🥬', count: 15 },
+  { name: 'Frutta', emoji: '🍎', count: 12 },
+  { name: 'Carne', emoji: '🥩', count: 8 },
+  { name: 'Formaggi', emoji: '🧀', count: 6 },
+  { name: 'Spezie', emoji: '🌿', count: 10 },
+  { name: 'Cereali', emoji: '🌾', count: 7 }
+])
+
+const quickAddIngredients = ref([
+  'Pomodori', 'Cipolla', 'Aglio', 'Basilico', 'Olio d\'oliva', 'Sale', 'Pepe', 'Mozzarella'
+])
+
 // Permission state
 const hasPermission = ref(false)
 const permissionDenied = ref(false)
@@ -373,6 +594,20 @@ const useIOSWorkaround = ref(false)
 
 // Development mode check
 const isDevelopment = ref(import.meta.env.DEV)
+
+// Computed properties
+const filteredIngredients = computed(() => {
+  if (!searchQuery.value || searchQuery.value.length < 2) return []
+  return availableIngredients.value.filter(ingredient =>
+    ingredient.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+})
+
+const showHeader = computed(() => {
+  // Show header on choice screen and manual selection screen
+  // Hide header only when camera is active or captured image is shown
+  return showChoiceScreen.value || showManualSelectionScreen.value
+})
 
 // Device info
 const deviceInfo = ref({
@@ -1413,6 +1648,9 @@ const generateRecipe = async () => {
     // Store ingredients for recipe generation
     userDataService.setCurrentIngredients(detectedIngredients.value)
     
+    // Check if should show donation toast (for camera detection)
+    checkDonationToast()
+    
     // Navigate to recipes page
     router.push('/app/recipes')
     
@@ -1450,6 +1688,162 @@ const cleanup = () => {
   console.log('Camera cleanup completed')
 }
 
+// Manual selection functions
+const showManualSelection = () => {
+  showChoiceScreen.value = false
+  showManualSelectionScreen.value = true
+}
+
+const startCameraMode = async () => {
+  showChoiceScreen.value = false
+  showManualSelectionScreen.value = false
+  await nextTick()
+  await requestPermission()
+}
+
+const backToChoice = () => {
+  showManualSelectionScreen.value = false
+  showChoiceScreen.value = true
+  selectedIngredients.value = []
+  searchQuery.value = ''
+}
+
+const toggleIngredient = (ingredient) => {
+  const index = selectedIngredients.value.indexOf(ingredient)
+  if (index > -1) {
+    selectedIngredients.value.splice(index, 1)
+  } else {
+    selectedIngredients.value.push(ingredient)
+  }
+  // Clear search bar after selection to allow new search
+  searchQuery.value = ''
+}
+
+const removeIngredient = (ingredient) => {
+  const index = selectedIngredients.value.indexOf(ingredient)
+  if (index > -1) {
+    selectedIngredients.value.splice(index, 1)
+  }
+}
+
+const generateRecipeFromManual = async () => {
+  if (selectedIngredients.value.length === 0) {
+    toast.error(t('camera.selectAtLeastOne'))
+    return
+  }
+
+  try {
+    // Store ingredients for recipe generation
+    userDataService.setCurrentIngredients(selectedIngredients.value)
+    
+    // Check if should show donation toast (for manual selection)
+    checkDonationToast()
+    
+    // Navigate to recipes page
+    router.push('/app/recipes')
+    
+  } catch (error) {
+    console.error('Error generating recipe from manual selection:', error)
+    toast.error('Errore nella generazione delle ricette')
+  }
+}
+
+const getIngredientEmoji = (ingredient) => {
+  const emojiMap = {
+    'Pomodori': '🍅',
+    'Pomodorini': '🍅',
+    'Cipolla': '🧅',
+    'Aglio': '🧄',
+    'Basilico': '🌿',
+    'Origano': '🌿',
+    'Prezzemolo': '🌿',
+    'Rosmarino': '🌿',
+    'Salvia': '🌿',
+    'Timo': '🌿',
+    'Mozzarella': '🧀',
+    'Parmigiano': '🧀',
+    'Carote': '🥕',
+    'Peperoni': '🌶️',
+    'Zucchine': '🥒',
+    'Melanzane': '🍆',
+    'Spinaci': '🥬',
+    'Rucola': '🥬',
+    'Lattuga': '🥬',
+    'Cetrioli': '🥒',
+    'Funghi': '🍄',
+    'Patate': '🥔',
+    'Uova': '🥚',
+    'Pollo': '🐔',
+    'Manzo': '🥩',
+    'Maiale': '🥩',
+    'Prosciutto': '🥓',
+    'Salame': '🥓',
+    'Tonno': '🐟',
+    'Salmone': '🐟',
+    'Limoni': '🍋',
+    'Arance': '🍊',
+    'Mele': '🍎',
+    'Banane': '🍌',
+    'Fragole': '🍓',
+    'Pesche': '🍑',
+    'Pere': '🍐',
+    'Uva': '🍇',
+    'Pasta': '🍝',
+    'Riso': '🍚',
+    'Pane': '🍞',
+    'Latte': '🥛',
+    'Fagioli': '🫘',
+    'Lenticchie': '🫘',
+    'Ceci': '🫘'
+  }
+  return emojiMap[ingredient] || '🥘'
+}
+
+const searchByCategory = (categoryName) => {
+  const categoryMap = {
+    'Verdure': ['Pomodori', 'Cipolla', 'Carote', 'Peperoni', 'Zucchine', 'Melanzane', 'Spinaci', 'Rucola', 'Lattuga', 'Cetrioli', 'Funghi', 'Patate'],
+    'Frutta': ['Limoni', 'Arance', 'Mele', 'Banane', 'Fragole', 'Pesche', 'Pere', 'Uva'],
+    'Carne': ['Pollo', 'Manzo', 'Maiale', 'Prosciutto', 'Salame', 'Tonno', 'Salmone'],
+    'Formaggi': ['Mozzarella', 'Parmigiano'],
+    'Spezie': ['Basilico', 'Origano', 'Prezzemolo', 'Rosmarino', 'Salvia', 'Timo', 'Aglio', 'Sale', 'Pepe'],
+    'Cereali': ['Pasta', 'Riso', 'Pane', 'Fagioli', 'Lenticchie', 'Ceci']
+  }
+  
+  searchQuery.value = categoryName.toLowerCase()
+  // Update filtered ingredients manually for category search
+  const categoryIngredients = categoryMap[categoryName] || []
+  
+  // Clear search and show category results
+  setTimeout(() => {
+    searchQuery.value = ''
+    // Could implement a separate category view here
+  }, 100)
+}
+
+const checkDonationToast = () => {
+  // Increment recipe count and check if should show donation toast
+  DonationHelper.incrementRecipeCount()
+  
+  if (DonationHelper.shouldShowDonationToast()) {
+    // Show toast after a small delay
+    setTimeout(() => {
+      toast.info(t('recipes.donationToast'), {
+        timeout: 8000,
+        closeOnClick: false,
+        pauseOnFocusLoss: false,
+        pauseOnHover: true,
+        draggable: false,
+        showCloseButtonOnHover: true,
+        hideProgressBar: false,
+        closeButton: "button",
+        icon: true,
+        rtl: false
+      })
+      DonationHelper.markDonationToastShown()
+    }, 2000)
+  }
+}
+
 // Component lifecycle
 onMounted(async () => {
   console.log('Camera component mounted')
@@ -1460,16 +1854,8 @@ onMounted(async () => {
   // Check available cameras
   await checkAvailableCameras()
   
-  // Wait for DOM to be fully rendered before requesting camera
-  await nextTick()
-  
-  // Wait longer for router transitions to complete and DOM to settle
-  setTimeout(async () => {
-    console.log('Requesting camera after DOM is ready')
-    console.log('Video element exists:', !!videoElement.value)
-    console.log('Video element in DOM:', !!document.querySelector('video'))
-    await requestPermission()
-  }, 500) // Increased delay to 500ms to allow for router transition
+  // Don't automatically start camera - show choice screen instead
+  console.log('Showing choice screen instead of auto-starting camera')
 })
 
 onBeforeUnmount(() => {
