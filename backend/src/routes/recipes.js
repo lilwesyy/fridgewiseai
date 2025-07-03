@@ -1,9 +1,101 @@
 import express from 'express'
 import Recipe from '../models/Recipe.js'
+import Activity from '../models/Activity.js'
 import { authenticateToken, optionalAuth } from '../middleware/auth.js'
 import Joi from 'joi'
 
 const router = express.Router()
+
+// Create/Save a new recipe
+router.post('/', authenticateToken, async (req, res) => {
+  try {
+    // Convert Gemini format to our Recipe model format
+    const {
+      title,
+      description,
+      ingredients,
+      instructions,
+      cookingTime,
+      servings,
+      difficulty,
+      calories,
+      tags,
+      tips,
+      sourceIngredients,
+      isGenerated
+    } = req.body
+
+    // Transform ingredients from Gemini format to our format
+    const transformedIngredients = ingredients.map((ing, index) => ({
+      name: ing.name || ing,
+      amount: ing.amount || '1 piece',
+      unit: ing.unit || '',
+      notes: ing.notes || ''
+    }))
+
+    // Transform instructions from Gemini format to our format
+    const transformedInstructions = instructions.map((inst, index) => ({
+      step: index + 1,
+      description: typeof inst === 'string' ? inst : inst.description,
+      duration: inst.duration || 5
+    }))
+
+    // Create recipe data in our model format
+    const recipeData = {
+      title: title || 'Generated Recipe',
+      description: description || 'A delicious AI-generated recipe',
+      ingredients: transformedIngredients,
+      instructions: transformedInstructions,
+      cookingTime: {
+        prep: 10,
+        cook: cookingTime || 20,
+        total: (cookingTime || 20) + 10
+      },
+      servings: servings || 4,
+      difficulty: difficulty || 'medium',
+      cuisine: 'other',
+      tags: tags || ['ai-generated'],
+      generatedFrom: {
+        ingredients: sourceIngredients || [],
+        prompt: `Generated with ingredients: ${sourceIngredients?.join(', ') || 'various'}`,
+        aiModel: 'gemini'
+      },
+      createdBy: req.user._id,
+      isPublic: false
+    }
+
+    const recipe = new Recipe(recipeData)
+    await recipe.save()
+
+    // Update user stats
+    await req.user.updateOne({ $inc: { 'stats.totalRecipes': 1 } })
+
+    res.status(201).json(recipe)
+  } catch (error) {
+    console.error('Create recipe error:', error)
+    res.status(500).json({
+      error: 'Failed to create recipe',
+      code: 'CREATE_ERROR'
+    })
+  }
+})
+
+// Get all user's recipes (no pagination)
+router.get('/all', authenticateToken, async (req, res) => {
+  try {
+    const recipes = await Recipe.find({ createdBy: req.user._id })
+      .sort({ createdAt: -1 })
+      .lean()
+
+    res.json(recipes)
+  } catch (error) {
+    console.error('Get all recipes error:', error)
+    res.status(500).json({
+      error: 'Failed to get recipes',
+      code: 'FETCH_ERROR'
+    })
+  }
+})
 
 // Generate recipe from ingredients
 router.post('/generate', authenticateToken, async (req, res) => {
@@ -197,6 +289,23 @@ router.get('/my', authenticateToken, async (req, res) => {
   }
 })
 
+// Get user's saved recipes (MUST be before /:id route)
+router.get('/saved', authenticateToken, async (req, res) => {
+  try {
+    const recipes = await Recipe.find({ savedBy: req.user._id })
+      .sort({ createdAt: -1 })
+      .lean()
+
+    res.json(recipes)
+  } catch (error) {
+    console.error('Get saved recipes error:', error)
+    res.status(500).json({
+      error: 'Failed to get saved recipes',
+      code: 'FETCH_ERROR'
+    })
+  }
+})
+
 // Get single recipe
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
@@ -367,6 +476,57 @@ router.get('/', optionalAuth, async (req, res) => {
     res.status(500).json({
       error: 'Failed to search recipes',
       code: 'SEARCH_ERROR'
+    })
+  }
+})
+
+// Save/Unsave recipe endpoints
+router.post('/:id/save', authenticateToken, async (req, res) => {
+  try {
+    const recipe = await Recipe.findById(req.params.id)
+    if (!recipe) {
+      return res.status(404).json({
+        error: 'Recipe not found',
+        code: 'RECIPE_NOT_FOUND'
+      })
+    }
+
+    // Add user to recipe's saved by users
+    if (!recipe.savedBy.includes(req.user._id)) {
+      recipe.savedBy.push(req.user._id)
+      await recipe.save()
+    }
+
+    res.json({ message: 'Recipe saved successfully' })
+  } catch (error) {
+    console.error('Save recipe error:', error)
+    res.status(500).json({
+      error: 'Failed to save recipe',
+      code: 'SAVE_ERROR'
+    })
+  }
+})
+
+router.delete('/:id/save', authenticateToken, async (req, res) => {
+  try {
+    const recipe = await Recipe.findById(req.params.id)
+    if (!recipe) {
+      return res.status(404).json({
+        error: 'Recipe not found',
+        code: 'RECIPE_NOT_FOUND'
+      })
+    }
+
+    // Remove user from recipe's saved by users
+    recipe.savedBy = recipe.savedBy.filter(id => !id.equals(req.user._id))
+    await recipe.save()
+
+    res.json({ message: 'Recipe unsaved successfully' })
+  } catch (error) {
+    console.error('Unsave recipe error:', error)
+    res.status(500).json({
+      error: 'Failed to unsave recipe',
+      code: 'UNSAVE_ERROR'
     })
   }
 })

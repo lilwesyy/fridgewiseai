@@ -151,6 +151,10 @@ const recipeSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  savedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   ratings: {
     average: {
       type: Number,
