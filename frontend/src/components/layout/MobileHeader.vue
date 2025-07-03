@@ -9,7 +9,7 @@
           <button 
             v-if="props.showDonateButton" 
             @click="emit('donate-click')"
-            class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200 transition-colors flex items-center justify-center"
+            class="relative w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 text-white hover:from-yellow-500 hover:to-orange-500 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
             :title="t('common.donateTooltip')"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
