@@ -1,6 +1,6 @@
 <template>
   <AuthenticatedLayout>
-    <div class="px-4 py-6 mx-auto max-w-3xl w-full">
+    <div class="px-4 py-6 pb-20 mx-auto max-w-3xl w-full">
       <!-- Header -->
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ $t('savedRecipes.title') }}</h1>
@@ -186,7 +186,7 @@
         class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl"
         @click.stop
       >
-        <div class="p-7">
+        <div class="p-7 pb-20">
           <div class="flex items-start justify-between mb-4">
             <h2 class="text-2xl font-bold text-gray-900">{{ selectedRecipe.title }}</h2>
             <button 

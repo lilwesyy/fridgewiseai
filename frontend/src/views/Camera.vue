@@ -99,12 +99,18 @@
         </div>
         
         <!-- Main Content Area -->
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto pb-20">
           <div class="p-4">
             <!-- Search Results or Popular Ingredients -->
             <div v-if="searchQuery.length >= 2" class="space-y-3">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">{{ $t('camera.searchResults') }}</h3>
-              <div v-if="filteredIngredients.length > 0" class="grid grid-cols-2 gap-3">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-medium text-gray-700">{{ $t('camera.searchResults') }}</h3>
+                <div v-if="isSearching" class="flex items-center text-blue-600">
+                  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                  <span class="text-xs">Ricerca...</span>
+                </div>
+              </div>
+              <div v-if="filteredIngredients.length > 0 && !isSearching" class="grid grid-cols-2 gap-3">
                 <div 
                   v-for="ingredient in filteredIngredients.slice(0, 20)" 
                   :key="ingredient"
@@ -126,7 +132,7 @@
                   </div>
                 </div>
               </div>
-              <div v-else class="text-center py-12">
+              <div v-else-if="!isSearching" class="text-center py-12">
                 <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -212,7 +218,7 @@
       </div>
 
       <!-- Permission Denied -->
-      <div v-if="permissionDenied" class="absolute inset-0 flex items-center justify-center bg-white z-50 overflow-y-auto">
+      <div v-if="permissionDenied" class="absolute inset-0 flex items-center justify-center bg-white z-50 overflow-y-auto pb-20">
         <button 
           @click="goBack"
           class="absolute top-4 left-4 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center transition-all active:scale-95 z-10"
@@ -300,7 +306,7 @@
             <BaseButton variant="secondary" full-width @click="openGallery">
               {{ t('camera.uploadFromGallery') }}
             </BaseButton>
-            <BaseButton v-if="deviceInfo.isIOS" variant="outline" full-width @click="openIOSSettings">
+            <BaseButton v-if="deviceInfo.isIOS" variant="secondary" full-width @click="openIOSSettings">
               {{ t('camera.openIPhoneSettings') }}
             </BaseButton>
           </div>
@@ -437,7 +443,7 @@
         </div>
 
         <!-- Preview Controls - scrollable section -->
-        <div class="bg-white flex-shrink-0 max-h-80 overflow-y-auto">
+        <div class="bg-white flex-shrink-0 max-h-80 overflow-y-auto pb-20">
           <div class="p-4 space-y-4 mx-auto max-w-3xl w-full">
             <div v-if="detectedIngredients.length > 0" class="mb-4">
               <h3 class="font-semibold text-gray-900 mb-2">{{ t('camera.detectedIngredientsLabel') }}</h3>
@@ -457,10 +463,25 @@
               <BaseButton 
                 variant="secondary" 
                 full-width
-                @click="retakePhoto"
+                @click="addMorePhotos"
                 :disabled="processing"
               >
-                {{ deviceInfo.isIOS && !deviceInfo.hasMediaDevices ? t('camera.takeAnotherPhoto') : t('camera.retakePhoto') }}
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                {{ t('camera.addMorePhotos') }}
+              </BaseButton>
+              <BaseButton 
+                variant="secondary" 
+                full-width
+                @click="clearAndRetake"
+                :disabled="processing"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                {{ t('camera.restart') }}
               </BaseButton>
               <BaseButton 
                 variant="primary" 
@@ -476,7 +497,7 @@
             <!-- iOS Additional Options -->
             <div v-if="deviceInfo.isIOS && !deviceInfo.hasMediaDevices" class="flex space-x-3 mt-3">
               <BaseButton 
-                variant="outline" 
+                variant="secondary" 
                 full-width
                 @click="openCameraCapture"
                 :disabled="processing"
@@ -484,7 +505,7 @@
                 {{ t('camera.iPhoneCameraButton') }}
               </BaseButton>
               <BaseButton 
-                variant="outline" 
+                variant="secondary" 
                 full-width
                 @click="openGallery"
                 :disabled="processing"
@@ -525,7 +546,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useI18n } from 'vue-i18n'
@@ -533,6 +554,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
 import { ingredientService, userDataService } from '@/services/api'
 import { DonationHelper } from '@/utils/donationHelper'
+import ingredientsDatabase from '@/services/ingredientsDatabase'
 
 const router = useRouter()
 const toast = useToast()
@@ -558,15 +580,9 @@ const showChoiceScreen = ref(true)
 const showManualSelectionScreen = ref(false)
 const selectedIngredients = ref([])
 const searchQuery = ref('')
-const availableIngredients = ref([
-  'Pomodori', 'Cipolla', 'Aglio', 'Basilico', 'Origano', 'Mozzarella', 'Parmigiano',
-  'Olio d\'oliva', 'Sale', 'Pepe', 'Carote', 'Sedano', 'Prezzemolo', 'Rosmarino',
-  'Salvia', 'Timo', 'Peperoni', 'Zucchine', 'Melanzane', 'Spinaci', 'Rucola',
-  'Lattuga', 'Cetrioli', 'Pomodorini', 'Funghi', 'Patate', 'Pasta', 'Riso',
-  'Pane', 'Uova', 'Latte', 'Burro', 'Yogurt', 'Prosciutto', 'Salame', 'Tonno',
-  'Salmone', 'Pollo', 'Manzo', 'Maiale', 'Limoni', 'Arance', 'Mele', 'Banane',
-  'Fragole', 'Pesche', 'Pere', 'Uva', 'Fagioli', 'Lenticchie', 'Ceci'
-])
+const searchResults = ref([])
+const isSearching = ref(false)
+const searchDebounceTimeout = ref(null)
 
 const popularCategories = ref([
   { name: 'Verdure', emoji: '🥬', count: 15 },
@@ -577,9 +593,7 @@ const popularCategories = ref([
   { name: 'Cereali', emoji: '🌾', count: 7 }
 ])
 
-const quickAddIngredients = ref([
-  'Pomodori', 'Cipolla', 'Aglio', 'Basilico', 'Olio d\'oliva', 'Sale', 'Pepe', 'Mozzarella'
-])
+const quickAddIngredients = ref([])
 
 // Permission state
 const hasPermission = ref(false)
@@ -597,10 +611,7 @@ const isDevelopment = ref(import.meta.env.DEV)
 
 // Computed properties
 const filteredIngredients = computed(() => {
-  if (!searchQuery.value || searchQuery.value.length < 2) return []
-  return availableIngredients.value.filter(ingredient =>
-    ingredient.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
+  return searchResults.value.map(result => result.nameIT || result.name)
 })
 
 const showHeader = computed(() => {
@@ -1328,22 +1339,34 @@ const processImage = async () => {
     
     // Call API for ingredient detection
     const response = await ingredientService.detectIngredients(capturedImage.value)
-    detectedIngredients.value = response.ingredients || []
+    const newIngredients = response.ingredients || []
     
-    if (detectedIngredients.value.length > 0) {
-      toast.success(`Rilevati ${detectedIngredients.value.length} ingredienti`)
+    // Aggiungi nuovi ingredienti a quelli già rilevati (evita duplicati)
+    newIngredients.forEach(ingredient => {
+      if (!detectedIngredients.value.includes(ingredient)) {
+        detectedIngredients.value.push(ingredient)
+      }
+    })
+    
+    if (newIngredients.length > 0) {
+      const confidenceText = response.confidence ? ` (confidenza: ${Math.round(response.confidence * 100)}%)` : ''
+      toast.success(t('camera.ingredientsAdded', { added: newIngredients.length, total: detectedIngredients.value.length }))
     } else {
-      toast.info('Nessun ingrediente rilevato. Prova con un\'altra foto.')
-      // Mock ingredients for demo
-      detectedIngredients.value = ['Pomodori', 'Cipolla', 'Aglio', 'Basilico']
+      toast.info(t('camera.noNewIngredientsDetected'))
     }
     
   } catch (error) {
-    console.error('Error processing image:', error)
-    toast.error('Errore nell\'analisi dell\'immagine')
+    // Gestisci diversi tipi di errore con toast localizzati
+    if (error.response?.status === 503) {
+      toast.error(t('camera.serviceUnavailable'))
+    } else if (error.response?.status === 422) {
+      toast.warning(t('camera.noIngredientsDetected'))
+    } else {
+      toast.error(t('camera.analysisError'))
+    }
     
-    // Fallback to mock ingredients
-    detectedIngredients.value = ['Pomodori', 'Cipolla', 'Aglio', 'Basilico']
+    // Non aggiungere ingredienti mockati
+    detectedIngredients.value = []
     
   } finally {
     processing.value = false
@@ -1615,8 +1638,27 @@ const handleCameraCapture = (event) => {
   reader.readAsDataURL(file)
 }
 
-// Retake photo
-const retakePhoto = () => {
+// Add more photos (keep existing ingredients)
+const addMorePhotos = () => {
+  capturedImage.value = null
+  processing.value = false
+  
+  // For iOS devices, offer choice between methods
+  if (deviceInfo.value.isIOS && !deviceInfo.value.hasMediaDevices) {
+    // If direct camera access isn't available, just clean up
+    console.log('iOS device - camera stream not available, staying in capture mode')
+    // Don't restart camera since it's not available
+    return
+  }
+  
+  // Restart camera for devices that support it
+  setTimeout(() => {
+    requestPermission()
+  }, 100)
+}
+
+// Clear all and retake (reset everything)
+const clearAndRetake = () => {
   capturedImage.value = null
   detectedIngredients.value = []
   processing.value = false
@@ -1634,6 +1676,8 @@ const retakePhoto = () => {
     requestPermission()
   }, 100)
 }
+
+// retakePhoto è ora gestito da clearAndRetake
 
 // Generate recipe from detected ingredients
 const generateRecipe = async () => {
@@ -1799,25 +1843,44 @@ const getIngredientEmoji = (ingredient) => {
   return emojiMap[ingredient] || '🥘'
 }
 
-const searchByCategory = (categoryName) => {
-  const categoryMap = {
-    'Verdure': ['Pomodori', 'Cipolla', 'Carote', 'Peperoni', 'Zucchine', 'Melanzane', 'Spinaci', 'Rucola', 'Lattuga', 'Cetrioli', 'Funghi', 'Patate'],
-    'Frutta': ['Limoni', 'Arance', 'Mele', 'Banane', 'Fragole', 'Pesche', 'Pere', 'Uva'],
-    'Carne': ['Pollo', 'Manzo', 'Maiale', 'Prosciutto', 'Salame', 'Tonno', 'Salmone'],
-    'Formaggi': ['Mozzarella', 'Parmigiano'],
-    'Spezie': ['Basilico', 'Origano', 'Prezzemolo', 'Rosmarino', 'Salvia', 'Timo', 'Aglio', 'Sale', 'Pepe'],
-    'Cereali': ['Pasta', 'Riso', 'Pane', 'Fagioli', 'Lenticchie', 'Ceci']
+// Ricerca ingredienti con debounce
+const searchIngredients = async (query) => {
+  if (!query || query.length < 2) {
+    searchResults.value = []
+    isSearching.value = false
+    return
   }
+
+  isSearching.value = true
   
+  try {
+    const results = await ingredientsDatabase.searchIngredients(query)
+    searchResults.value = results
+    console.log(`🔍 Found ${results.length} ingredients for "${query}"`)
+  } catch (error) {
+    console.error('Error searching ingredients:', error)
+    searchResults.value = []
+  } finally {
+    isSearching.value = false
+  }
+}
+
+// Watch per search query con debounce
+const debouncedSearch = (newQuery) => {
+  // Cancella timeout precedente
+  if (searchDebounceTimeout.value) {
+    clearTimeout(searchDebounceTimeout.value)
+  }
+
+  // Imposta nuovo timeout
+  searchDebounceTimeout.value = setTimeout(() => {
+    searchIngredients(newQuery)
+  }, 300) // 300ms debounce
+}
+
+const searchByCategory = (categoryName) => {
   searchQuery.value = categoryName.toLowerCase()
-  // Update filtered ingredients manually for category search
-  const categoryIngredients = categoryMap[categoryName] || []
-  
-  // Clear search and show category results
-  setTimeout(() => {
-    searchQuery.value = ''
-    // Could implement a separate category view here
-  }, 100)
+  debouncedSearch(categoryName.toLowerCase())
 }
 
 const checkDonationToast = () => {
@@ -1844,6 +1907,11 @@ const checkDonationToast = () => {
   }
 }
 
+// Watcher per search query
+watch(searchQuery, (newQuery) => {
+  debouncedSearch(newQuery)
+})
+
 // Component lifecycle
 onMounted(async () => {
   console.log('Camera component mounted')
@@ -1853,6 +1921,28 @@ onMounted(async () => {
   
   // Check available cameras
   await checkAvailableCameras()
+  
+  // Pre-load ingredients database
+  try {
+    const allIngredients = await ingredientsDatabase.loadAllIngredients()
+    
+    // Popola quick add con ingredienti più comuni (primi 8)
+    const commonIngredients = [
+      'Pomodori', 'Cipolla', 'Aglio', 'Basilico', 'Olio d\'oliva', 'Sale', 'Pepe', 'Mozzarella'
+    ]
+    
+    // Filtra ingredienti che esistono nel database
+    quickAddIngredients.value = allIngredients
+      .filter(ingredient => commonIngredients.includes(ingredient.nameIT))
+      .map(ingredient => ingredient.nameIT)
+      .slice(0, 8)
+    
+    console.log(`✅ Quick add ingredients loaded: ${quickAddIngredients.value.length}`)
+  } catch (error) {
+    console.warn('Could not pre-load ingredients database:', error)
+    // Nessun fallback - il database è obbligatorio
+    quickAddIngredients.value = []
+  }
   
   // Don't automatically start camera - show choice screen instead
   console.log('Showing choice screen instead of auto-starting camera')

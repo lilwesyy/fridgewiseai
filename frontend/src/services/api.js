@@ -246,11 +246,28 @@ class IngredientService {
   // Detect ingredients from image
   async detectIngredients(imageData) {
     try {
+      console.log('🔍 Sending image for ingredient detection...')
+      
       const response = await axios.post('/ingredients/detect', {
         image: imageData
       })
+      
+      console.log('✅ Ingredient detection response:', response.data)
+      
       return response.data
     } catch (error) {
+      console.error('❌ Ingredient detection error:', error)
+      
+      // Restituisce dati di fallback in caso di errore
+      if (error.response?.status === 500) {
+        return {
+          ingredients: ['Pomodori', 'Cipolla', 'Aglio', 'Basilico'],
+          confidence: 0.5,
+          fallbackMode: true,
+          error: 'Servizio temporaneamente non disponibile'
+        }
+      }
+      
       throw new Error(error.response?.data?.error || 'Failed to detect ingredients')
     }
   }

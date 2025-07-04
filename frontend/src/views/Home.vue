@@ -136,78 +136,75 @@
   </AuthenticatedLayout>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
 import DonationFooter from '@/components/layout/DonationFooter.vue'
 import { userDataService } from '@/services/api'
+import { useToast } from 'vue-toastification'
 
-export default {
-  name: 'HomePage',
-  components: {
-    AuthenticatedLayout,
-    BaseButton,
-    DonationFooter,
-  },
-  setup() {
-    const authStore = useAuthStore()
-    return { authStore }
-  },
-  data() {
-    return {
-      recentItems: [],
-      loading: false,
-      showDonationBanner: false
-    }
-  },
-  computed: {
-    welcomeMessage() {
-      const userName = this.authStore.currentUser?.name || this.$t('auth.name');
-      const highlightedName = `<span class="text-primary-600">${userName}</span>`;
-      return this.$t('home.welcome', { name: highlightedName });
-    }
-  },
-  mounted() {
-    this.loadRecentActivity()
-    this.checkDonationBanner()
-  },
-  methods: {
-    async loadRecentActivity() {
-      this.loading = true
-      try {
-        // Load recent activity from database
-        this.recentItems = await userDataService.getRecentActivity()
-      } catch (error) {
-        console.error('Failed to load recent activity:', error)
-        // Fallback to empty array
-        this.recentItems = []
-      } finally {
-        this.loading = false
-      }
-    },
-    checkDonationBanner() {
-      // Show banner occasionally - every 5th visit to home
-      const lastShown = localStorage.getItem('donationBannerLastShown')
-      const visitCount = parseInt(localStorage.getItem('homeVisitCount') || '0') + 1
-      localStorage.setItem('homeVisitCount', visitCount.toString())
-      
-      const daysSinceLastShown = lastShown ? (Date.now() - parseInt(lastShown)) / (1000 * 60 * 60 * 24) : 999
-      
-      // Show if: never shown before OR 7+ days since last shown OR every 5th visit
-      if (!lastShown || daysSinceLastShown >= 7 || visitCount % 5 === 0) {
-        this.showDonationBanner = true
-      }
-    },
-    dismissDonationBanner() {
-      this.showDonationBanner = false
-      localStorage.setItem('donationBannerLastShown', Date.now().toString())
-    },
-    openDonation() {
-      // Same logic as in Profile.vue
-      this.$toast.info(this.$t('profile.donationMessage'))
-      this.dismissDonationBanner()
-    }
+// Composables
+const { t } = useI18n()
+const authStore = useAuthStore()
+const toast = useToast()
+
+// Reactive data
+const recentItems = ref([])
+const loading = ref(false)
+const showDonationBanner = ref(false)
+
+// Computed
+const welcomeMessage = computed(() => {
+  const userName = authStore.currentUser?.name || t('auth.name')
+  const highlightedName = `<span class="text-primary-600">${userName}</span>`
+  return t('home.welcome', { name: highlightedName })
+})
+
+// Methods
+const loadRecentActivity = async () => {
+  loading.value = true
+  try {
+    // Load recent activity from database
+    recentItems.value = await userDataService.getRecentActivity()
+  } catch (error) {
+    console.error('Failed to load recent activity:', error)
+    // Fallback to empty array
+    recentItems.value = []
+  } finally {
+    loading.value = false
   }
 }
+
+const checkDonationBanner = () => {
+  // Show banner occasionally - every 5th visit to home
+  const lastShown = localStorage.getItem('donationBannerLastShown')
+  const visitCount = parseInt(localStorage.getItem('homeVisitCount') || '0') + 1
+  localStorage.setItem('homeVisitCount', visitCount.toString())
+  
+  const daysSinceLastShown = lastShown ? (Date.now() - parseInt(lastShown)) / (1000 * 60 * 60 * 24) : 999
+  
+  // Show if: never shown before OR 7+ days since last shown OR every 5th visit
+  if (!lastShown || daysSinceLastShown >= 7 || visitCount % 5 === 0) {
+    showDonationBanner.value = true
+  }
+}
+
+const dismissDonationBanner = () => {
+  showDonationBanner.value = false
+  localStorage.setItem('donationBannerLastShown', Date.now().toString())
+}
+
+const openDonation = () => {
+  toast.info(t('profile.donationMessage'))
+  dismissDonationBanner()
+}
+
+// Lifecycle
+onMounted(() => {
+  loadRecentActivity()
+  checkDonationBanner()
+})
 </script>

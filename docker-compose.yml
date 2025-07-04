@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:7.0
@@ -12,6 +10,27 @@ services:
     volumes:
       - mongodb_data:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - fridgewiseai-network
+
+  recognize-anything-api:
+    image: mnahkies/recognize-anything-api:latest
+    container_name: fridgewiseai-recognize-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      MODEL_NAME: ram_plus  # Modello migliore per food recognition
+      IMAGE_SIZE: 384
+      THRESHOLD: 0.68
+    # Rimuovi --gpus all se non hai GPU NVIDIA
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
     networks:
       - fridgewiseai-network
 

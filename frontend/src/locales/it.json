@@ -83,7 +83,13 @@
       "analysisError": "Errore durante l'analisi dell'immagine",
       "permissionError": "Accesso alla fotocamera negato",
       "detectSuccess": "Ingredienti rilevati con successo!",
-      "detectError": "Errore nel rilevamento degli ingredienti"
+      "detectError": "Errore nel rilevamento degli ingredienti",
+      "aiServiceUnavailable": "Servizio AI temporaneamente non disponibile",
+      "usingFallbackMode": "Utilizzando modalità di riserva",
+      "confidenceLevel": "Livello di confidenza: {confidence}%",
+      "processingTime": "Tempo di elaborazione: {time}",
+      "aiDetectionSuccess": "🎉 Riconoscimento AI completato!",
+      "fallbackDetection": "ℹ️ Rilevamento con modalità di riserva"
     },
     "general": {
       "error": "Si è verificato un errore",
@@ -232,6 +238,13 @@
     "tryAfterChangingSettings": "Prova Dopo Aver Cambiato Impostazioni",
     "testCameraPermissions": "Testa Permessi Camera",
     "uploadFromGallery": "Carica da Galleria",
+    "serviceUnavailable": "Servizio di riconoscimento non disponibile. Riprova più tardi.",
+    "noIngredientsDetected": "Nessun ingrediente rilevato nell'immagine. Prova con una foto più chiara.",
+    "analysisError": "Errore durante l'analisi dell'immagine",
+    "addMorePhotos": "Aggiungi altra foto",
+    "restart": "Ricomincia",
+    "ingredientsAdded": "Aggiunti {added} ingredienti! Totale: {total}",
+    "noNewIngredientsDetected": "Nessun nuovo ingrediente rilevato. Prova con un'altra foto.",
     "openIPhoneSettings": "Apri Impostazioni iPhone",
     "startingCamera": "Avvio Camera",
     "connecting": "Connessione in corso...",

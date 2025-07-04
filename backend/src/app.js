@@ -8,6 +8,7 @@ import dotenv from 'dotenv'
 // Import routes
 import authRoutes from './routes/auth.js'
 import ingredientRoutes from './routes/ingredients.js'
+import ingredientsDatabaseRoutes from './routes/ingredients-database.js'
 import recipeRoutes from './routes/recipes.js'
 import userRoutes from './routes/users.js'
 import activityRoutes from './routes/activity.js'
@@ -58,6 +59,7 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes)
 app.use('/api/ingredients', ingredientRoutes)
+app.use('/api/ingredients-database', ingredientsDatabaseRoutes)
 app.use('/api/recipes', recipeRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/activity', activityRoutes)
