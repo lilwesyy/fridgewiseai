@@ -542,6 +542,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import BaseButton from '@/components/ui/Button.vue'
 import { saveLanguagePreference } from '@/services/languageDetectionService'
+import { DonationHelper } from '@/utils/donationHelper'
 
 const router = useRouter()
 const { t, locale } = useI18n()
@@ -635,21 +636,7 @@ onMounted(() => {
 
 // Gestione donazioni
 const openDonation = () => {
-  // Simula il messaggio di donazione come nelle altre pagine
-  alert(getCurrentDonationMessage())
-}
-
-const getCurrentDonationMessage = () => {
-  switch (locale.value) {
-    case 'it':
-      return 'Grazie per aver considerato di supportare FridgeWiseAI! L\'integrazione PayPal arriverà presto.'
-    case 'fr':
-      return 'Merci d\'avoir envisagé de soutenir FridgeWiseAI! L\'intégration PayPal arrivera bientôt.'
-    case 'de':
-      return 'Danke, dass Sie erwägen, FridgeWiseAI zu unterstützen! Die PayPal-Integration kommt bald.'
-    default:
-      return 'Thank you for considering supporting FridgeWiseAI! PayPal integration coming soon.'
-  }
+  DonationHelper.openPayPalDonation()
 }
 
 onUnmounted(() => {
