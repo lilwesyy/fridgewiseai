@@ -63,7 +63,7 @@ class GeminiService {
       console.log(`✅ Success with Gemini model: ${this.model}`)
       console.log('📝 Generated text length:', generatedText.length)
       
-      return this.parseRecipeResponse(generatedText, ingredients)
+      return this.parseRecipeResponse(generatedText, ingredients, preferences)
       
     } catch (error) {
       console.error(`❌ Gemini API failed:`, error.response?.status || error.message)
@@ -89,8 +89,9 @@ class GeminiService {
     const ingredientList = ingredients.join(', ')
     const dietary = preferences.dietary || []
     const cuisine = preferences.cuisine || 'any'
-    const difficulty = preferences.difficulty || 'any'
-    const cookingTime = preferences.cookingTime || 'any'
+    const difficulty = preferences.difficulty || 'easy'
+    const maxCookingTime = preferences.maxCookingTime || 30
+    const servings = preferences.servings || 4
 
     let prompt = `Crea una ricetta deliziosa usando questi ingredienti: ${ingredientList}.`
     
@@ -102,13 +103,9 @@ class GeminiService {
       prompt += ` Rendila in stile cucina ${cuisine}.`
     }
     
-    if (difficulty !== 'any') {
-      prompt += ` La difficoltà dovrebbe essere ${difficulty}.`
-    }
-    
-    if (cookingTime !== 'any') {
-      prompt += ` Il tempo di cottura dovrebbe essere ${cookingTime}.`
-    }
+    prompt += ` La difficoltà dovrebbe essere ${difficulty}.`
+    prompt += ` Il tempo di cottura non deve superare i ${maxCookingTime} minuti.`
+    prompt += ` La ricetta deve essere per ${servings} persone.`
 
     prompt += `
 
@@ -116,9 +113,9 @@ Rispondi SOLO con un oggetto JSON in questo formato esatto:
 {
   "title": "Nome della Ricetta",
   "description": "Breve descrizione del piatto",
-  "cookingTime": 30,
-  "servings": 4,
-  "difficulty": "easy|medium|hard",
+  "cookingTime": ${maxCookingTime <= 30 ? Math.min(maxCookingTime, 25) : maxCookingTime - 5},
+  "servings": ${servings},
+  "difficulty": "${difficulty}",
   "calories": 350,
   "ingredients": [
     {"name": "nome ingrediente", "amount": "1 tazza", "emoji": "🥄"},
@@ -145,7 +142,7 @@ Importante:
     return prompt
   }
 
-  parseRecipeResponse(responseText, originalIngredients) {
+  parseRecipeResponse(responseText, originalIngredients, preferences = {}) {
     try {
       // Try to extract JSON from the response
       const jsonMatch = responseText.match(/\{[\s\S]*\}/)
@@ -158,9 +155,9 @@ Importante:
         id: Date.now().toString(), // Generate unique ID
         title: recipe.title || 'Ricetta Generata',
         description: recipe.description || 'Una deliziosa ricetta creata appositamente per te!',
-        cookingTime: recipe.cookingTime || 30,
-        servings: recipe.servings || 4,
-        difficulty: recipe.difficulty || 'medium',
+        cookingTime: recipe.cookingTime || preferences.maxCookingTime || 30,
+        servings: recipe.servings || preferences.servings || 4,
+        difficulty: recipe.difficulty || preferences.difficulty || 'medium',
         calories: recipe.calories || null,
         ingredients: this.validateIngredients(recipe.ingredients || []),
         instructions: recipe.instructions || ['Segui i passaggi di preparazione'],
@@ -176,7 +173,7 @@ Importante:
       console.error('Failed to parse Gemini response:', error)
       console.error('Raw response:', responseText)
       // Return a fallback recipe if parsing fails
-      return this.createFallbackRecipe(originalIngredients)
+      return this.createFallbackRecipe(originalIngredients, preferences)
     }
   }
 
@@ -188,14 +185,14 @@ Importante:
     }))
   }
 
-  createFallbackRecipe(ingredients) {
+  createFallbackRecipe(ingredients, preferences = {}) {
     return {
       id: Date.now().toString(),
       title: `Ricetta con ${ingredients.join(', ')}`,
       description: 'Una ricetta semplice creata con i tuoi ingredienti disponibili.',
-      cookingTime: 30,
-      servings: 2,
-      difficulty: 'easy',
+      cookingTime: preferences.maxCookingTime || 30,
+      servings: preferences.servings || 2,
+      difficulty: preferences.difficulty || 'easy',
       calories: null,
       ingredients: ingredients.map(ing => ({
         name: ing,

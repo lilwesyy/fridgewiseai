@@ -301,8 +301,11 @@
     "ingredients": "Ingredienti",
     "instructions": "Istruzioni",
     "cookingTime": "Tempo di Cottura",
+    "maxCookingTime": "Tempo Max di Cottura",
     "minutes": "min",
     "servings": "porzioni",
+    "person": "persona",
+    "people": "persone",
     "calories": "Calorie",
     "difficulty": {
       "label": "Difficoltà",

@@ -11,7 +11,7 @@
       <div v-if="currentIngredients.length > 0" class="mb-6">
         <div class="bg-primary-50 rounded-lg p-4 border border-primary-200">
           <h3 class="font-semibold text-primary-900 mb-2">{{ $t('recipes.currentIngredients') }}:</h3>
-          <div class="flex flex-wrap gap-2 mb-3">
+          <div class="flex flex-wrap gap-2 mb-4">
             <span 
               v-for="ingredient in currentIngredients" 
               :key="ingredient"
@@ -20,6 +20,54 @@
               {{ ingredient }}
             </span>
           </div>
+          
+          <!-- Recipe Preferences -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <!-- Servings -->
+            <div>
+              <label class="block text-sm font-medium text-primary-800 mb-1">{{ $t('recipes.servings') }}</label>
+              <select 
+                v-model="preferences.servings" 
+                class="w-full px-3 py-2 border border-primary-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+              >
+                <option value="1">1 {{ $t('recipes.person') }}</option>
+                <option value="2">2 {{ $t('recipes.people') }}</option>
+                <option value="4">4 {{ $t('recipes.people') }}</option>
+                <option value="6">6 {{ $t('recipes.people') }}</option>
+                <option value="8">8 {{ $t('recipes.people') }}</option>
+              </select>
+            </div>
+            
+            <!-- Difficulty -->
+            <div>
+              <label class="block text-sm font-medium text-primary-800 mb-1">{{ $t('recipes.difficulty.label') }}</label>
+              <select 
+                v-model="preferences.difficulty" 
+                class="w-full px-3 py-2 border border-primary-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+              >
+                <option value="easy">{{ $t('recipes.difficulty.easy') }}</option>
+                <option value="medium">{{ $t('recipes.difficulty.medium') }}</option>
+                <option value="hard">{{ $t('recipes.difficulty.hard') }}</option>
+              </select>
+            </div>
+            
+            <!-- Max Cooking Time -->
+            <div>
+              <label class="block text-sm font-medium text-primary-800 mb-1">{{ $t('recipes.maxCookingTime') }}</label>
+              <select 
+                v-model="preferences.maxCookingTime" 
+                class="w-full px-3 py-2 border border-primary-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+              >
+                <option value="15">15 {{ $t('recipes.minutes') }}</option>
+                <option value="30">30 {{ $t('recipes.minutes') }}</option>
+                <option value="45">45 {{ $t('recipes.minutes') }}</option>
+                <option value="60">60 {{ $t('recipes.minutes') }}</option>
+                <option value="90">90 {{ $t('recipes.minutes') }}</option>
+                <option value="120">120 {{ $t('recipes.minutes') }}</option>
+              </select>
+            </div>
+          </div>
+          
           <BaseButton 
             variant="primary" 
             @click="generateRecipe"
@@ -273,6 +321,11 @@ export default {
       activeFilter: 'all',
       selectedRecipe: null,
       savedRecipes: [],
+      preferences: {
+        servings: 4,
+        difficulty: 'easy',
+        maxCookingTime: 30
+      },
       filters: [
         { key: 'all', label: 'All' },
         { key: 'quick', label: 'Quick (< 30 min)' },
@@ -350,9 +403,10 @@ export default {
         // Convert to plain array to avoid Proxy serialization issues
         const plainIngredients = Array.from(this.currentIngredients)
         console.log('Sending ingredients to API:', plainIngredients)
+        console.log('Sending preferences to API:', this.preferences)
         
-        // Call backend API to generate recipe
-        const response = await recipeService.generateRecipe(plainIngredients)
+        // Call backend API to generate recipe with preferences
+        const response = await recipeService.generateRecipe(plainIngredients, this.preferences)
         const newRecipe = response.recipe
 
         // Add to local recipes list
@@ -397,7 +451,11 @@ export default {
 
     async saveRecipe(recipe) {
       try {
-        const recipeId = recipe.id
+        const recipeId = recipe._id || recipe.id
+        if (!recipeId) {
+          this.toast.error(this.$t('notifications.recipes.saveError'))
+          return
+        }
         if (!this.savedRecipes.includes(recipeId)) {
           await userDataService.addSavedRecipe(recipeId)
           this.savedRecipes.push(recipeId)

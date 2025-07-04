@@ -3,6 +3,7 @@ import Recipe from '../models/Recipe.js'
 import Activity from '../models/Activity.js'
 import { authenticateToken, optionalAuth } from '../middleware/auth.js'
 import Joi from 'joi'
+import mongoose from 'mongoose'
 
 const router = express.Router()
 
@@ -309,6 +310,14 @@ router.get('/saved', authenticateToken, async (req, res) => {
 // Get single recipe
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        error: 'Invalid recipe ID',
+        code: 'INVALID_RECIPE_ID'
+      })
+    }
+    
     const recipe = await Recipe.findById(req.params.id).populate('createdBy', 'name')
 
     if (!recipe) {
@@ -339,6 +348,14 @@ router.get('/:id', optionalAuth, async (req, res) => {
 // Update recipe
 router.put('/:id', authenticateToken, async (req, res) => {
   try {
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        error: 'Invalid recipe ID',
+        code: 'INVALID_RECIPE_ID'
+      })
+    }
+    
     const recipe = await Recipe.findById(req.params.id)
 
     if (!recipe) {
@@ -385,6 +402,14 @@ router.put('/:id', authenticateToken, async (req, res) => {
 // Delete recipe
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        error: 'Invalid recipe ID',
+        code: 'INVALID_RECIPE_ID'
+      })
+    }
+    
     const recipe = await Recipe.findById(req.params.id)
 
     if (!recipe) {
@@ -483,6 +508,14 @@ router.get('/', optionalAuth, async (req, res) => {
 // Save/Unsave recipe endpoints
 router.post('/:id/save', authenticateToken, async (req, res) => {
   try {
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        error: 'Invalid recipe ID',
+        code: 'INVALID_RECIPE_ID'
+      })
+    }
+    
     const recipe = await Recipe.findById(req.params.id)
     if (!recipe) {
       return res.status(404).json({
@@ -509,6 +542,14 @@ router.post('/:id/save', authenticateToken, async (req, res) => {
 
 router.delete('/:id/save', authenticateToken, async (req, res) => {
   try {
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        error: 'Invalid recipe ID',
+        code: 'INVALID_RECIPE_ID'
+      })
+    }
+    
     const recipe = await Recipe.findById(req.params.id)
     if (!recipe) {
       return res.status(404).json({

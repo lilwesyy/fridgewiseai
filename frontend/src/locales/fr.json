@@ -262,8 +262,11 @@
     "ingredients": "Ingrédients",
     "instructions": "Instructions",
     "cookingTime": "Temps de Cuisson",
+    "maxCookingTime": "Temps Max de Cuisson",
     "minutes": "min",
     "servings": "portions",
+    "person": "personne",
+    "people": "personnes",
     "calories": "Calories",
     "difficulty": {
       "label": "Difficulté",
