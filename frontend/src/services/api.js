@@ -240,6 +240,16 @@ class UserService {
       throw new Error(error.response?.data?.error || 'Failed to change password')
     }
   }
+
+  // Register supporter status
+  async registerSupporter(donationData) {
+    try {
+      const response = await axios.post('/auth/supporter', donationData)
+      return response.data
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to register supporter status')
+    }
+  }
 }
 
 class IngredientService {

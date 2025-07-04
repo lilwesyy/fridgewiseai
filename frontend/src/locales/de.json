@@ -334,7 +334,26 @@
       "title": "Noch keine Rezepte",
       "subtitle": "Beginnen Sie mit dem Scannen von Zutaten, um Ihr erstes Rezept zu generieren!",
       "action": "Zutaten scannen"
-    }
+    },
+    "donationToast": "Gefällt Ihnen die App? Erwägen Sie eine Spende zur Unterstützung der Entwicklung! 💝"
+  },
+  "donation": {
+    "title": "FridgeWise unterstützen",
+    "subtitle": "Helfen Sie uns, die App kostenlos zu halten und zu verbessern",
+    "benefits": {
+      "title": "Was Sie bekommen:",
+      "badge": "Exklusives Supporter-Abzeichen",
+      "support": "Unterstützen Sie die App-Entwicklung",
+      "free": "App bleibt für alle kostenlos"
+    },
+    "amounts": "Vorgeschlagene Beträge:",
+    "success": "Vielen Dank für Ihre Unterstützung! 💝",
+    "error": "Fehler bei der Spende",
+    "registerError": "Fehler beim Registrieren des Supporter-Status"
+  },
+  "supporter": {
+    "badge": "Supporter",
+    "badgeTooltip": "Vielen Dank für die Unterstützung von FridgeWise!"
   },
   "ingredients": {
     "tomatoes": "Tomaten",

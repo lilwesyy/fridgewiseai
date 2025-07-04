@@ -111,6 +111,24 @@ const userSchema = new mongoose.Schema({
       default: 0
     }
   },
+  supporter: {
+    isSupporter: {
+      type: Boolean,
+      default: false
+    },
+    supporterSince: {
+      type: Date,
+      default: null
+    },
+    donationAmount: {
+      type: Number,
+      default: 0
+    },
+    paypalTransactionId: {
+      type: String,
+      default: null
+    }
+  },
   isActive: {
     type: Boolean,
     default: true

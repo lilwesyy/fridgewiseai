@@ -9,7 +9,7 @@
         <p class="text-sm text-gray-600 mb-4">{{ $t('footer.supportDescription') }}</p>
       </div>
       <button 
-        @click="$emit('donate-click')"
+        @click="openDonation"
         class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center space-x-2 mx-auto"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,8 +23,14 @@
 </template>
 
 <script>
+import { DonationHelper } from '@/utils/donationHelper'
+
 export default {
   name: 'DonationFooter',
-  emits: ['donate-click']
+  methods: {
+    openDonation() {
+      DonationHelper.openPayPalDonation()
+    }
+  }
 }
 </script>

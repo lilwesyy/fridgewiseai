@@ -1,8 +1,9 @@
 <template>
   <header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 safe-area-top">
     <div class="flex items-center justify-between h-16 px-4 mx-auto max-w-3xl w-full">
-      <div class="flex items-center">
+      <div class="flex items-center space-x-2">
         <h1 class="text-xl font-bold text-primary-600">{{ t('app.name') }}</h1>
+        <SupporterBadge v-if="currentUser" :is-supporter="isSupporter" />
       </div>
       <div class="flex items-center space-x-4">
         <div class="relative inline-flex">
@@ -23,9 +24,17 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
+import { DonationHelper } from '@/utils/donationHelper'
+import SupporterBadge from '@/components/SupporterBadge.vue'
 
 const { t } = useI18n()
+const authStore = useAuthStore()
+
+const currentUser = computed(() => authStore.currentUser)
+const isSupporter = computed(() => DonationHelper.isUserSupporter(currentUser.value))
 
 const props = defineProps({
   showDonateButton: {

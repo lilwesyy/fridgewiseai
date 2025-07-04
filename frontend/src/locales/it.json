@@ -343,6 +343,24 @@
     },
     "donationToast": "Ti piace l'app? Considera una donazione per supportare lo sviluppo! 💝"
   },
+  "donation": {
+    "title": "Supporta FridgeWise",
+    "subtitle": "Aiutaci a mantenere l'app gratuita e a migliorarla",
+    "benefits": {
+      "title": "Cosa ottieni:",
+      "badge": "Badge Supporter esclusivo",
+      "support": "Supporti lo sviluppo dell'app",
+      "free": "L'app rimane gratuita per tutti"
+    },
+    "amounts": "Importi suggeriti:",
+    "success": "Grazie per il tuo supporto! 💝",
+    "error": "Errore durante la donazione",
+    "registerError": "Errore nel registrare lo status di supporter"
+  },
+  "supporter": {
+    "badge": "Supporter",
+    "badgeTooltip": "Grazie per aver supportato FridgeWise!"
+  },
   "ingredients": {
     "tomatoes": "Pomodori",
     "cheese": "Formaggio",

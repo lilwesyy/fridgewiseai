@@ -35,7 +35,10 @@
         <!-- Hint text -->
         <p class="text-xs text-gray-500 mb-3 opacity-75">{{ $t('profile.clickToChangePhoto') }}</p>
         
-        <h1 class="text-2xl font-bold text-gray-900">{{ authStore.currentUser?.name || $t('profile.user') }}</h1>
+        <div class="flex items-center justify-center space-x-2">
+          <h1 class="text-2xl font-bold text-gray-900">{{ authStore.currentUser?.name || $t('profile.user') }}</h1>
+          <SupporterBadge :is-supporter="isSupporter" />
+        </div>
         <p class="text-gray-600">{{ authStore.currentUser?.email }}</p>
       </div>
 
@@ -572,13 +575,16 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
+import SupporterBadge from '@/components/SupporterBadge.vue'
 import { userService, userDataService, recipeService } from '@/services/api'
+import { DonationHelper } from '@/utils/donationHelper'
 
 export default {
   name: 'ProfilePage',
   components: {
     AuthenticatedLayout,
-    BaseButton
+    BaseButton,
+    SupporterBadge
   },
   setup() {
     const authStore = useAuthStore()
@@ -631,6 +637,9 @@ export default {
     },
     totalRecipes() {
       return this.stats.totalRecipes || 0
+    },
+    isSupporter() {
+      return DonationHelper.isUserSupporter(this.currentUser)
     },
     savedRecipes() {
       return this.savedRecipesCount || 0
