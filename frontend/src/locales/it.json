@@ -359,7 +359,11 @@
   },
   "supporter": {
     "badge": "Supporter",
-    "badgeTooltip": "Grazie per aver supportato FridgeWise!"
+    "badgeTooltip": "Grazie per aver supportato FridgeWise!",
+    "title": "Sei un Supporter!",
+    "thankYou": "Grazie per il tuo supporto a FridgeWise",
+    "since": "Supporter dal",
+    "donateAgain": "Dona di nuovo"
   },
   "ingredients": {
     "tomatoes": "Pomodori",

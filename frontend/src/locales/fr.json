@@ -320,7 +320,11 @@
   },
   "supporter": {
     "badge": "Supporter",
-    "badgeTooltip": "Merci d'avoir soutenu FridgeWise!"
+    "badgeTooltip": "Merci d'avoir soutenu FridgeWise!",
+    "title": "Vous êtes un Supporter!",
+    "thankYou": "Merci de soutenir FridgeWise",
+    "since": "Supporter depuis le",
+    "donateAgain": "Faire un nouveau don"
   },
   "ingredients": {
     "tomatoes": "Tomates",

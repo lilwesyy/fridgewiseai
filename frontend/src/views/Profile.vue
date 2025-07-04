@@ -175,8 +175,36 @@
           </svg>
         </button>
 
-        <!-- Donate - Enhanced -->
+        <!-- Supporter Status / Donate -->
+        <div v-if="isSupporter" class="w-full bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 shadow-sm border-2 border-purple-200">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-400 rounded-lg flex items-center justify-center shadow-lg">
+              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900 flex items-center">
+                {{ $t('supporter.title') }}
+                <SupporterBadge :is-supporter="true" class="ml-2" />
+              </h3>
+              <p class="text-sm text-gray-600">{{ $t('supporter.thankYou') }}</p>
+              <p v-if="currentUser?.supporter?.supporterSince" class="text-xs text-gray-500 mt-1">
+                {{ $t('supporter.since') }}: {{ formatDate(currentUser.supporter.supporterSince) }}
+              </p>
+            </div>
+          </div>
+          <button 
+            @click="openDonation"
+            class="mt-3 w-full text-center text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
+          >
+            {{ $t('supporter.donateAgain') }}
+          </button>
+        </div>
+        
+        <!-- Donate - For non-supporters -->
         <button 
+          v-else
           @click="openDonation"
           class="w-full bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-4 shadow-sm border-2 border-yellow-200 flex items-center space-x-3 hover:shadow-lg hover:border-yellow-300 transition-all duration-300 transform hover:scale-[1.02]"
         >
@@ -753,8 +781,12 @@ export default {
     },
 
     openDonation() {
-      // In a real app, this would open PayPal donation modal
-      alert(this.$t('profile.donationMessage'))
+      DonationHelper.openPayPalDonation()
+    },
+
+    formatDate(dateString) {
+      if (!dateString) return ''
+      return new Date(dateString).toLocaleDateString(this.$i18n.locale)
     },
 
     handleLogout() {

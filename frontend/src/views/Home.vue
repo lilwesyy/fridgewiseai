@@ -131,7 +131,7 @@
       </div>
 
       <!-- Donation Footer -->
-      <DonationFooter @donate-click="openDonation" />
+      <DonationFooter />
     </div>
   </AuthenticatedLayout>
 </template>
@@ -145,6 +145,7 @@ import BaseButton from '@/components/ui/Button.vue'
 import DonationFooter from '@/components/layout/DonationFooter.vue'
 import { userDataService } from '@/services/api'
 import { useToast } from 'vue-toastification'
+import { DonationHelper } from '@/utils/donationHelper'
 
 // Composables
 const { t } = useI18n()
@@ -198,7 +199,7 @@ const dismissDonationBanner = () => {
 }
 
 const openDonation = () => {
-  toast.info(t('profile.donationMessage'))
+  DonationHelper.openPayPalDonation()
   dismissDonationBanner()
 }
 
