@@ -244,12 +244,14 @@ class UserService {
 
 class IngredientService {
   // Detect ingredients from image
-  async detectIngredients(imageData) {
+  async detectIngredients(imageData, locale = 'en') {
     try {
       console.log('🔍 Sending image for ingredient detection...')
+      console.log('🌍 Using locale:', locale)
       
       const response = await axios.post('/ingredients/detect', {
-        image: imageData
+        image: imageData,
+        locale: locale
       })
       
       console.log('✅ Ingredient detection response:', response.data)
@@ -260,8 +262,9 @@ class IngredientService {
       
       // Restituisce dati di fallback in caso di errore
       if (error.response?.status === 500) {
+        const fallbackIngredients = this.getFallbackIngredients(locale)
         return {
-          ingredients: ['Pomodori', 'Cipolla', 'Aglio', 'Basilico'],
+          ingredients: fallbackIngredients,
           confidence: 0.5,
           fallbackMode: true,
           error: 'Servizio temporaneamente non disponibile'
@@ -270,6 +273,17 @@ class IngredientService {
       
       throw new Error(error.response?.data?.error || 'Failed to detect ingredients')
     }
+  }
+
+  getFallbackIngredients(locale) {
+    const fallbacks = {
+      it: ['Pomodori', 'Cipolla', 'Aglio', 'Basilico'],
+      en: ['Tomatoes', 'Onion', 'Garlic', 'Basil'],
+      fr: ['Tomates', 'Oignon', 'Ail', 'Basilic'],
+      de: ['Tomaten', 'Zwiebel', 'Knoblauch', 'Basilikum']
+    }
+    
+    return fallbacks[locale] || fallbacks['en']
   }
 }
 

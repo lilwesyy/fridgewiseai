@@ -558,7 +558,7 @@ import ingredientsDatabase from '@/services/ingredientsDatabase'
 
 const router = useRouter()
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // Template refs
 const videoElement = ref(null)
@@ -611,7 +611,10 @@ const isDevelopment = ref(import.meta.env.DEV)
 
 // Computed properties
 const filteredIngredients = computed(() => {
-  return searchResults.value.map(result => result.nameIT || result.name)
+  return searchResults.value.map(result => {
+    // Usa il nome localizzato se disponibile, altrimenti usa il nome inglese
+    return result.localizedName || result[`name${locale.value.toUpperCase()}`] || result.name
+  })
 })
 
 const showHeader = computed(() => {
@@ -1337,8 +1340,8 @@ const processImage = async () => {
   try {
     console.log('Processing image for ingredient detection...')
     
-    // Call API for ingredient detection
-    const response = await ingredientService.detectIngredients(capturedImage.value)
+    // Call API for ingredient detection with current locale
+    const response = await ingredientService.detectIngredients(capturedImage.value, locale.value)
     const newIngredients = response.ingredients || []
     
     // Aggiungi nuovi ingredienti a quelli già rilevati (evita duplicati)
@@ -1854,7 +1857,7 @@ const searchIngredients = async (query) => {
   isSearching.value = true
   
   try {
-    const results = await ingredientsDatabase.searchIngredients(query)
+    const results = await ingredientsDatabase.searchIngredients(query, locale.value)
     searchResults.value = results
     console.log(`🔍 Found ${results.length} ingredients for "${query}"`)
   } catch (error) {
@@ -1924,17 +1927,25 @@ onMounted(async () => {
   
   // Pre-load ingredients database
   try {
-    const allIngredients = await ingredientsDatabase.loadAllIngredients()
+    const allIngredients = await ingredientsDatabase.loadAllIngredients(locale.value)
     
-    // Popola quick add con ingredienti più comuni (primi 8)
-    const commonIngredients = [
-      'Pomodori', 'Cipolla', 'Aglio', 'Basilico', 'Olio d\'oliva', 'Sale', 'Pepe', 'Mozzarella'
-    ]
+    // Popola quick add con ingredienti più comuni (primi 8) - localizzati
+    const commonIngredientsLists = {
+      it: ['Pomodori', 'Cipolla', 'Aglio', 'Basilico', 'Olio d\'oliva', 'Sale', 'Pepe', 'Mozzarella'],
+      en: ['Tomatoes', 'Onion', 'Garlic', 'Basil', 'Olive Oil', 'Salt', 'Pepper', 'Mozzarella'],
+      fr: ['Tomates', 'Oignon', 'Ail', 'Basilic', 'Huile d\'olive', 'Sel', 'Poivre', 'Mozzarella'],
+      de: ['Tomaten', 'Zwiebel', 'Knoblauch', 'Basilikum', 'Olivenöl', 'Salz', 'Pfeffer', 'Mozzarella']
+    }
+    
+    const commonIngredients = commonIngredientsLists[locale.value] || commonIngredientsLists['en']
     
     // Filtra ingredienti che esistono nel database
     quickAddIngredients.value = allIngredients
-      .filter(ingredient => commonIngredients.includes(ingredient.nameIT))
-      .map(ingredient => ingredient.nameIT)
+      .filter(ingredient => {
+        const localizedName = ingredient.localizedName || ingredient[`name${locale.value.toUpperCase()}`] || ingredient.name
+        return commonIngredients.includes(localizedName)
+      })
+      .map(ingredient => ingredient.localizedName || ingredient[`name${locale.value.toUpperCase()}`] || ingredient.name)
       .slice(0, 8)
     
     console.log(`✅ Quick add ingredients loaded: ${quickAddIngredients.value.length}`)

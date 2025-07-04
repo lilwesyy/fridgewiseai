@@ -11,9 +11,10 @@ class RecognizeAnythingService {
   /**
    * Rileva ingredienti da immagine usando Recognize Anything API
    * @param {string} imageData - Base64 encoded image data
+   * @param {string} locale - Locale for translation (en, it, fr, de)
    * @returns {Promise<Array>} Lista di ingredienti rilevati
    */
-  async detectIngredients(imageData) {
+  async detectIngredients(imageData, locale = 'en') {
     try {
       console.log('🔍 Starting ingredient detection with Recognize Anything API...')
       
@@ -39,7 +40,7 @@ class RecognizeAnythingService {
       console.log('✅ Recognize Anything API response:', response.data)
       
       // Estrai ingredienti dalla risposta
-      const ingredients = this.extractFoodIngredients(response.data)
+      const ingredients = this.extractFoodIngredients(response.data, locale)
       
       return {
         ingredients,
@@ -66,9 +67,10 @@ class RecognizeAnythingService {
   /**
    * Estrae ingredienti alimentari dai tag rilevati
    * @param {Object} apiResponse - Risposta dell'API
+   * @param {string} locale - Locale for translation
    * @returns {Array} Lista di ingredienti filtrati
    */
-  extractFoodIngredients(apiResponse) {
+  extractFoodIngredients(apiResponse, locale = 'en') {
     let allTags = []
     
     // Gestisce diversi formati di risposta a seconda del modello
@@ -89,7 +91,7 @@ class RecognizeAnythingService {
       .filter(tag => tag && typeof tag === 'string')
       .map(tag => tag.toLowerCase().trim())
       .filter(tag => this.isFoodIngredient(tag))
-      .map(tag => this.translateToItalian(tag))
+      .map(tag => this.translateIngredient(tag, locale))
       .filter(ingredient => ingredient)
       .slice(0, 10) // Limita a 10 ingredienti principali
     
@@ -153,119 +155,22 @@ class RecognizeAnythingService {
   }
 
   /**
-   * Traduce ingredienti inglesi in italiano
+   * Traduce ingredienti inglesi nella lingua specificata
    * @param {string} englishIngredient - Ingrediente in inglese
-   * @returns {string} Ingrediente tradotto in italiano
+   * @param {string} locale - Locale di destinazione (en, it, fr, de)
+   * @returns {string} Ingrediente tradotto
    */
-  translateToItalian(englishIngredient) {
-    const translations = {
-      // Verdure
-      'tomato': 'Pomodoro',
-      'tomatoes': 'Pomodori',
-      'onion': 'Cipolla',
-      'onions': 'Cipolle',
-      'garlic': 'Aglio',
-      'carrot': 'Carota',
-      'carrots': 'Carote',
-      'pepper': 'Peperone',
-      'peppers': 'Peperoni',
-      'bell pepper': 'Peperone',
-      'potato': 'Patata',
-      'potatoes': 'Patate',
-      'lettuce': 'Lattuga',
-      'spinach': 'Spinaci',
-      'broccoli': 'Broccoli',
-      'cucumber': 'Cetriolo',
-      'zucchini': 'Zucchine',
-      'eggplant': 'Melanzana',
-      'mushroom': 'Fungo',
-      'mushrooms': 'Funghi',
-      'celery': 'Sedano',
-      'cabbage': 'Cavolo',
-      'cauliflower': 'Cavolfiore',
-      'beans': 'Fagioli',
-      'peas': 'Piselli',
-      'corn': 'Mais',
-      'avocado': 'Avocado',
-      
-      // Frutta
-      'apple': 'Mela',
-      'apples': 'Mele',
-      'orange': 'Arancia',
-      'oranges': 'Arance',
-      'banana': 'Banana',
-      'bananas': 'Banane',
-      'lemon': 'Limone',
-      'lemons': 'Limoni',
-      'lime': 'Lime',
-      'strawberry': 'Fragola',
-      'strawberries': 'Fragole',
-      'grape': 'Uva',
-      'grapes': 'Uva',
-      'cherry': 'Ciliegia',
-      'cherries': 'Ciliegie',
-      'peach': 'Pesca',
-      'peaches': 'Pesche',
-      'pear': 'Pera',
-      'pears': 'Pere',
-      
-      // Proteine
-      'chicken': 'Pollo',
-      'beef': 'Manzo',
-      'pork': 'Maiale',
-      'fish': 'Pesce',
-      'salmon': 'Salmone',
-      'tuna': 'Tonno',
-      'shrimp': 'Gamberi',
-      'egg': 'Uovo',
-      'eggs': 'Uova',
-      'cheese': 'Formaggio',
-      'milk': 'Latte',
-      'yogurt': 'Yogurt',
-      'mozzarella': 'Mozzarella',
-      'parmesan': 'Parmigiano',
-      
-      // Cereali e pasta
-      'bread': 'Pane',
-      'pasta': 'Pasta',
-      'rice': 'Riso',
-      'flour': 'Farina',
-      'noodles': 'Pasta',
-      'spaghetti': 'Spaghetti',
-      'pizza': 'Pizza',
-      
-      // Condimenti e spezie
-      'oil': 'Olio',
-      'olive': 'Oliva',
-      'olive oil': 'Olio d\'oliva',
-      'salt': 'Sale',
-      'pepper': 'Pepe',
-      'basil': 'Basilico',
-      'oregano': 'Origano',
-      'parsley': 'Prezzemolo',
-      'rosemary': 'Rosmarino',
-      'thyme': 'Timo',
-      'sage': 'Salvia',
-      'mint': 'Menta',
-      'cilantro': 'Coriandolo',
-      'dill': 'Aneto',
-      
-      // Legumi e noci
-      'nuts': 'Noci',
-      'almond': 'Mandorla',
-      'almonds': 'Mandorle',
-      'walnut': 'Noce',
-      'walnuts': 'Noci',
-      'pine nuts': 'Pinoli',
-      'lentils': 'Lenticchie',
-      'chickpeas': 'Ceci',
-      
-      // Latticini
-      'butter': 'Burro',
-      'cream': 'Panna',
-      'ricotta': 'Ricotta',
-      'gorgonzola': 'Gorgonzola',
-      'goat cheese': 'Formaggio di capra'
+  translateIngredient(englishIngredient, locale = 'en') {
+    // Se è inglese, restituisci come originale (capitalizzato)
+    if (locale === 'en') {
+      return englishIngredient.charAt(0).toUpperCase() + englishIngredient.slice(1)
+    }
+    
+    // Ottieni le traduzioni per il locale specificato
+    const translations = this.getTranslations(locale)
+    if (!translations) {
+      // Se il locale non è supportato, restituisci capitalizzato
+      return englishIngredient.charAt(0).toUpperCase() + englishIngredient.slice(1)
     }
     
     // Cerca traduzione esatta
@@ -281,6 +186,345 @@ class RecognizeAnythingService {
     
     // Se non trova traduzione, capitalizza la prima lettera
     return englishIngredient.charAt(0).toUpperCase() + englishIngredient.slice(1)
+  }
+
+  /**
+   * Ottiene le traduzioni per il locale specificato
+   * @param {string} locale - Locale di destinazione
+   * @returns {Object|null} Oggetto con le traduzioni o null se non supportato
+   */
+  getTranslations(locale) {
+    const allTranslations = {
+      it: {
+        // Verdure
+        'tomato': 'Pomodoro',
+        'tomatoes': 'Pomodori',
+        'onion': 'Cipolla',
+        'onions': 'Cipolle',
+        'garlic': 'Aglio',
+        'carrot': 'Carota',
+        'carrots': 'Carote',
+        'pepper': 'Peperone',
+        'peppers': 'Peperoni',
+        'bell pepper': 'Peperone',
+        'potato': 'Patata',
+        'potatoes': 'Patate',
+        'lettuce': 'Lattuga',
+        'spinach': 'Spinaci',
+        'broccoli': 'Broccoli',
+        'cucumber': 'Cetriolo',
+        'zucchini': 'Zucchine',
+        'eggplant': 'Melanzana',
+        'mushroom': 'Fungo',
+        'mushrooms': 'Funghi',
+        'celery': 'Sedano',
+        'cabbage': 'Cavolo',
+        'cauliflower': 'Cavolfiore',
+        'beans': 'Fagioli',
+        'peas': 'Piselli',
+        'corn': 'Mais',
+        'avocado': 'Avocado',
+        
+        // Frutta
+        'apple': 'Mela',
+        'apples': 'Mele',
+        'orange': 'Arancia',
+        'oranges': 'Arance',
+        'banana': 'Banana',
+        'bananas': 'Banane',
+        'lemon': 'Limone',
+        'lemons': 'Limoni',
+        'lime': 'Lime',
+        'strawberry': 'Fragola',
+        'strawberries': 'Fragole',
+        'grape': 'Uva',
+        'grapes': 'Uva',
+        'cherry': 'Ciliegia',
+        'cherries': 'Ciliegie',
+        'peach': 'Pesca',
+        'peaches': 'Pesche',
+        'pear': 'Pera',
+        'pears': 'Pere',
+        
+        // Proteine
+        'chicken': 'Pollo',
+        'beef': 'Manzo',
+        'pork': 'Maiale',
+        'fish': 'Pesce',
+        'salmon': 'Salmone',
+        'tuna': 'Tonno',
+        'shrimp': 'Gamberi',
+        'egg': 'Uovo',
+        'eggs': 'Uova',
+        'cheese': 'Formaggio',
+        'milk': 'Latte',
+        'yogurt': 'Yogurt',
+        'mozzarella': 'Mozzarella',
+        'parmesan': 'Parmigiano',
+        
+        // Cereali e pasta
+        'bread': 'Pane',
+        'pasta': 'Pasta',
+        'rice': 'Riso',
+        'flour': 'Farina',
+        'noodles': 'Pasta',
+        'spaghetti': 'Spaghetti',
+        'pizza': 'Pizza',
+        
+        // Condimenti e spezie
+        'oil': 'Olio',
+        'olive': 'Oliva',
+        'olive oil': 'Olio d\'oliva',
+        'salt': 'Sale',
+        'pepper': 'Pepe',
+        'basil': 'Basilico',
+        'oregano': 'Origano',
+        'parsley': 'Prezzemolo',
+        'rosemary': 'Rosmarino',
+        'thyme': 'Timo',
+        'sage': 'Salvia',
+        'mint': 'Menta',
+        'cilantro': 'Coriandolo',
+        'dill': 'Aneto',
+        
+        // Legumi e noci
+        'nuts': 'Noci',
+        'almond': 'Mandorla',
+        'almonds': 'Mandorle',
+        'walnut': 'Noce',
+        'walnuts': 'Noci',
+        'pine nuts': 'Pinoli',
+        'lentils': 'Lenticchie',
+        'chickpeas': 'Ceci',
+        
+        // Latticini
+        'butter': 'Burro',
+        'cream': 'Panna',
+        'ricotta': 'Ricotta',
+        'gorgonzola': 'Gorgonzola',
+        'goat cheese': 'Formaggio di capra'
+      },
+      fr: {
+        // Verdure
+        'tomato': 'Tomate',
+        'tomatoes': 'Tomates',
+        'onion': 'Oignon',
+        'onions': 'Oignons',
+        'garlic': 'Ail',
+        'carrot': 'Carotte',
+        'carrots': 'Carottes',
+        'pepper': 'Poivron',
+        'peppers': 'Poivrons',
+        'bell pepper': 'Poivron',
+        'potato': 'Pomme de terre',
+        'potatoes': 'Pommes de terre',
+        'lettuce': 'Laitue',
+        'spinach': 'Épinards',
+        'broccoli': 'Brocoli',
+        'cucumber': 'Concombre',
+        'zucchini': 'Courgette',
+        'eggplant': 'Aubergine',
+        'mushroom': 'Champignon',
+        'mushrooms': 'Champignons',
+        'celery': 'Céleri',
+        'cabbage': 'Chou',
+        'cauliflower': 'Chou-fleur',
+        'beans': 'Haricots',
+        'peas': 'Petits pois',
+        'corn': 'Maïs',
+        'avocado': 'Avocat',
+        
+        // Frutta
+        'apple': 'Pomme',
+        'apples': 'Pommes',
+        'orange': 'Orange',
+        'oranges': 'Oranges',
+        'banana': 'Banane',
+        'bananas': 'Bananes',
+        'lemon': 'Citron',
+        'lemons': 'Citrons',
+        'lime': 'Citron vert',
+        'strawberry': 'Fraise',
+        'strawberries': 'Fraises',
+        'grape': 'Raisin',
+        'grapes': 'Raisins',
+        'cherry': 'Cerise',
+        'cherries': 'Cerises',
+        'peach': 'Pêche',
+        'peaches': 'Pêches',
+        'pear': 'Poire',
+        'pears': 'Poires',
+        
+        // Proteine
+        'chicken': 'Poulet',
+        'beef': 'Bœuf',
+        'pork': 'Porc',
+        'fish': 'Poisson',
+        'salmon': 'Saumon',
+        'tuna': 'Thon',
+        'shrimp': 'Crevettes',
+        'egg': 'Œuf',
+        'eggs': 'Œufs',
+        'cheese': 'Fromage',
+        'milk': 'Lait',
+        'yogurt': 'Yaourt',
+        'mozzarella': 'Mozzarella',
+        'parmesan': 'Parmesan',
+        
+        // Cereali e pasta
+        'bread': 'Pain',
+        'pasta': 'Pâtes',
+        'rice': 'Riz',
+        'flour': 'Farine',
+        'noodles': 'Nouilles',
+        'spaghetti': 'Spaghettis',
+        'pizza': 'Pizza',
+        
+        // Condimenti e spezie
+        'oil': 'Huile',
+        'olive': 'Olive',
+        'olive oil': 'Huile d\'olive',
+        'salt': 'Sel',
+        'pepper': 'Poivre',
+        'basil': 'Basilic',
+        'oregano': 'Origan',
+        'parsley': 'Persil',
+        'rosemary': 'Romarin',
+        'thyme': 'Thym',
+        'sage': 'Sauge',
+        'mint': 'Menthe',
+        'cilantro': 'Coriandre',
+        'dill': 'Aneth',
+        
+        // Legumi e noci
+        'nuts': 'Noix',
+        'almond': 'Amande',
+        'almonds': 'Amandes',
+        'walnut': 'Noix',
+        'walnuts': 'Noix',
+        'pine nuts': 'Pignons',
+        'lentils': 'Lentilles',
+        'chickpeas': 'Pois chiches',
+        
+        // Latticini
+        'butter': 'Beurre',
+        'cream': 'Crème',
+        'ricotta': 'Ricotta',
+        'gorgonzola': 'Gorgonzola',
+        'goat cheese': 'Fromage de chèvre'
+      },
+      de: {
+        // Verdure
+        'tomato': 'Tomate',
+        'tomatoes': 'Tomaten',
+        'onion': 'Zwiebel',
+        'onions': 'Zwiebeln',
+        'garlic': 'Knoblauch',
+        'carrot': 'Karotte',
+        'carrots': 'Karotten',
+        'pepper': 'Paprika',
+        'peppers': 'Paprika',
+        'bell pepper': 'Paprika',
+        'potato': 'Kartoffel',
+        'potatoes': 'Kartoffeln',
+        'lettuce': 'Salat',
+        'spinach': 'Spinat',
+        'broccoli': 'Brokkoli',
+        'cucumber': 'Gurke',
+        'zucchini': 'Zucchini',
+        'eggplant': 'Aubergine',
+        'mushroom': 'Pilz',
+        'mushrooms': 'Pilze',
+        'celery': 'Sellerie',
+        'cabbage': 'Kohl',
+        'cauliflower': 'Blumenkohl',
+        'beans': 'Bohnen',
+        'peas': 'Erbsen',
+        'corn': 'Mais',
+        'avocado': 'Avocado',
+        
+        // Frutta
+        'apple': 'Apfel',
+        'apples': 'Äpfel',
+        'orange': 'Orange',
+        'oranges': 'Orangen',
+        'banana': 'Banane',
+        'bananas': 'Bananen',
+        'lemon': 'Zitrone',
+        'lemons': 'Zitronen',
+        'lime': 'Limette',
+        'strawberry': 'Erdbeere',
+        'strawberries': 'Erdbeeren',
+        'grape': 'Traube',
+        'grapes': 'Trauben',
+        'cherry': 'Kirsche',
+        'cherries': 'Kirschen',
+        'peach': 'Pfirsich',
+        'peaches': 'Pfirsiche',
+        'pear': 'Birne',
+        'pears': 'Birnen',
+        
+        // Proteine
+        'chicken': 'Huhn',
+        'beef': 'Rindfleisch',
+        'pork': 'Schweinefleisch',
+        'fish': 'Fisch',
+        'salmon': 'Lachs',
+        'tuna': 'Thunfisch',
+        'shrimp': 'Garnelen',
+        'egg': 'Ei',
+        'eggs': 'Eier',
+        'cheese': 'Käse',
+        'milk': 'Milch',
+        'yogurt': 'Joghurt',
+        'mozzarella': 'Mozzarella',
+        'parmesan': 'Parmesan',
+        
+        // Cereali e pasta
+        'bread': 'Brot',
+        'pasta': 'Nudeln',
+        'rice': 'Reis',
+        'flour': 'Mehl',
+        'noodles': 'Nudeln',
+        'spaghetti': 'Spaghetti',
+        'pizza': 'Pizza',
+        
+        // Condimenti e spezie
+        'oil': 'Öl',
+        'olive': 'Olive',
+        'olive oil': 'Olivenöl',
+        'salt': 'Salz',
+        'pepper': 'Pfeffer',
+        'basil': 'Basilikum',
+        'oregano': 'Oregano',
+        'parsley': 'Petersilie',
+        'rosemary': 'Rosmarin',
+        'thyme': 'Thymian',
+        'sage': 'Salbei',
+        'mint': 'Minze',
+        'cilantro': 'Koriander',
+        'dill': 'Dill',
+        
+        // Legumi e noci
+        'nuts': 'Nüsse',
+        'almond': 'Mandel',
+        'almonds': 'Mandeln',
+        'walnut': 'Walnuss',
+        'walnuts': 'Walnüsse',
+        'pine nuts': 'Pinienkernen',
+        'lentils': 'Linsen',
+        'chickpeas': 'Kichererbsen',
+        
+        // Latticini
+        'butter': 'Butter',
+        'cream': 'Sahne',
+        'ricotta': 'Ricotta',
+        'gorgonzola': 'Gorgonzola',
+        'goat cheese': 'Ziegenkäse'
+      }
+    }
+    
+    return allTranslations[locale] || null
   }
 
   /**

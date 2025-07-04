@@ -7,7 +7,7 @@ const router = express.Router()
 // Detect ingredients from image
 router.post('/detect', authenticateToken, async (req, res) => {
   try {
-    const { image } = req.body
+    const { image, locale } = req.body
     
     if (!image) {
       return res.status(400).json({
@@ -18,8 +18,8 @@ router.post('/detect', authenticateToken, async (req, res) => {
 
     console.log('🔍 Processing ingredient detection request...')
     
-    // Usa il servizio Recognize Anything direttamente
-    const result = await recognizeAnythingService.detectIngredients(image)
+    // Usa il servizio Recognize Anything direttamente con locale
+    const result = await recognizeAnythingService.detectIngredients(image, locale || 'en')
     
     if (result.ingredients.length === 0) {
       console.log('⚠️ No ingredients detected')

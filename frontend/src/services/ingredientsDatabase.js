@@ -10,24 +10,27 @@ class IngredientsDatabase {
 
   /**
    * Carica tutti gli ingredienti tramite backend
+   * @param {string} locale - Locale per le traduzioni
    * @returns {Promise<Array>} Lista di tutti gli ingredienti
    */
-  async loadAllIngredients() {
-    if (this.isLoaded && this.allIngredients.length > 0) {
-      return this.allIngredients
+  async loadAllIngredients(locale = 'en') {
+    const cacheKey = `all_${locale}`
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey)
     }
 
     try {
       console.log('🔍 Loading ingredients from backend...')
       const response = await axios.get(`${this.baseURL}/all`, {
+        params: { locale },
         timeout: 10000
       })
 
       if (response.data && response.data.ingredients) {
-        this.allIngredients = response.data.ingredients
-        this.isLoaded = true
-        console.log(`✅ Loaded ${this.allIngredients.length} ingredients from backend`)
-        return this.allIngredients
+        const ingredients = response.data.ingredients
+        this.cache.set(cacheKey, ingredients)
+        console.log(`✅ Loaded ${ingredients.length} ingredients from backend for ${locale}`)
+        return ingredients
       }
 
       throw new Error('Invalid response format')
@@ -41,15 +44,16 @@ class IngredientsDatabase {
   /**
    * Cerca ingredienti che corrispondono alla query
    * @param {string} query - Testo di ricerca
+   * @param {string} locale - Locale per le traduzioni
    * @returns {Promise<Array>} Ingredienti corrispondenti
    */
-  async searchIngredients(query) {
+  async searchIngredients(query, locale = 'en') {
     if (!query || query.length < 2) {
       return []
     }
 
     // Controlla cache
-    const cacheKey = query.toLowerCase()
+    const cacheKey = `${query.toLowerCase()}_${locale}`
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey)
     }
@@ -57,7 +61,7 @@ class IngredientsDatabase {
     try {
       console.log(`🔍 Searching ingredients for: "${query}"`)
       const response = await axios.get(`${this.baseURL}/search`, {
-        params: { q: query },
+        params: { q: query, locale },
         timeout: 5000
       })
 
@@ -66,7 +70,7 @@ class IngredientsDatabase {
       // Salva in cache
       this.cache.set(cacheKey, results)
       
-      console.log(`✅ Found ${results.length} ingredients for "${query}"`)
+      console.log(`✅ Found ${results.length} ingredients for "${query}" (${locale})`)
       return results
     } catch (error) {
       console.error('❌ Error searching ingredients:', error.message)
@@ -83,8 +87,6 @@ class IngredientsDatabase {
    */
   clearCache() {
     this.cache.clear()
-    this.allIngredients = []
-    this.isLoaded = false
     console.log('🧹 Ingredients cache cleared')
   }
 }

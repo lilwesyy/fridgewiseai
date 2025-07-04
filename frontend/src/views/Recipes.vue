@@ -405,8 +405,14 @@ export default {
         console.log('Sending ingredients to API:', plainIngredients)
         console.log('Sending preferences to API:', this.preferences)
         
-        // Call backend API to generate recipe with preferences
-        const response = await recipeService.generateRecipe(plainIngredients, this.preferences)
+        // Call backend API to generate recipe with preferences and locale
+        const preferencesWithLocale = {
+          ...this.preferences,
+          locale: this.$i18n.locale
+        }
+        console.log('Sending locale:', this.$i18n.locale)
+        
+        const response = await recipeService.generateRecipe(plainIngredients, preferencesWithLocale)
         const newRecipe = response.recipe
 
         // Add to local recipes list

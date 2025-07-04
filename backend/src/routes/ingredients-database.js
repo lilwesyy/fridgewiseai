@@ -4,9 +4,9 @@ import { translateIngredient, getEnglishNameFromItalian } from '../utils/ingredi
 
 const router = express.Router()
 
-// Cache per ingredienti TheMealDB
-let ingredientsCache = null
-let cacheTimestamp = null
+// Cache per ingredienti TheMealDB - separato per locale
+const ingredientsCache = new Map() // locale -> cache
+const cacheTimestamps = new Map() // locale -> timestamp
 const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 ore
 
 /**
@@ -15,18 +15,19 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 ore
  */
 router.get('/search', async (req, res) => {
   try {
-    const { q: query } = req.query
+    const { q: query, locale = 'en' } = req.query
 
     if (!query || query.length < 2) {
       return res.json({ ingredients: [] })
     }
 
-    console.log(`🔍 Searching ingredients for: "${query}"`)
+    console.log(`🔍 Searching ingredients for: "${query}" (locale: ${locale})`)
 
     // Carica tutti gli ingredienti se non in cache o cache scaduta
-    await loadAllIngredients()
+    await loadAllIngredients(locale)
 
-    if (!ingredientsCache) {
+    const cache = ingredientsCache.get(locale)
+    if (!cache) {
       return res.status(500).json({
         error: 'Failed to load ingredients database',
         ingredients: []
@@ -44,16 +45,17 @@ router.get('/search', async (req, res) => {
     
     console.log(`🔍 Search: "${query}" ${englishEquivalent ? `→ "${englishEquivalent}"` : '(direct)'}`)
     
-    const results = ingredientsCache.filter(ingredient => {
+    const results = cache.filter(ingredient => {
       // Ricerca primaria: usa la versione inglese se disponibile
       const primaryMatch = ingredient.name.toLowerCase().includes(primarySearchTerm)
       
       // Ricerca secondaria: cerca anche nella versione originale e tradotta
       const nameMatch = ingredient.name.toLowerCase().includes(searchTerm)
-      const nameITMatch = ingredient.nameIT.toLowerCase().includes(searchTerm)
+      const translatedFieldName = `name${locale.toUpperCase()}`
+      const translatedMatch = ingredient[translatedFieldName] && ingredient[translatedFieldName].toLowerCase().includes(searchTerm)
       const descriptionMatch = ingredient.description && ingredient.description.toLowerCase().includes(searchTerm)
       
-      return primaryMatch || nameMatch || nameITMatch || descriptionMatch
+      return primaryMatch || nameMatch || translatedMatch || descriptionMatch
     }).slice(0, 20) // Limita a 20 risultati
 
     console.log(`✅ Found ${results.length} ingredients for "${query}"`)
@@ -79,11 +81,13 @@ router.get('/search', async (req, res) => {
  */
 router.get('/all', async (req, res) => {
   try {
-    console.log('📦 Loading all ingredients...')
+    const { locale = 'en' } = req.query
+    console.log(`📦 Loading all ingredients... (locale: ${locale})`)
 
-    await loadAllIngredients()
+    await loadAllIngredients(locale)
 
-    if (!ingredientsCache) {
+    const cache = ingredientsCache.get(locale)
+    if (!cache) {
       return res.status(500).json({
         error: 'Failed to load ingredients database',
         ingredients: []
@@ -91,9 +95,9 @@ router.get('/all', async (req, res) => {
     }
 
     res.json({
-      ingredients: ingredientsCache,
-      count: ingredientsCache.length,
-      lastUpdated: cacheTimestamp
+      ingredients: cache,
+      count: cache.length,
+      lastUpdated: cacheTimestamps.get(locale)
     })
 
   } catch (error) {
@@ -108,12 +112,15 @@ router.get('/all', async (req, res) => {
 /**
  * Carica tutti gli ingredienti da TheMealDB
  */
-async function loadAllIngredients() {
-  // Controlla cache
+async function loadAllIngredients(locale = 'en') {
+  // Controlla cache per questo locale
   const now = Date.now()
-  if (ingredientsCache && cacheTimestamp && (now - cacheTimestamp) < CACHE_DURATION) {
-    console.log('📋 Using cached ingredients')
-    return ingredientsCache
+  const cache = ingredientsCache.get(locale)
+  const timestamp = cacheTimestamps.get(locale)
+  
+  if (cache && timestamp && (now - timestamp) < CACHE_DURATION) {
+    console.log(`📋 Using cached ingredients for ${locale}`)
+    return cache
   }
 
   try {
@@ -127,23 +134,37 @@ async function loadAllIngredients() {
     })
 
     if (response.data && response.data.meals) {
-      console.log(`🔄 Processing ${response.data.meals.length} ingredients with hybrid translation...`)
+      console.log(`🔄 Processing ${response.data.meals.length} ingredients for locale ${locale}...`)
       
-      // Traduci tutti gli ingredienti in parallelo
-      ingredientsCache = await Promise.all(
+      // Traduci tutti gli ingredienti per il locale specifico
+      const translatedIngredients = await Promise.all(
         response.data.meals.map(async (item) => {
-          const nameIT = await translateIngredient(item.strIngredient, 'it')
-          return {
-            name: item.strIngredient,
-            description: item.strDescription || '',
-            nameIT: nameIT
+          let translatedName = item.strIngredient // Default: inglese
+          
+          // Traduci solo se il locale non è inglese
+          if (locale !== 'en') {
+            translatedName = await translateIngredient(item.strIngredient, locale)
           }
+          
+          const ingredient = {
+            name: item.strIngredient, // Sempre in inglese per compatibilità
+            description: item.strDescription || '',
+            localizedName: translatedName // Nome localizzato
+          }
+          
+          // Aggiungi anche i campi legacy per compatibilità
+          ingredient[`name${locale.toUpperCase()}`] = translatedName
+          
+          return ingredient
         })
       )
       
-      cacheTimestamp = now
-      console.log(`✅ Loaded and translated ${ingredientsCache.length} ingredients from TheMealDB`)
-      return ingredientsCache
+      // Salva nella cache per questo locale
+      ingredientsCache.set(locale, translatedIngredients)
+      cacheTimestamps.set(locale, now)
+      
+      console.log(`✅ Loaded and translated ${translatedIngredients.length} ingredients for ${locale}`)
+      return translatedIngredients
     }
 
     throw new Error('Invalid response format from TheMealDB')
@@ -152,37 +173,79 @@ async function loadAllIngredients() {
     console.error('❌ Error loading from TheMealDB:', error.message)
     
     // Fallback con ingredienti hardcoded
-    if (!ingredientsCache) {
-      console.log('🔄 Using fallback ingredients')
-      ingredientsCache = getFallbackIngredients()
-      cacheTimestamp = now
+    let cache = ingredientsCache.get(locale)
+    if (!cache) {
+      console.log(`🔄 Using fallback ingredients for ${locale}`)
+      cache = getFallbackIngredients(locale)
+      ingredientsCache.set(locale, cache)
+      cacheTimestamps.set(locale, now)
     }
     
-    return ingredientsCache
+    return cache
   }
 }
 
 // Le traduzioni sono ora gestite dal sistema ibrido in utils/ingredientTranslations.js
 
 /**
- * Ingredienti di fallback
+ * Ingredienti di fallback per locale
  */
-function getFallbackIngredients() {
-  const fallbackList = [
-    'Pomodori', 'Cipolle', 'Aglio', 'Basilico', 'Origano', 'Mozzarella', 'Parmigiano',
-    'Olio d\'oliva', 'Sale', 'Pepe', 'Carote', 'Sedano', 'Prezzemolo', 'Rosmarino',
-    'Salvia', 'Timo', 'Peperoni', 'Zucchine', 'Melanzane', 'Spinaci', 'Rucola',
-    'Lattuga', 'Cetrioli', 'Pomodorini', 'Funghi', 'Patate', 'Pasta', 'Riso',
-    'Pane', 'Uova', 'Latte', 'Burro', 'Yogurt', 'Prosciutto', 'Salame', 'Tonno',
-    'Salmone', 'Pollo', 'Manzo', 'Maiale', 'Limoni', 'Arance', 'Mele', 'Banane',
-    'Fragole', 'Pesche', 'Pere', 'Uva', 'Fagioli', 'Lenticchie', 'Ceci'
-  ]
-
-  return fallbackList.map(name => ({
-    name: name,
-    nameIT: name,
-    description: ''
-  }))
+function getFallbackIngredients(locale = 'en') {
+  const fallbackLists = {
+    en: [
+      'Tomatoes', 'Onions', 'Garlic', 'Basil', 'Oregano', 'Mozzarella', 'Parmesan',
+      'Olive Oil', 'Salt', 'Pepper', 'Carrots', 'Celery', 'Parsley', 'Rosemary',
+      'Sage', 'Thyme', 'Peppers', 'Zucchini', 'Eggplant', 'Spinach', 'Arugula',
+      'Lettuce', 'Cucumbers', 'Cherry Tomatoes', 'Mushrooms', 'Potatoes', 'Pasta', 'Rice',
+      'Bread', 'Eggs', 'Milk', 'Butter', 'Yogurt', 'Ham', 'Salami', 'Tuna',
+      'Salmon', 'Chicken', 'Beef', 'Pork', 'Lemons', 'Oranges', 'Apples', 'Bananas',
+      'Strawberries', 'Peaches', 'Pears', 'Grapes', 'Beans', 'Lentils', 'Chickpeas'
+    ],
+    it: [
+      'Pomodori', 'Cipolle', 'Aglio', 'Basilico', 'Origano', 'Mozzarella', 'Parmigiano',
+      'Olio d\'oliva', 'Sale', 'Pepe', 'Carote', 'Sedano', 'Prezzemolo', 'Rosmarino',
+      'Salvia', 'Timo', 'Peperoni', 'Zucchine', 'Melanzane', 'Spinaci', 'Rucola',
+      'Lattuga', 'Cetrioli', 'Pomodorini', 'Funghi', 'Patate', 'Pasta', 'Riso',
+      'Pane', 'Uova', 'Latte', 'Burro', 'Yogurt', 'Prosciutto', 'Salame', 'Tonno',
+      'Salmone', 'Pollo', 'Manzo', 'Maiale', 'Limoni', 'Arance', 'Mele', 'Banane',
+      'Fragole', 'Pesche', 'Pere', 'Uva', 'Fagioli', 'Lenticchie', 'Ceci'
+    ],
+    fr: [
+      'Tomates', 'Oignons', 'Ail', 'Basilic', 'Origan', 'Mozzarella', 'Parmesan',
+      'Huile d\'olive', 'Sel', 'Poivre', 'Carottes', 'Céleri', 'Persil', 'Romarin',
+      'Sauge', 'Thym', 'Poivrons', 'Courgettes', 'Aubergine', 'Épinards', 'Roquette',
+      'Laitue', 'Concombres', 'Tomates cerises', 'Champignons', 'Pommes de terre', 'Pâtes', 'Riz',
+      'Pain', 'Œufs', 'Lait', 'Beurre', 'Yaourt', 'Jambon', 'Salami', 'Thon',
+      'Saumon', 'Poulet', 'Bœuf', 'Porc', 'Citrons', 'Oranges', 'Pommes', 'Bananes',
+      'Fraises', 'Pêches', 'Poires', 'Raisins', 'Haricots', 'Lentilles', 'Pois chiches'
+    ],
+    de: [
+      'Tomaten', 'Zwiebeln', 'Knoblauch', 'Basilikum', 'Oregano', 'Mozzarella', 'Parmesan',
+      'Olivenöl', 'Salz', 'Pfeffer', 'Karotten', 'Sellerie', 'Petersilie', 'Rosmarin',
+      'Salbei', 'Thymian', 'Paprika', 'Zucchini', 'Aubergine', 'Spinat', 'Rucola',
+      'Salat', 'Gurken', 'Kirschtomaten', 'Pilze', 'Kartoffeln', 'Nudeln', 'Reis',
+      'Brot', 'Eier', 'Milch', 'Butter', 'Joghurt', 'Schinken', 'Salami', 'Thunfisch',
+      'Lachs', 'Huhn', 'Rindfleisch', 'Schweinefleisch', 'Zitronen', 'Orangen', 'Äpfel', 'Bananen',
+      'Erdbeeren', 'Pfirsiche', 'Birnen', 'Trauben', 'Bohnen', 'Linsen', 'Kichererbsen'
+    ]
+  }
+  
+  const fallbackList = fallbackLists[locale] || fallbackLists['en']
+  
+  return fallbackList.map((name, index) => {
+    const englishName = fallbackLists['en'][index] // Nome inglese corrispondente
+    
+    const ingredient = {
+      name: englishName || name, // Sempre nome inglese per compatibilità
+      description: '',
+      localizedName: name // Nome localizzato
+    }
+    
+    // Aggiungi campo legacy per compatibilità
+    ingredient[`name${locale.toUpperCase()}`] = name
+    
+    return ingredient
+  })
 }
 
 export default router
