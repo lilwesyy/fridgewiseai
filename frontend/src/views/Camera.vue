@@ -655,7 +655,18 @@ const popularCategories = computed(() => {
   }))
 })
 
-const quickAddIngredients = ref([])
+const quickAddIngredients = computed(() => {
+  // Ingredienti comuni per quick add
+  const commonIngredientsLists = {
+    it: ['Pomodori', 'Cipolla', 'Aglio', 'Basilico', 'Olio d\'oliva', 'Sale', 'Mozzarella'],
+    en: ['Tomatoes', 'Onion', 'Garlic', 'Basil', 'Olive Oil', 'Salt', 'Mozzarella'],
+    fr: ['Tomates', 'Oignon', 'Ail', 'Basilic', 'Huile d\'olive', 'Sel', 'Mozzarella'],
+    de: ['Tomaten', 'Zwiebel', 'Knoblauch', 'Basilikum', 'Olivenöl', 'Salz', 'Mozzarella']
+  }
+  
+  const currentLocale = locale.value
+  return commonIngredientsLists[currentLocale] || commonIngredientsLists['en']
+})
 
 // Permission state
 const hasPermission = ref(false)
@@ -2019,34 +2030,12 @@ onMounted(async () => {
   // Check available cameras
   await checkAvailableCameras()
   
-  // Pre-load ingredients database
+  // Pre-load ingredients database per le ricerche (ma non per quick add)
   try {
-    const allIngredients = await ingredientsDatabase.loadAllIngredients(locale.value)
-    
-    // Popola quick add con ingredienti più comuni (primi 8) - localizzati
-    const commonIngredientsLists = {
-      it: ['Pomodori', 'Cipolla', 'Aglio', 'Basilico', 'Olio d\'oliva', 'Sale', 'Pepe', 'Mozzarella'],
-      en: ['Tomatoes', 'Onion', 'Garlic', 'Basil', 'Olive Oil', 'Salt', 'Pepper', 'Mozzarella'],
-      fr: ['Tomates', 'Oignon', 'Ail', 'Basilic', 'Huile d\'olive', 'Sel', 'Poivre', 'Mozzarella'],
-      de: ['Tomaten', 'Zwiebel', 'Knoblauch', 'Basilikum', 'Olivenöl', 'Salz', 'Pfeffer', 'Mozzarella']
-    }
-    
-    const commonIngredients = commonIngredientsLists[locale.value] || commonIngredientsLists['en']
-    
-    // Filtra ingredienti che esistono nel database
-    quickAddIngredients.value = allIngredients
-      .filter(ingredient => {
-        const localizedName = ingredient.localizedName || ingredient[`name${locale.value.toUpperCase()}`] || ingredient.name
-        return commonIngredients.includes(localizedName)
-      })
-      .map(ingredient => ingredient.localizedName || ingredient[`name${locale.value.toUpperCase()}`] || ingredient.name)
-      .slice(0, 8)
-    
-    console.log(`✅ Quick add ingredients loaded: ${quickAddIngredients.value.length}`)
+    await ingredientsDatabase.loadAllIngredients(locale.value)
+    console.log(`✅ Ingredients database loaded for search`)
   } catch (error) {
     console.warn('Could not pre-load ingredients database:', error)
-    // Nessun fallback - il database è obbligatorio
-    quickAddIngredients.value = []
   }
   
   // Don't automatically start camera - show choice screen instead
