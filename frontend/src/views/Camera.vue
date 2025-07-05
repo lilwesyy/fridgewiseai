@@ -41,73 +41,88 @@
       <!-- Manual Selection Screen -->
       <div v-if="showManualSelectionScreen" class="absolute inset-0 flex flex-col bg-white z-50">
         <div class="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-3">
-          <div class="flex items-center justify-between">
-            <button 
-              @click="backToChoice"
-              class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center transition-all active:scale-95"
-            >
-              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-              </svg>
-            </button>
-            <h2 class="text-lg font-semibold text-gray-900">{{ $t('camera.selectIngredients') }}</h2>
-            <button 
-              @click="generateRecipeFromManual"
-              :disabled="selectedIngredients.length === 0"
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
-            >
-              {{ $t('camera.generateRecipesButton') }}
-            </button>
-          </div>
-          
-          <!-- Search Bar -->
-          <div class="mt-4 relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
+          <div class="max-w-3xl mx-auto">
+            <div class="flex items-center justify-between">
+              <button 
+                @click="backToChoice"
+                class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center transition-all active:scale-95"
+              >
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              <h2 class="text-lg font-semibold text-gray-900">{{ $t('camera.selectIngredients') }}</h2>
+              <button 
+                @click="generateRecipeFromManual"
+                :disabled="selectedIngredients.length === 0"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
+              >
+                {{ $t('camera.generateRecipesButton') }}
+              </button>
             </div>
-            <input
-              v-model="searchQuery"
-              type="text"
-              :placeholder="$t('camera.searchIngredients')"
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
+            
+            <!-- Search Bar -->
+            <div class="mt-4 relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+              <input
+                v-model="searchQuery"
+                type="text"
+                :placeholder="$t('camera.searchIngredients')"
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              />
+            </div>
           </div>
         </div>
         
         <!-- Selected Ingredients -->
         <div v-if="selectedIngredients.length > 0" class="flex-shrink-0 bg-blue-50 border-b border-blue-200 px-4 py-3">
-          <h3 class="text-sm font-medium text-blue-900 mb-2">{{ $t('camera.selectedIngredients') }} ({{ selectedIngredients.length }})</h3>
-          <div class="flex flex-wrap gap-2">
-            <span 
-              v-for="ingredient in selectedIngredients" 
-              :key="ingredient"
-              class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-            >
-              {{ ingredient }}
-              <button 
-                @click="removeIngredient(ingredient)"
-                class="ml-2 text-blue-600 hover:text-blue-800"
+          <div class="max-w-3xl mx-auto">
+            <h3 class="text-sm font-medium text-blue-900 mb-2">{{ $t('camera.selectedIngredients') }} ({{ selectedIngredients.length }})</h3>
+            <div class="flex flex-wrap gap-2">
+              <span 
+                v-for="ingredient in selectedIngredients" 
+                :key="ingredient"
+                class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
-            </span>
+                {{ ingredient }}
+                <button 
+                  @click="removeIngredient(ingredient)"
+                  class="ml-2 text-blue-600 hover:text-blue-800"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </span>
+            </div>
           </div>
         </div>
         
         <!-- Main Content Area -->
         <div class="flex-1 overflow-y-auto pb-20">
-          <div class="p-4">
+          <div class="p-4 max-w-3xl mx-auto">
             <!-- Search Results or Popular Ingredients -->
-            <div v-if="searchQuery.length >= 2" class="space-y-3">
+            <div v-if="searchQuery.length >= 2 || searchResults.length > 0" class="space-y-3">
               <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-medium text-gray-700">{{ $t('camera.searchResults') }}</h3>
-                <div v-if="isSearching" class="flex items-center text-blue-600">
-                  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                  <span class="text-xs">Ricerca...</span>
+                <h3 class="text-sm font-medium text-gray-700">
+                  {{ searchQuery.length >= 2 ? $t('camera.searchResults') : 'Risultati categoria' }}
+                </h3>
+                <div class="flex items-center space-x-2">
+                  <div v-if="isSearching" class="flex items-center text-blue-600">
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                    <span class="text-xs">Ricerca...</span>
+                  </div>
+                  <button 
+                    v-if="searchResults.length > 0 && searchQuery.length === 0"
+                    @click="clearCategoryResults"
+                    class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded border border-gray-300 hover:border-gray-400 transition-colors"
+                  >
+                    Pulisci
+                  </button>
                 </div>
               </div>
               <div v-if="filteredIngredients.length > 0 && !isSearching" class="grid grid-cols-2 gap-3">
@@ -1881,9 +1896,41 @@ const debouncedSearch = (newQuery) => {
   }, 300) // 300ms debounce
 }
 
-const searchByCategory = (categoryName) => {
-  searchQuery.value = categoryName.toLowerCase()
-  debouncedSearch(categoryName.toLowerCase())
+const searchByCategory = async (categoryName) => {
+  console.log(`🏷️ Searching by category: ${categoryName}`)
+  isSearching.value = true
+  searchQuery.value = '' // Clear search query to show category results
+  
+  try {
+    const results = await ingredientsDatabase.searchByCategory(categoryName, locale.value)
+    searchResults.value = results
+    console.log(`✅ Found ${results.length} ingredients for category "${categoryName}"`)
+    
+    // Debug: mostra come sono strutturati i risultati
+    if (results.length > 0) {
+      console.log('🔍 First result structure:', results[0])
+      console.log('🌍 Current locale:', locale.value)
+    }
+    
+    // Show a toast with the category name and count
+    if (results.length > 0) {
+      toast.success(`${results.length} ingredienti trovati per "${categoryName}"`)
+    } else {
+      toast.info(`Nessun ingrediente trovato per "${categoryName}"`)
+    }
+  } catch (error) {
+    console.error('Error searching by category:', error)
+    searchResults.value = []
+    toast.error('Errore nella ricerca per categoria')
+  } finally {
+    isSearching.value = false
+  }
+}
+
+const clearCategoryResults = () => {
+  searchResults.value = []
+  searchQuery.value = ''
+  console.log('🧹 Category results cleared')
 }
 
 const checkDonationToast = () => {

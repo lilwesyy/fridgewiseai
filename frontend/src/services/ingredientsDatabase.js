@@ -42,6 +42,43 @@ class IngredientsDatabase {
   }
 
   /**
+   * Cerca ingredienti per categoria
+   * @param {string} categoryName - Nome della categoria
+   * @param {string} locale - Locale per le traduzioni
+   * @returns {Promise<Array>} Ingredienti della categoria
+   */
+  async searchByCategory(categoryName, locale = 'en') {
+    if (!categoryName) {
+      return []
+    }
+
+    // Controlla cache
+    const cacheKey = `category_${categoryName.toLowerCase()}_${locale}`
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey)
+    }
+
+    try {
+      console.log(`🏷️ Searching ingredients by category: "${categoryName}"`)
+      const response = await axios.get(`${this.baseURL}/category`, {
+        params: { name: categoryName, locale }, // Rimosso refresh per non sovraccaricare API
+        timeout: 5000
+      })
+
+      const results = response.data.ingredients || []
+      
+      // Salva in cache
+      this.cache.set(cacheKey, results)
+      
+      console.log(`✅ Found ${results.length} ingredients for category "${categoryName}" (${locale})`)
+      return results
+    } catch (error) {
+      console.error('❌ Error searching by category:', error.message)
+      return []
+    }
+  }
+
+  /**
    * Cerca ingredienti che corrispondono alla query
    * @param {string} query - Testo di ricerca
    * @param {string} locale - Locale per le traduzioni
