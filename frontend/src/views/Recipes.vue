@@ -426,7 +426,7 @@ export default {
         try {
           await userDataService.addRecentActivity({
             id: newRecipe.id,
-            title: `Generated: ${newRecipe.title}`,
+            title: `${this.$t('home.generated')} ${newRecipe.title}`,
             timestamp: new Date().toLocaleDateString()
           })
         } catch (error) {

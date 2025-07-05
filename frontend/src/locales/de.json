@@ -433,7 +433,11 @@
     "noRecipesSubtitle": "Beginne mit dem Scannen deiner Zutaten, um dein erstes Rezept zu generieren",
     "getStarted": "Loslegen",
     "proTip": "Profi-Tipp",
-    "proTipContent": "Für beste Ergebnisse, mache klare Fotos deiner Zutaten mit guter Beleuchtung. Die KI arbeitet besser, wenn sie einzelne Elemente deutlich sehen kann."
+    "proTipContent": "Für beste Ergebnisse, mache klare Fotos deiner Zutaten mit guter Beleuchtung. Die KI arbeitet besser, wenn sie einzelne Elemente deutlich sehen kann.",
+    "supportTitle": "FridgeWiseAI Unterstützen",
+    "supportDescription": "Hilf uns dabei, die App weiter zu verbessern!",
+    "supportButton": "Spenden",
+    "generated": "Generiert:"
   },
   "profile": {
     "title": "Profil",

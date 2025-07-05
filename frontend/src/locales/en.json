@@ -424,7 +424,8 @@
     "proTipContent": "For best results, take clear photos of your ingredients with good lighting. The AI works better when it can see individual items clearly.",
     "supportTitle": "Support FridgeWiseAI",
     "supportDescription": "Help us keep improving the app!",
-    "supportButton": "Donate"
+    "supportButton": "Donate",
+    "generated": "Generated:"
   },
   "savedRecipes": {
     "title": "Saved Recipes",

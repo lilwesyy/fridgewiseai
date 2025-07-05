@@ -442,7 +442,8 @@
     "proTipContent": "Per risultati migliori, scatta foto chiare dei tuoi ingredienti con una buona illuminazione. L'AI funziona meglio quando può vedere chiaramente i singoli elementi.",
     "supportTitle": "Supporta FridgeWiseAI",
     "supportDescription": "Aiutaci a continuare a migliorare l'app!",
-    "supportButton": "Dona"
+    "supportButton": "Dona",
+    "generated": "Generato:"
   },
   "profile": {
     "title": "Profilo",
