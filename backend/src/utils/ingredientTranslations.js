@@ -88,7 +88,8 @@ async function translateWithRetry(text, sourceLang = 'en', targetLang = 'it', ma
  * @returns {Promise<string>} Testo tradotto
  */
 async function translateWithAPI(text, sourceLang = 'en', targetLang = 'it', timeout = 5000) {
-  const url = 'http://localhost:5000/translate'
+  const baseUrl = process.env.LIBRETRANSLATE_API_URL || 'http://localhost:5000'
+  const url = `${baseUrl}/translate`
   
   const requestData = {
     q: text.toLowerCase(),
