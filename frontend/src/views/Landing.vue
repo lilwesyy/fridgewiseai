@@ -14,9 +14,9 @@
         <div class="flex justify-between items-center h-16">
           <!-- Logo -->
           <div class="flex items-center">
-            <div class="w-10 h-10 flex items-center justify-center">
+            <!-- <div class="w-10 h-10 flex items-center justify-center">
               <img src="@/assets/logo.svg" alt="FridgeWise AI Logo" class="w-10 h-10">
-            </div>
+            </div> -->
             <span class="ml-3 text-xl font-bold text-gray-900">FridgeWise AI</span>
           </div>
           

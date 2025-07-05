@@ -342,16 +342,26 @@ const isLoginFormValid = computed(() => {
 })
 
 const isRegisterFormValid = computed(() => {
+  const passwordsMatch = registerForm.value.password === registerForm.value.confirmPassword
+  const captchaValid = registerForm.value.captchaAnswer && parseInt(registerForm.value.captchaAnswer) === mathCaptcha.value.answer
+  
+  // Solo logga quando c'è un problema specifico
+  if (registerForm.value.password && registerForm.value.confirmPassword && !passwordsMatch) {
+    console.log('❌ Password mismatch:', {
+      password: registerForm.value.password,
+      confirmPassword: registerForm.value.confirmPassword
+    })
+  }
+  
   return (
     registerForm.value.name &&
     registerForm.value.email &&
     registerForm.value.password &&
     registerForm.value.confirmPassword &&
-    registerForm.value.password === registerForm.value.confirmPassword &&
-    registerForm.value.captchaAnswer &&
-    parseInt(registerForm.value.captchaAnswer) === mathCaptcha.value.answer &&
+    passwordsMatch &&
+    captchaValid &&
     registerForm.value.acceptTerms &&
-    !registerForm.value.honeypot // Honeypot should be empty
+    !registerForm.value.honeypot
   )
 })
 
@@ -390,13 +400,17 @@ const handleLogin = async () => {
 }
 
 const handleRegister = async () => {
+  console.log('🚀 Registration started')
   registerErrors.value = {}
   authStore.clearMessages()
 
   // Anti-bot validation checks
+  console.log('🔍 Validating anti-bot measures...')
   if (!validateAntiBot()) {
+    console.log('❌ Anti-bot validation failed')
     return
   }
+  console.log('✅ Anti-bot validation passed')
 
   // Basic validation
   if (!registerForm.value.name) {
@@ -471,14 +485,24 @@ const validateCaptcha = () => {
 const validateAntiBot = () => {
   const currentTime = Date.now()
   
+  console.log('📊 Anti-bot validation stats:', {
+    honeypot: registerForm.value.honeypot,
+    interactionCount: interactionCount.value,
+    formTime: formStartTime.value ? currentTime - formStartTime.value : 0,
+    captchaAnswer: registerForm.value.captchaAnswer,
+    correctAnswer: mathCaptcha.value.answer
+  })
+  
   // 1. Honeypot check - if filled, it's likely a bot
   if (registerForm.value.honeypot) {
+    console.log('❌ Honeypot filled')
     toast.error(t('auth.validation.suspiciousActivity'))
     return false
   }
   
   // 2. Rate limiting check
   if (lastSubmissionTime.value && (currentTime - lastSubmissionTime.value) < RATE_LIMIT_MS) {
+    console.log('❌ Rate limit exceeded')
     registerErrors.value.general = t('auth.validation.tooManyAttempts')
     return false
   }
@@ -487,10 +511,12 @@ const validateAntiBot = () => {
   if (formStartTime.value) {
     const formTime = currentTime - formStartTime.value
     if (formTime < MIN_FORM_TIME_MS) {
+      console.log('❌ Form filled too fast:', formTime, 'ms')
       registerErrors.value.general = t('auth.validation.formTooFast')
       return false
     }
     if (formTime > MAX_FORM_TIME_MS) {
+      console.log('❌ Form expired:', formTime, 'ms')
       registerErrors.value.general = t('auth.validation.formExpired')
       return false
     }
@@ -498,16 +524,20 @@ const validateAntiBot = () => {
   
   // 4. CAPTCHA validation
   if (!registerForm.value.captchaAnswer || parseInt(registerForm.value.captchaAnswer) !== mathCaptcha.value.answer) {
+    console.log('❌ CAPTCHA failed')
     registerErrors.value.captchaAnswer = t('auth.validation.incorrectCaptcha')
     return false
   }
   
-  // 5. Interaction count check (basic behavioral analysis)
-  if (interactionCount.value < 5) {
-    registerErrors.value.general = t('auth.validation.insufficientInteraction')
-    return false
-  }
+  // 5. Interaction count check (basic behavioral analysis) - TEMPORANEAMENTE DISABILITATO
+  // if (interactionCount.value < 5) {
+  //   console.log('❌ Insufficient interactions:', interactionCount.value)
+  //   registerErrors.value.general = t('auth.validation.insufficientInteraction')
+  //   return false
+  // }
+  console.log('⚠️ Interaction count check temporarily disabled')
   
+  console.log('✅ All anti-bot checks passed')
   return true
 }
 

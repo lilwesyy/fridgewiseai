@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
     languageDetectionMetadata: {
       source: {
         type: String,
-        enum: ['ip', 'browser', 'fallback'],
+        enum: ['ip', 'browser', 'fallback', 'ip-geolocation'],
         default: null
       },
       confidence: {

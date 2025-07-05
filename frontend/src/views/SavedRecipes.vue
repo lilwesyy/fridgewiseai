@@ -403,13 +403,26 @@ export default {
     },
 
     cookRecipe(recipe) {
-      // Naviga alla modalità cucina con la ricetta
-      this.$router.push({
-        name: 'CookingMode',
-        params: {
-          recipe: encodeURIComponent(JSON.stringify(recipe))
+      // Naviga alla modalità cucina con l'ID della ricetta
+      console.log('🍳 Starting cooking mode for recipe:', recipe.title)
+      try {
+        // Clean the recipe ID to remove any "recipe-" prefix
+        let recipeId = recipe._id || recipe.id
+        if (recipeId && recipeId.startsWith('recipe-')) {
+          recipeId = recipeId.substring(7) // Remove "recipe-" prefix
+          console.log('🧹 Cleaned recipe ID:', recipeId)
         }
-      })
+        
+        this.$router.push({
+          name: 'CookingMode',
+          params: {
+            recipe: recipeId
+          }
+        })
+      } catch (error) {
+        console.error('❌ Navigation error:', error)
+        this.toast.error('Errore durante la navigazione alla modalità cucina')
+      }
     },
 
     clearSearch() {

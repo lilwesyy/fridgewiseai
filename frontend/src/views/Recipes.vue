@@ -611,11 +611,26 @@ export default {
 
     enterCookingMode() {
       if (this.cookingModeRecipe) {
-        // Navigate to cooking mode with the recipe data
-        this.$router.push({
-          path: `/app/cooking/recipe-${this.cookingModeRecipe._id || this.cookingModeRecipe.id}`,
-          state: { recipe: this.cookingModeRecipe }
-        })
+        // Navigate to cooking mode with the recipe ID (same as SavedRecipes.vue)
+        console.log('🍳 Starting cooking mode for recipe:', this.cookingModeRecipe.title)
+        try {
+          // Clean the recipe ID to remove any "recipe-" prefix
+          let recipeId = this.cookingModeRecipe._id || this.cookingModeRecipe.id
+          if (recipeId && recipeId.startsWith('recipe-')) {
+            recipeId = recipeId.substring(7) // Remove "recipe-" prefix
+            console.log('🧹 Cleaned recipe ID:', recipeId)
+          }
+          
+          this.$router.push({
+            name: 'CookingMode',
+            params: {
+              recipe: recipeId
+            }
+          })
+        } catch (error) {
+          console.error('❌ Navigation error:', error)
+          this.toast.error(this.$t('notifications.general.error'))
+        }
       }
       this.closeCookingModeModal()
     },

@@ -1,13 +1,33 @@
 services:
+  # Nginx Reverse Proxy for Production
+  nginx:
+    image: nginx:alpine
+    container_name: fridgewiseai-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - fridgewiseai-network
+
   # Backend API
   backend:
     build: ./backend
     container_name: fridgewiseai-backend
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
       NODE_ENV: production
+      PORT: 3000
       MONGODB_URI: mongodb://mongodb:27017/fridgewiseai
       RECOGNIZE_ANYTHING_API_URL: http://recognize-anything-api:8000
       LIBRETRANSLATE_API_URL: http://libretranslate:5000
@@ -25,8 +45,8 @@ services:
     build: ./frontend
     container_name: fridgewiseai-frontend
     restart: unless-stopped
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     depends_on:
       - backend
     networks:
@@ -37,8 +57,8 @@ services:
     image: mongo:7.0
     container_name: fridgewiseai-mongo
     restart: unless-stopped
-    ports:
-      - "27017:27017"
+    expose:
+      - "27017"
     environment:
       MONGO_INITDB_DATABASE: fridgewiseai
     volumes:
@@ -52,20 +72,12 @@ services:
     image: mnahkies/recognize-anything-api:latest
     container_name: fridgewiseai-recognize-api
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
-      MODEL_NAME: ram_plus  # Modello migliore per food recognition
+      MODEL_NAME: ram_plus
       IMAGE_SIZE: 384
       THRESHOLD: 0.68
-    # Rimuovi --gpus all se non hai GPU NVIDIA
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
     networks:
       - fridgewiseai-network
 
@@ -74,15 +86,15 @@ services:
     image: libretranslate/libretranslate:latest
     container_name: fridgewiseai-libretranslate
     restart: unless-stopped
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     environment:
-      LT_LOAD_ONLY: en,it,fr,de  # Carica solo le lingue necessarie per performance migliori
-      LT_SUGGESTIONS: false      # Disabilita suggerimenti per privacy
-      LT_DISABLE_WEB_UI: false   # Mantieni web UI per testing
-      LT_UPDATE_MODELS: true     # Aggiorna modelli automaticamente
+      LT_LOAD_ONLY: en,it,fr,de
+      LT_SUGGESTIONS: false
+      LT_DISABLE_WEB_UI: true
+      LT_UPDATE_MODELS: true
     volumes:
-      - libretranslate_data:/app/db  # Persist dei modelli scaricati
+      - libretranslate_data:/app/db
     networks:
       - fridgewiseai-network
 

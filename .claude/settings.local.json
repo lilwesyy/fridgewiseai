@@ -4,7 +4,12 @@
       "Bash(rg:*)",
       "Bash(curl:*)",
       "Bash(grep:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(docker compose:*)",
+      "Bash(openssl x509:*)",
+      "Bash(openssl verify:*)",
+      "Bash(sudo ls:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

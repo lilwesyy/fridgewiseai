@@ -955,11 +955,32 @@ const confirmExit = () => {
 }
 
 // Lifecycle
-onMounted(() => {
+onMounted(async () => {
   // Carica la ricetta dai parametri della rotta
   if (route.params.recipe) {
     try {
-      const rawRecipe = JSON.parse(decodeURIComponent(route.params.recipe))
+      let rawRecipe
+      
+      // Prova prima a vedere se è un JSON (compatibilità con vecchio formato)
+      try {
+        rawRecipe = JSON.parse(decodeURIComponent(route.params.recipe))
+        console.log('📄 Loaded recipe from JSON parameter')
+      } catch {
+        // Se non è JSON, allora è un ID - recupera la ricetta dall'API
+        console.log('🔍 Loading recipe from ID:', route.params.recipe)
+        
+        // Clean the recipe ID to remove any "recipe-" prefix
+        let recipeId = route.params.recipe
+        if (recipeId && recipeId.startsWith('recipe-')) {
+          recipeId = recipeId.substring(7) // Remove "recipe-" prefix
+          console.log('🧹 Cleaned recipe ID:', recipeId)
+        }
+        
+        const { recipeService } = await import('@/services/api')
+        const recipeData = await recipeService.getRecipe(recipeId)
+        rawRecipe = recipeData.recipe || recipeData
+        console.log('✅ Recipe loaded from API:', rawRecipe.title)
+      }
       
       // Normalizza il formato della ricetta per compatibilità
       recipe.value = {
@@ -972,7 +993,7 @@ onMounted(() => {
         difficulty: rawRecipe.difficulty || ''
       }
     } catch (error) {
-      console.error('Error parsing recipe:', error)
+      console.error('Error loading recipe:', error)
       router.go(-1)
       return
     }
