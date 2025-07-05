@@ -365,7 +365,7 @@
         </div>
         
         <!-- Camera Controls Overlay - only show when stream is active -->
-        <div v-if="isStreamActive" class="absolute inset-0 pointer-events-none">
+        <div v-if="isStreamActive" class="absolute inset-0 pointer-events-none z-40">
           <!-- Top bar -->
           <div class="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-4 pointer-events-auto">
             <div class="flex items-center justify-between">
@@ -396,12 +396,12 @@
           </div>
           
           <!-- Center guide -->
-          <div class="flex-1 flex items-center justify-center p-8">
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="w-64 h-64 border-2 border-white/40 border-dashed rounded-2xl"></div>
           </div>
           
           <!-- Bottom controls -->
-          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 pb-24 pointer-events-auto">
+          <div class="absolute left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 pb-8 pointer-events-auto" :class="{ 'bottom-0': true, 'md:bottom-16 lg:bottom-20': true }">
             <div class="flex items-center justify-center space-x-8 mx-auto max-w-sm">
               <button @click="openGallery" class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center transition-all active:scale-95 touch-manipulation">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

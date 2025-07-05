@@ -1,5 +1,6 @@
 import axios from 'axios'
 import FormData from 'form-data'
+import { translateIngredients } from '../utils/ingredientTranslations.js'
 
 class RecognizeAnythingService {
   constructor() {
@@ -39,8 +40,8 @@ class RecognizeAnythingService {
       
       console.log('✅ Recognize Anything API response:', response.data)
       
-      // Estrai ingredienti dalla risposta
-      const ingredients = this.extractFoodIngredients(response.data, locale)
+      // Estrai e traduci ingredienti dalla risposta
+      const ingredients = await this.extractFoodIngredients(response.data, locale)
       
       return {
         ingredients,
@@ -68,9 +69,9 @@ class RecognizeAnythingService {
    * Estrae ingredienti alimentari dai tag rilevati
    * @param {Object} apiResponse - Risposta dell'API
    * @param {string} locale - Locale for translation
-   * @returns {Array} Lista di ingredienti filtrati
+   * @returns {Promise<Array>} Lista di ingredienti filtrati e tradotti
    */
-  extractFoodIngredients(apiResponse, locale = 'en') {
+  async extractFoodIngredients(apiResponse, locale = 'en') {
     let allTags = []
     
     // Gestisce diversi formati di risposta a seconda del modello
@@ -86,17 +87,38 @@ class RecognizeAnythingService {
       allTags = [...allTags, ...apiResponse.user_tags]
     }
     
-    // Filtra e pulisce i tag per ottenere solo ingredienti alimentari
-    const foodIngredients = allTags
+    // Filtra e pulisce i tag per ottenere solo ingredienti alimentari (in inglese)
+    const englishFoodIngredients = allTags
       .filter(tag => tag && typeof tag === 'string')
       .map(tag => tag.toLowerCase().trim())
       .filter(tag => this.isFoodIngredient(tag))
-      .map(tag => this.translateIngredient(tag, locale))
-      .filter(ingredient => ingredient)
+      .map(tag => tag.charAt(0).toUpperCase() + tag.slice(1)) // Capitalizza
       .slice(0, 10) // Limita a 10 ingredienti principali
     
     // Rimuovi duplicati
-    return [...new Set(foodIngredients)]
+    const uniqueIngredients = [...new Set(englishFoodIngredients)]
+    
+    // Se locale è inglese, restituisci direttamente
+    if (locale === 'en') {
+      return uniqueIngredients
+    }
+    
+    // Traduci usando LibreTranslate
+    try {
+      console.log(`🌍 Translating ${uniqueIngredients.length} ingredients from English to ${locale}...`)
+      const translatedIngredients = await translateIngredients(uniqueIngredients, 'en', locale)
+      console.log('✅ Translation successful:', translatedIngredients)
+      return translatedIngredients
+    } catch (error) {
+      console.warn('⚠️ LibreTranslate translation failed, falling back to static dictionary:', error.message)
+      
+      // Fallback al dizionario statico
+      const fallbackTranslated = uniqueIngredients
+        .map(ingredient => this.translateIngredient(ingredient.toLowerCase(), locale))
+        .filter(ingredient => ingredient)
+      
+      return fallbackTranslated
+    }
   }
 
   /**
