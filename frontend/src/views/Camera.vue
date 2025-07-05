@@ -3,22 +3,22 @@
     <div class="flex flex-col relative overflow-hidden bg-black z-30" :class="showHeader ? 'fixed top-16 left-0 right-0 bottom-0' : 'fixed inset-0'">
       <!-- Choice Screen -->
       <div v-if="showChoiceScreen" class="absolute inset-0 flex items-center justify-center bg-white z-50">
-        <div class="text-center max-w-lg mx-auto px-6 py-8 w-full">
-          <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="text-center max-w-lg mx-auto px-6 py-8 w-full animate-fade-in-up">
+          <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-in animation-delay-200">
+            <svg class="w-10 h-10 text-blue-600 animate-pulse-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
           </div>
           
-          <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ $t('camera.choiceTitle') }}</h2>
-          <p class="text-gray-600 mb-8">{{ $t('camera.choiceSubtitle') }}</p>
+          <h2 class="text-2xl font-bold text-gray-900 mb-4 animate-slide-in-left animation-delay-300">{{ $t('camera.choiceTitle') }}</h2>
+          <p class="text-gray-600 mb-8 animate-slide-in-left animation-delay-400">{{ $t('camera.choiceSubtitle') }}</p>
           
           <div class="space-y-4">
             <button 
               @click="showManualSelection"
-              class="w-full bg-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-3"
+              class="w-full bg-blue-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-blue-700 hover:scale-105 hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-3 animate-bounce-in animation-delay-500 group"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
               </svg>
               <span>{{ $t('camera.manualSelection') }}</span>
@@ -26,10 +26,10 @@
             
             <button 
               @click="startCameraMode"
-              class="w-full bg-green-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-3"
+              class="w-full bg-green-600 text-white py-4 px-6 rounded-xl font-semibold hover:bg-green-700 hover:scale-105 hover:shadow-xl transition-all duration-300 flex items-center justify-center space-x-3 animate-bounce-in animation-delay-600 group"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+              <svg class="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2-2V9z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
               <span>{{ $t('camera.useCamera') }}</span>
@@ -172,38 +172,42 @@
               </div>
               
               <!-- Popular Categories -->
-              <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-3">{{ $t('camera.popularCategories') }}</h3>
+              <div class="animate-fade-in-up animation-delay-200">
+                <h3 class="text-sm font-medium text-gray-700 mb-3 animate-slide-in-left animation-delay-300">{{ $t('camera.popularCategories') }}</h3>
                 <div class="grid grid-cols-2 gap-3">
                   <div 
-                    v-for="category in popularCategories" 
+                    v-for="(category, index) in popularCategories" 
                     :key="category.name"
                     @click="searchByCategory(category.name)"
-                    class="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-4 hover:from-blue-50 hover:to-blue-100 hover:border-blue-300 cursor-pointer transition-all duration-200 transform hover:scale-105"
+                    class="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-4 hover:from-blue-50 hover:to-blue-100 hover:border-blue-300 hover:shadow-lg cursor-pointer transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 animate-bounce-in group"
+                    :class="`animation-delay-${400 + index * 100}`"
                   >
                     <div class="text-center">
-                      <div class="text-2xl mb-2">{{ category.emoji }}</div>
-                      <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
-                      <div class="text-xs text-gray-500 mt-1">{{ category.count }} {{ $t('camera.ingredients') }}</div>
+                      <div class="text-2xl mb-2 group-hover:scale-125 transition-transform duration-300">{{ category.emoji }}</div>
+                      <div class="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300">{{ category.name }}</div>
+                      <div class="text-xs text-gray-500 mt-1 group-hover:text-blue-500 transition-colors duration-300">{{ category.count }} {{ $t('camera.ingredients') }}</div>
                     </div>
                   </div>
                 </div>
               </div>
               
               <!-- Quick Add (Most Used) -->
-              <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-3">{{ $t('camera.quickAdd') }}</h3>
+              <div class="animate-fade-in-up animation-delay-1000">
+                <h3 class="text-sm font-medium text-gray-700 mb-3 animate-slide-in-left animation-delay-1100">{{ $t('camera.quickAdd') }}</h3>
                 <div class="flex flex-wrap gap-2">
                   <button 
-                    v-for="ingredient in quickAddIngredients" 
+                    v-for="(ingredient, index) in quickAddIngredients" 
                     :key="ingredient"
                     @click="toggleIngredient(ingredient)"
-                    class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                    :class="{ 'bg-blue-100 border-blue-300 text-blue-800': selectedIngredients.includes(ingredient) }"
+                    class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 hover:scale-105 hover:shadow-md transition-all duration-300 animate-slide-in-right group"
+                    :class="[
+                      { 'bg-blue-100 border-blue-300 text-blue-800': selectedIngredients.includes(ingredient) },
+                      `animation-delay-${1200 + index * 100}`
+                    ]"
                   >
-                    <span class="mr-2">{{ getIngredientEmoji(ingredient) }}</span>
+                    <span class="mr-2 group-hover:scale-110 transition-transform duration-300">{{ getIngredientEmoji(ingredient) }}</span>
                     {{ ingredient }}
-                    <svg v-if="selectedIngredients.includes(ingredient)" class="w-4 h-4 ml-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-if="selectedIngredients.includes(ingredient)" class="w-4 h-4 ml-2 text-blue-600 animate-bounce-in" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                   </button>
@@ -2152,5 +2156,112 @@ video {
   button {
     touch-action: manipulation;
   }
+}
+
+/* Camera component animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(30px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05) translateY(-5px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.95) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Animation classes */
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out forwards;
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.8s ease-out forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Animation delays */
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+.animation-delay-600 { animation-delay: 600ms; }
+.animation-delay-700 { animation-delay: 700ms; }
+.animation-delay-800 { animation-delay: 800ms; }
+.animation-delay-900 { animation-delay: 900ms; }
+.animation-delay-1000 { animation-delay: 1000ms; }
+.animation-delay-1100 { animation-delay: 1100ms; }
+.animation-delay-1200 { animation-delay: 1200ms; }
+.animation-delay-1300 { animation-delay: 1300ms; }
+.animation-delay-1400 { animation-delay: 1400ms; }
+.animation-delay-1500 { animation-delay: 1500ms; }
+
+/* Initially hide animated elements */
+.animate-fade-in-up,
+.animate-slide-in-left,
+.animate-slide-in-right,
+.animate-bounce-in {
+  opacity: 0;
 }
 </style>

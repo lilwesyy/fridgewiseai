@@ -2,20 +2,21 @@
   <AuthenticatedLayout>
     <div class="px-4 py-6 pb-20 mx-auto max-w-3xl w-full">
       <!-- Header -->
-      <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ $t('recipes.title') }}</h1>
-        <p class="text-gray-600">{{ $t('recipes.subtitle') }}</p>
+      <div class="mb-6 animate-fade-in-up">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2 animate-slide-in-left animation-delay-200">{{ $t('recipes.title') }}</h1>
+        <p class="text-gray-600 animate-slide-in-left animation-delay-300">{{ $t('recipes.subtitle') }}</p>
       </div>
 
       <!-- Generate Recipe Button -->
-      <div v-if="currentIngredients.length > 0" class="mb-6">
-        <div class="bg-primary-50 rounded-lg p-4 border border-primary-200">
-          <h3 class="font-semibold text-primary-900 mb-2">{{ $t('recipes.currentIngredients') }}:</h3>
+      <div v-if="currentIngredients.length > 0" class="mb-6 animate-slide-down-fade-in animation-delay-400">
+        <div class="bg-primary-50 rounded-lg p-4 border border-primary-200 hover:border-primary-300 hover:shadow-lg transition-all duration-300 group">
+          <h3 class="font-semibold text-primary-900 mb-2 group-hover:text-primary-600 transition-colors duration-300">{{ $t('recipes.currentIngredients') }}:</h3>
           <div class="flex flex-wrap gap-2 mb-4">
             <span 
-              v-for="ingredient in currentIngredients" 
+              v-for="(ingredient, index) in currentIngredients" 
               :key="ingredient"
-              class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
+              class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 hover:scale-105 transition-all duration-300 animate-bounce-in"
+              :class="`animation-delay-${500 + index * 100}`"
             >
               {{ ingredient }}
             </span>
@@ -80,17 +81,18 @@
       </div>
 
       <!-- Filters -->
-      <div class="mb-6">
+      <div class="mb-6 animate-fade-in-up animation-delay-800">
         <div class="flex space-x-2 overflow-x-auto pb-2">
           <button 
-            v-for="filter in filters" 
+            v-for="(filter, index) in filters" 
             :key="filter.key"
             @click="activeFilter = filter.key"
             :class="[
-              'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
+              'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 hover:scale-105 hover:shadow-md animate-bounce-in',
               activeFilter === filter.key
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-primary-600 text-white shadow-lg'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+              `animation-delay-${900 + index * 100}`
             ]"
           >
             {{ $t(`recipes.filters.${filter.key}`) }}
@@ -112,23 +114,24 @@
       <!-- Recipe List -->
       <div v-else-if="filteredRecipes.length > 0" class="space-y-4">
         <div 
-          v-for="recipe in filteredRecipes" 
+          v-for="(recipe, index) in filteredRecipes" 
           :key="recipe._id || recipe.id"
-          class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all transform hover:-translate-y-1 duration-200"
+          class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl hover:border-primary-200 transition-all transform hover:-translate-y-2 hover:scale-105 duration-300 animate-slide-in-right group"
+          :class="`animation-delay-${1200 + index * 150}`"
         >
           <div class="p-5">
             <div class="flex items-start justify-between mb-3">
-              <h3 class="text-lg font-semibold text-gray-900">{{ recipe.title }}</h3>
+              <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors duration-300">{{ recipe.title }}</h3>
               <button 
                 @click="toggleSaved(recipe._id || recipe.id)"
                 :class="[
-                  'p-2 rounded-full transition-colors',
+                  'p-2 rounded-full transition-all duration-300 hover:scale-110',
                   savedRecipes.includes(recipe._id || recipe.id)
-                    ? 'text-red-600 hover:bg-red-50'
+                    ? 'text-red-600 hover:bg-red-50 animate-pulse-slow'
                     : 'text-gray-400 hover:bg-gray-50'
                 ]"
               >
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-5 h-5 transition-transform duration-300 hover:scale-125" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
                 </svg>
               </button>
@@ -547,3 +550,129 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* Recipes component animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-down-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(30px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05) translateY(-5px);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.95) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Animation classes */
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out forwards;
+}
+
+.animate-slide-down-fade-in {
+  animation: slide-down-fade-in 0.5s ease-out forwards;
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.8s ease-out forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Animation delays */
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+.animation-delay-600 { animation-delay: 600ms; }
+.animation-delay-700 { animation-delay: 700ms; }
+.animation-delay-800 { animation-delay: 800ms; }
+.animation-delay-900 { animation-delay: 900ms; }
+.animation-delay-1000 { animation-delay: 1000ms; }
+.animation-delay-1100 { animation-delay: 1100ms; }
+.animation-delay-1200 { animation-delay: 1200ms; }
+.animation-delay-1350 { animation-delay: 1350ms; }
+.animation-delay-1500 { animation-delay: 1500ms; }
+.animation-delay-1650 { animation-delay: 1650ms; }
+.animation-delay-1800 { animation-delay: 1800ms; }
+
+/* Initially hide animated elements */
+.animate-fade-in-up,
+.animate-slide-in-left,
+.animate-slide-in-right,
+.animate-slide-down-fade-in,
+.animate-bounce-in {
+  opacity: 0;
+}
+</style>
