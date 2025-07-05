@@ -645,7 +645,7 @@ const popularCategories = computed(() => {
     }
   }
   
-  const currentLocale = $i18n.locale
+  const currentLocale = locale.value
   const translations = categoryMapping[currentLocale] || categoryMapping['en']
   
   return baseCategories.map(category => ({
