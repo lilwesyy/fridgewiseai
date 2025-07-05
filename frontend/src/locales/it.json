@@ -266,6 +266,9 @@
     "searchIngredients": "Cerca ingredienti...",
     "selectedIngredients": "Ingredienti Selezionati",
     "searchResults": "Risultati ricerca",
+    "categoryResults": "Risultati categoria",
+    "searching": "Ricerca...",
+    "clearButton": "Pulisci",
     "noResults": "Nessun risultato",
     "tryAnotherSearch": "Prova con un'altra ricerca",
     "searchPromptTitle": "Cerca ingredienti",
@@ -273,7 +276,34 @@
     "popularCategories": "Categorie popolari",
     "quickAdd": "Aggiungi velocemente",
     "selectAtLeastOne": "Seleziona almeno un ingrediente",
-    "ingredients": "ingredienti"
+    "errors": {
+      "permissionDenied": "Permessi camera negati. Vai nelle Impostazioni per abilitarli.",
+      "permissionDeniedIOS": "Permessi camera negati su iOS",
+      "cameraNotFound": "Camera non trovata",
+      "cameraNotFoundDevice": "Nessuna camera trovata su questo dispositivo.",
+      "iOSCameraError": "Errore accesso camera iOS",
+      "unknownError": "Errore sconosciuto",
+      "safariIOS": "Camera diretta non disponibile su Safari iOS. Usa il pulsante \"Scatta Foto con Camera iPhone\".",
+      "apiNotAvailable": "Le API della camera non sono disponibili su questo browser.",
+      "getUserMediaNotAvailable": "getUserMedia non è disponibile su questo browser.",
+      "insecureConnection": "Connessione non sicura. La camera richiede HTTPS.",
+      "unsupportedBrowser": "Camera non supportata su questo browser.",
+      "permissionCheckError": "Errore nel test dei permessi"
+    },
+    "success": {
+      "iOSCameraActivated": "Camera iOS attivata con successo!",
+      "permissionGranted": "Permessi camera concessi!",
+      "permissionAlreadyGranted": "Permessi camera già concessi!"
+    },
+    "selectValidImageFile": "Seleziona un file immagine valido",
+    "invalidCameraFile": "File non valido dalla camera",
+    "photoTakenSuccess": "Foto scattata con successo!",
+    "cameraFileReadError": "Errore nella lettura della foto",
+    "noIngredientsToUse": "Nessun ingrediente da utilizzare",
+    "recipeGenerationError": "Errore nella generazione delle ricette",
+    "categorySearchSuccess": "ingredienti trovati per",
+    "categorySearchEmpty": "Nessun ingrediente trovato per",
+    "categorySearchError": "Errore nella ricerca per categoria"
   },
   "savedRecipes": {
     "title": "Ricette Salvate",

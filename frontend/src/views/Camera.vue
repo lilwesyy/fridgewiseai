@@ -109,19 +109,19 @@
             <div v-if="searchQuery.length >= 2 || searchResults.length > 0" class="space-y-3">
               <div class="flex items-center justify-between mb-3">
                 <h3 class="text-sm font-medium text-gray-700">
-                  {{ searchQuery.length >= 2 ? $t('camera.searchResults') : 'Risultati categoria' }}
+                  {{ searchQuery.length >= 2 ? $t('camera.searchResults') : $t('camera.categoryResults') }}
                 </h3>
                 <div class="flex items-center space-x-2">
                   <div v-if="isSearching" class="flex items-center text-blue-600">
                     <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                    <span class="text-xs">Ricerca...</span>
+                    <span class="text-xs">{{ $t('camera.searching') }}</span>
                   </div>
                   <button 
                     v-if="searchResults.length > 0 && searchQuery.length === 0"
                     @click="clearCategoryResults"
                     class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded border border-gray-300 hover:border-gray-400 transition-colors"
                   >
-                    Pulisci
+                    {{ $t('camera.clearButton') }}
                   </button>
                 </div>
               </div>
@@ -1362,7 +1362,7 @@ const capturePhoto = () => {
       isStreamActive: isStreamActive.value,
       useIOSWorkaround: useIOSWorkaround.value
     })
-    toast.error('Camera non pronta')
+    toast.error(t('camera.errors.cameraNotReady'))
     return
   }
 
@@ -1403,7 +1403,7 @@ const capturePhoto = () => {
     
   } catch (error) {
     console.error('Error capturing photo:', error)
-    toast.error('Errore nella cattura della foto')
+    toast.error(t('camera.errors.captureError'))
   }
 }
 
@@ -1504,7 +1504,7 @@ const forceIOSCameraRequest = async () => {
     isStreamActive.value = true
     useIOSWorkaround.value = true
     
-    toast.success('Camera iOS attivata con successo!')
+    toast.success(t('camera.success.iOSCameraActivated'))
     console.log('Forced iOS camera access successful')
     
   } catch (error) {
@@ -1516,14 +1516,14 @@ const forceIOSCameraRequest = async () => {
     
     // Provide specific error messages
     if (error.name === 'NotAllowedError') {
-      cameraError.value = 'Permessi camera negati. Controlla le impostazioni Safari e riprova.'
-      toast.error('Permessi camera negati su iOS')
+      cameraError.value = t('camera.errors.permissionDenied')
+      toast.error(t('camera.errors.permissionDeniedIOS'))
     } else if (error.name === 'NotFoundError') {
-      cameraError.value = 'Nessuna camera trovata su questo dispositivo iOS.'
-      toast.error('Camera non trovata')
+      cameraError.value = t('camera.errors.cameraNotFoundDevice')
+      toast.error(t('camera.errors.cameraNotFound'))
     } else {
-      cameraError.value = 'Impossibile accedere alla camera iOS. Usa "Scatta Foto con Camera iPhone".'
-      toast.error('Errore accesso camera iOS: ' + (error.message || 'Errore sconosciuto'))
+      cameraError.value = t('camera.errors.safariIOS')
+      toast.error(t('camera.errors.iOSCameraError') + ': ' + (error.message || t('camera.errors.unknownError')))
     }
     
     permissionDenied.value = true
@@ -1553,11 +1553,11 @@ const testCameraPermissions = async () => {
     if (!navigator.mediaDevices) {
       console.error('navigator.mediaDevices not available')
       if (deviceInfo.value.isIOS) {
-        toast.info('Camera diretta non disponibile su Safari iOS. Usa il pulsante "Scatta Foto con Camera iPhone".')
-        cameraError.value = 'Camera diretta non supportata. Usa il pulsante "Scatta Foto con Camera iPhone" per scattare foto.'
+        toast.info(t('camera.errors.safariIOS'))
+        cameraError.value = t('camera.errors.safariIOS')
       } else {
-        toast.error('Le API della camera non sono disponibili su questo browser.')
-        cameraError.value = 'Le API della camera non sono supportate. Assicurati di essere su HTTPS o usa "Carica da Galleria".'
+        toast.error(t('camera.errors.apiNotAvailable'))
+        cameraError.value = t('camera.errors.apiNotAvailable')
       }
       permissionDenied.value = true
       return
@@ -1567,11 +1567,11 @@ const testCameraPermissions = async () => {
     if (!navigator.mediaDevices.getUserMedia) {
       console.error('getUserMedia not available')
       if (deviceInfo.value.isIOS) {
-        toast.info('getUserMedia non disponibile su Safari iOS. Usa il pulsante "Scatta Foto con Camera iPhone".')
-        cameraError.value = 'Camera diretta non supportata. Usa il pulsante "Scatta Foto con Camera iPhone" per scattare foto.'
+        toast.info(t('camera.errors.getUserMediaIOS'))
+        cameraError.value = t('camera.errors.safariIOS')
       } else {
-        toast.error('getUserMedia non è disponibile su questo browser.')
-        cameraError.value = 'La funzione camera non è supportata. Usa "Carica da Galleria".'
+        toast.error(t('camera.errors.getUserMediaNotAvailable'))
+        cameraError.value = t('camera.errors.unsupportedBrowser')
       }
       permissionDenied.value = true
       return
@@ -1580,8 +1580,8 @@ const testCameraPermissions = async () => {
     // Check if we're in a secure context
     if (!window.isSecureContext) {
       console.error('Not in secure context')
-      toast.error('Connessione non sicura. La camera richiede HTTPS.')
-      cameraError.value = 'La camera richiede una connessione sicura (HTTPS). Usa "Carica da Galleria".'
+      toast.error(t('camera.errors.insecureConnection'))
+      cameraError.value = t('camera.errors.insecureConnection')
       permissionDenied.value = true
       return
     }
@@ -1593,12 +1593,12 @@ const testCameraPermissions = async () => {
     console.log('Permission status:', permissionStatus)
     
     if (permissionStatus === 'denied') {
-      toast.error('Permessi camera negati. Vai nelle Impostazioni per abilitarli.')
+      toast.error(t('camera.errors.permissionDenied'))
       return
     }
     
     if (permissionStatus === 'granted') {
-      toast.success('Permessi camera già concessi!')
+      toast.success(t('camera.success.permissionAlreadyGranted'))
       // Try to initialize camera
       setTimeout(() => requestPermission(), 500)
       return
@@ -1615,7 +1615,7 @@ const testCameraPermissions = async () => {
       })
       
       console.log('Permission granted! Stream obtained.')
-      toast.success('Permessi camera concessi!')
+      toast.success(t('camera.success.permissionGranted'))
       
       // Stop the test stream
       testStream.getTracks().forEach(track => track.stop())
@@ -1627,28 +1627,28 @@ const testCameraPermissions = async () => {
       console.error('Permission test failed:', error)
       
       if (error.name === 'NotAllowedError') {
-        toast.error('Permessi camera negati. Controlla le impostazioni Safari.')
-        cameraError.value = 'Permessi camera negati. Segui le istruzioni qui sopra.'
+        toast.error(t('camera.errors.permissionDenied'))
+        cameraError.value = t('camera.errors.permissionDenied')
         permissionDenied.value = true
       } else if (error.name === 'NotFoundError') {
-        toast.error('Nessuna camera trovata su questo dispositivo.')
-        cameraError.value = 'Nessuna camera disponibile. Usa "Carica da Galleria".'
+        toast.error(t('camera.errors.cameraNotFoundDevice'))
+        cameraError.value = t('camera.errors.cameraNotFoundDevice')
         permissionDenied.value = true
       } else if (error.name === 'NotSupportedError') {
-        toast.error('Camera non supportata su questo browser.')
-        cameraError.value = 'Camera non supportata. Usa "Carica da Galleria".'
+        toast.error(t('camera.errors.unsupportedBrowser'))
+        cameraError.value = t('camera.errors.unsupportedBrowser')
         permissionDenied.value = true
       } else {
-        toast.error('Errore nel test dei permessi: ' + (error.message || 'Errore sconosciuto'))
-        cameraError.value = 'Errore nel test della camera. Usa "Carica da Galleria".'
+        toast.error(t('camera.errors.permissionCheckError') + ': ' + (error.message || t('camera.errors.unknownError')))
+        cameraError.value = t('camera.errors.permissionCheckError')
         permissionDenied.value = true
       }
     }
     
   } catch (error) {
     console.error('Error testing permissions:', error)
-    toast.error('Errore nel test dei permessi: ' + (error.message || 'Errore sconosciuto'))
-    cameraError.value = 'Errore nel test della camera. Usa "Carica da Galleria".'
+    toast.error(t('camera.errors.permissionCheckError') + ': ' + (error.message || t('camera.errors.unknownError')))
+    cameraError.value = t('camera.errors.permissionCheckError')
     permissionDenied.value = true
   }
 }
@@ -1659,7 +1659,7 @@ const handleFileSelect = (event) => {
   if (!file) return
 
   if (!file.type.startsWith('image/')) {
-    toast.error('Seleziona un file immagine valido')
+    toast.error(t('camera.selectValidImageFile'))
     return
   }
 
@@ -1670,7 +1670,7 @@ const handleFileSelect = (event) => {
     processImage()
   }
   reader.onerror = () => {
-    toast.error('Errore nella lettura del file')
+    toast.error(t('camera.fileReadError'))
   }
   reader.readAsDataURL(file)
 }
@@ -1695,7 +1695,7 @@ const handleCameraCapture = (event) => {
   console.log('Using iOS camera capture fallback method')
 
   if (!file.type.startsWith('image/')) {
-    toast.error('File non valido dalla camera')
+    toast.error(t('camera.invalidCameraFile'))
     return
   }
 
@@ -1704,12 +1704,12 @@ const handleCameraCapture = (event) => {
     console.log('Camera image loaded successfully')
     capturedImage.value = e.target.result
     cleanup() // Stop any running camera stream
-    toast.success('Foto scattata con successo!')
+    toast.success(t('camera.photoTakenSuccess'))
     processImage()
   }
   reader.onerror = () => {
     console.error('Error reading camera file')
-    toast.error('Errore nella lettura della foto')
+    toast.error(t('camera.cameraFileReadError'))
   }
   
   // Reset the input for future captures
@@ -1762,7 +1762,7 @@ const clearAndRetake = () => {
 // Generate recipe from detected ingredients
 const generateRecipe = async () => {
   if (detectedIngredients.value.length === 0) {
-    toast.error('Nessun ingrediente da utilizzare')
+    toast.error(t('camera.noIngredientsToUse'))
     return
   }
 
@@ -1780,7 +1780,7 @@ const generateRecipe = async () => {
     
   } catch (error) {
     console.error('Error generating recipe:', error)
-    toast.error('Errore nella generazione delle ricette')
+    toast.error(t('camera.recipeGenerationError'))
   } finally {
     processing.value = false
   }
@@ -1868,7 +1868,7 @@ const generateRecipeFromManual = async () => {
     
   } catch (error) {
     console.error('Error generating recipe from manual selection:', error)
-    toast.error('Errore nella generazione delle ricette')
+    toast.error(t('camera.recipeGenerationError'))
   }
 }
 
@@ -1976,14 +1976,14 @@ const searchByCategory = async (categoryName) => {
     
     // Show a toast with the category name and count
     if (results.length > 0) {
-      toast.success(`${results.length} ingredienti trovati per "${categoryName}"`)
+      toast.success(`${results.length} ${t('camera.categorySearchSuccess')} "${categoryName}"`)
     } else {
-      toast.info(`Nessun ingrediente trovato per "${categoryName}"`)
+      toast.info(`${t('camera.categorySearchEmpty')} "${categoryName}"`)
     }
   } catch (error) {
     console.error('Error searching by category:', error)
     searchResults.value = []
-    toast.error('Errore nella ricerca per categoria')
+    toast.error(t('camera.categorySearchError'))
   } finally {
     isSearching.value = false
   }

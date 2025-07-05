@@ -260,6 +260,9 @@
     "searchIngredients": "Search ingredients...",
     "selectedIngredients": "Selected Ingredients",
     "searchResults": "Search results",
+    "categoryResults": "Category results", 
+    "searching": "Searching...",
+    "clearButton": "Clear",
     "noResults": "No results",
     "tryAnotherSearch": "Try another search",
     "searchPromptTitle": "Search ingredients",
@@ -267,7 +270,29 @@
     "popularCategories": "Popular categories",
     "quickAdd": "Quick add",
     "selectAtLeastOne": "Select at least one ingredient",
-    "ingredients": "ingredients"
+    "ingredients": "ingredients",
+    "errors": {
+      "cameraNotReady": "Camera not ready",
+      "captureError": "Error capturing photo",
+      "cameraOpenError": "Error opening camera",
+      "iOSOnly": "This feature is only available on iOS",
+      "permissionDenied": "Camera permission denied. Go to Settings to enable.",
+      "permissionDeniedIOS": "Camera permission denied on iOS",
+      "cameraNotFound": "Camera not found",
+      "cameraNotFoundDevice": "No camera found on this device.",
+      "unsupportedBrowser": "Camera not supported on this browser.",
+      "apiNotAvailable": "Camera APIs not available on this browser.",
+      "getUserMediaNotAvailable": "getUserMedia not available on this browser.",
+      "insecureConnection": "Insecure connection. Camera requires HTTPS.",
+      "safariIOS": "Direct camera not available on Safari iOS. Use the \"Take Photo with iPhone Camera\" button.",
+      "getUserMediaIOS": "getUserMedia not available on Safari iOS. Use the \"Take Photo with iPhone Camera\" button.",
+      "permissionCheckError": "Error testing permissions"
+    },
+    "success": {
+      "iOSCameraActivated": "iOS camera activated successfully!",
+      "permissionGranted": "Camera permissions granted!",
+      "permissionAlreadyGranted": "Camera permissions already granted!"
+    }
   },
   "recipes": {
     "title": "Your Recipes",
