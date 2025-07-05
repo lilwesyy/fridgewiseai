@@ -599,14 +599,61 @@ const searchResults = ref([])
 const isSearching = ref(false)
 const searchDebounceTimeout = ref(null)
 
-const popularCategories = ref([
-  { name: 'Verdure', emoji: '🥬', count: 15 },
-  { name: 'Frutta', emoji: '🍎', count: 12 },
-  { name: 'Carne', emoji: '🥩', count: 8 },
-  { name: 'Formaggi', emoji: '🧀', count: 6 },
-  { name: 'Spezie', emoji: '🌿', count: 10 },
-  { name: 'Cereali', emoji: '🌾', count: 7 }
-])
+const popularCategories = computed(() => {
+  const baseCategories = [
+    { key: 'vegetables', emoji: '🥬', count: 15 },
+    { key: 'fruit', emoji: '🍎', count: 12 },
+    { key: 'meat', emoji: '🥩', count: 8 },
+    { key: 'cheese', emoji: '🧀', count: 6 },
+    { key: 'spices', emoji: '🌿', count: 10 },
+    { key: 'grains', emoji: '🌾', count: 7 }
+  ]
+  
+  // Mappa le chiavi alle traduzioni localizzate
+  const categoryMapping = {
+    'it': {
+      'vegetables': 'Verdure',
+      'fruit': 'Frutta', 
+      'meat': 'Carne',
+      'cheese': 'Formaggi',
+      'spices': 'Spezie',
+      'grains': 'Cereali'
+    },
+    'en': {
+      'vegetables': 'Vegetables',
+      'fruit': 'Fruit',
+      'meat': 'Meat', 
+      'cheese': 'Cheese',
+      'spices': 'Spices',
+      'grains': 'Grains'
+    },
+    'fr': {
+      'vegetables': 'Légumes',
+      'fruit': 'Fruits',
+      'meat': 'Viande',
+      'cheese': 'Fromage', 
+      'spices': 'Épices',
+      'grains': 'Céréales'
+    },
+    'de': {
+      'vegetables': 'Gemüse',
+      'fruit': 'Obst',
+      'meat': 'Fleisch',
+      'cheese': 'Käse',
+      'spices': 'Gewürze', 
+      'grains': 'Getreide'
+    }
+  }
+  
+  const currentLocale = $i18n.locale
+  const translations = categoryMapping[currentLocale] || categoryMapping['en']
+  
+  return baseCategories.map(category => ({
+    name: translations[category.key] || category.key,
+    emoji: category.emoji,
+    count: category.count
+  }))
+})
 
 const quickAddIngredients = ref([])
 
