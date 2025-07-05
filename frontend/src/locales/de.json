@@ -335,6 +335,12 @@
       "subtitle": "Beginnen Sie mit dem Scannen von Zutaten, um Ihr erstes Rezept zu generieren!",
       "action": "Zutaten scannen"
     },
+    "cookingModePrompt": {
+      "title": "Mit dem Kochen beginnen?",
+      "message": "Möchten Sie sofort mit dem Kochen dieses Rezepts im geführten Modus beginnen?",
+      "confirm": "Kochen beginnen",
+      "cancel": "Weiter stöbern"
+    },
     "donationToast": "Gefällt Ihnen die App? Erwägen Sie eine Spende zur Unterstützung der Entwicklung! 💝"
   },
   "donation": {

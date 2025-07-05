@@ -1,6 +1,6 @@
 import axios from 'axios'
 import FormData from 'form-data'
-import { translateIngredients } from '../utils/ingredientTranslations.js'
+import { translateIngredient } from '../utils/ingredientTranslations.js'
 
 class RecognizeAnythingService {
   constructor() {
@@ -103,22 +103,17 @@ class RecognizeAnythingService {
       return uniqueIngredients
     }
     
-    // Traduci usando LibreTranslate
-    try {
-      console.log(`🌍 Translating ${uniqueIngredients.length} ingredients from English to ${locale}...`)
-      const translatedIngredients = await translateIngredients(uniqueIngredients, 'en', locale)
-      console.log('✅ Translation successful:', translatedIngredients)
-      return translatedIngredients
-    } catch (error) {
-      console.warn('⚠️ LibreTranslate translation failed, falling back to static dictionary:', error.message)
-      
-      // Fallback al dizionario statico
-      const fallbackTranslated = uniqueIngredients
-        .map(ingredient => this.translateIngredient(ingredient.toLowerCase(), locale))
-        .filter(ingredient => ingredient)
-      
-      return fallbackTranslated
-    }
+    // Traduci usando SOLO LibreTranslate
+    console.log(`🌍 Translating ${uniqueIngredients.length} ingredients from English to ${locale}...`)
+    const translatedIngredients = await Promise.all(
+      uniqueIngredients.map(async (ingredient) => {
+        const translation = await translateIngredient(ingredient, locale)
+        console.log(`✅ Translated: ${ingredient} → ${translation}`)
+        return translation
+      })
+    )
+    
+    return translatedIngredients
   }
 
   /**

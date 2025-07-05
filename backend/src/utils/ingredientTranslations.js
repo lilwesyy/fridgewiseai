@@ -91,28 +91,39 @@ async function translateWithAPI(text, sourceLang = 'en', targetLang = 'it', time
   const url = 'http://localhost:5000/translate'
   
   const requestData = {
-    q: text,
+    q: text.toLowerCase(),
     source: sourceLang,
     target: targetLang
   }
 
-  const response = await axios.post(url, requestData, {
-    timeout,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+  try {
+    const response = await axios.post(url, requestData, {
+      timeout,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
 
-  if (response.data && response.data.translatedText) {
-    const translation = response.data.translatedText
-    
-    // Verifica che la traduzione sia valida
-    if (translation && translation.toLowerCase() !== text.toLowerCase()) {
-      return translation
+    console.log(`🔍 LibreTranslate response for "${text}":`, response.data)
+
+    if (response.data && response.data.translatedText) {
+      let translation = response.data.translatedText
+      
+      // Capitalizza la prima lettera per mantenere la formattazione
+      if (translation && translation.trim()) {
+        translation = translation.charAt(0).toUpperCase() + translation.slice(1)
+        return translation
+      }
     }
+
+    throw new Error(`Invalid response: ${JSON.stringify(response.data)}`)
+  } catch (error) {
+    if (error.response) {
+      console.error(`❌ LibreTranslate HTTP ${error.response.status}:`, error.response.data)
+      throw new Error(`LibreTranslate HTTP ${error.response.status}: ${JSON.stringify(error.response.data)}`)
+    }
+    throw error
   }
-
-  throw new Error('Invalid response from LibreTranslate API')
 }
 
 /**

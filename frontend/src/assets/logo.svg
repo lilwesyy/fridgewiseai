@@ -1,0 +1,32 @@
+<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="20" cy="20" r="18" fill="url(#primaryGradient)"/>
+  
+  <!-- Letter F -->
+  <path d="M10 12 L10 28 L12 28 L12 21 L20 21 L20 19 L12 19 L12 14 L22 14 L22 12 Z" fill="white" font-weight="bold"/>
+  
+  <!-- Smart spark/circuit element -->
+  <g transform="translate(24, 16)">
+    <!-- Central node -->
+    <circle cx="4" cy="4" r="1.5" fill="#4ade80"/>
+    
+    <!-- Connection lines -->
+    <line x1="4" y1="2.5" x2="4" y2="0" stroke="#86efac" stroke-width="1"/>
+    <line x1="5.5" y1="4" x2="8" y2="4" stroke="#86efac" stroke-width="1"/>
+    <line x1="4" y1="5.5" x2="4" y2="8" stroke="#86efac" stroke-width="1"/>
+    <line x1="2.5" y1="4" x2="0" y2="4" stroke="#86efac" stroke-width="1"/>
+    
+    <!-- End nodes -->
+    <circle cx="4" cy="0" r="0.5" fill="#86efac"/>
+    <circle cx="8" cy="4" r="0.5" fill="#86efac"/>
+    <circle cx="4" cy="8" r="0.5" fill="#86efac"/>
+    <circle cx="0" cy="4" r="0.5" fill="#86efac"/>
+  </g>
+</svg>

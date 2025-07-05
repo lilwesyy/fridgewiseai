@@ -341,6 +341,12 @@
       "subtitle": "Inizia scansionando alcuni ingredienti per generare la tua prima ricetta!",
       "action": "Scansiona Ingredienti"
     },
+    "cookingModePrompt": {
+      "title": "Iniziare a Cucinare?",
+      "message": "Vuoi iniziare subito a cucinare questa ricetta in modalità guidata?",
+      "confirm": "Inizia a Cucinare",
+      "cancel": "Continua a Navigare"
+    },
     "donationToast": "Ti piace l'app? Considera una donazione per supportare lo sviluppo! 💝"
   },
   "donation": {

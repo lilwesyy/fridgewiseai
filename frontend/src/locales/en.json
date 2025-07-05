@@ -317,6 +317,12 @@
       "subtitle": "Start by scanning some ingredients to generate your first recipe!",
       "action": "Scan Ingredients"
     },
+    "cookingModePrompt": {
+      "title": "Start Cooking?",
+      "message": "Would you like to start cooking this recipe in guided mode right away?",
+      "confirm": "Start Cooking",
+      "cancel": "Continue Browsing"
+    },
     "donationToast": "Enjoying the app? Consider a donation to support development! 💝"
   },
   "donation": {

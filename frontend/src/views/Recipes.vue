@@ -295,6 +295,46 @@
         </div>
       </div>
     </div>
+
+    <!-- Cooking Mode Prompt Modal -->
+    <div 
+      v-if="showCookingModeModal" 
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      @click="closeCookingModeModal"
+    >
+      <div 
+        class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl transform transition-all"
+        @click.stop
+      >
+        <div class="text-center">
+          <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+          
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('recipes.cookingModePrompt.title') }}</h3>
+          <p class="text-gray-600 mb-6">{{ $t('recipes.cookingModePrompt.message') }}</p>
+          
+          <div class="flex space-x-3">
+            <BaseButton 
+              variant="secondary" 
+              @click="continueBrowsing"
+              class="flex-1"
+            >
+              {{ $t('recipes.cookingModePrompt.cancel') }}
+            </BaseButton>
+            <BaseButton 
+              variant="primary" 
+              @click="enterCookingMode"
+              class="flex-1"
+            >
+              {{ $t('recipes.cookingModePrompt.confirm') }}
+            </BaseButton>
+          </div>
+        </div>
+      </div>
+    </div>
   </AuthenticatedLayout>
 </template>
 
@@ -324,6 +364,8 @@ export default {
       activeFilter: 'all',
       selectedRecipe: null,
       savedRecipes: [],
+      showCookingModeModal: false,
+      cookingModeRecipe: null,
       preferences: {
         servings: 4,
         difficulty: 'easy',
@@ -469,6 +511,9 @@ export default {
           await userDataService.addSavedRecipe(recipeId)
           this.savedRecipes.push(recipeId)
           this.toast.success(this.$t('notifications.recipes.saveSuccess'))
+          
+          // Ask if user wants to enter cooking mode
+          this.showCookingModePrompt(recipe)
         }
       } catch (error) {
         console.error('Failed to save recipe:', error)
@@ -487,6 +532,12 @@ export default {
           await userDataService.addSavedRecipe(recipeId)
           this.savedRecipes.push(recipeId)
           this.toast.success(this.$t('notifications.recipes.saveSuccess'))
+          
+          // Find the recipe and ask if user wants to enter cooking mode
+          const recipe = this.recipes.find(r => (r._id || r.id) === recipeId)
+          if (recipe) {
+            this.showCookingModePrompt(recipe)
+          }
         }
       } catch (error) {
         console.error('Failed to toggle saved recipe:', error)
@@ -546,6 +597,31 @@ export default {
           DonationHelper.markDonationToastShown()
         }, 2000)
       }
+    },
+
+    showCookingModePrompt(recipe) {
+      this.cookingModeRecipe = recipe
+      this.showCookingModeModal = true
+    },
+
+    closeCookingModeModal() {
+      this.showCookingModeModal = false
+      this.cookingModeRecipe = null
+    },
+
+    enterCookingMode() {
+      if (this.cookingModeRecipe) {
+        // Navigate to cooking mode with the recipe data
+        this.$router.push({
+          path: `/app/cooking/recipe-${this.cookingModeRecipe._id || this.cookingModeRecipe.id}`,
+          state: { recipe: this.cookingModeRecipe }
+        })
+      }
+      this.closeCookingModeModal()
+    },
+
+    continueBrowsing() {
+      this.closeCookingModeModal()
     }
   }
 }

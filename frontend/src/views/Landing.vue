@@ -14,10 +14,8 @@
         <div class="flex justify-between items-center h-16">
           <!-- Logo -->
           <div class="flex items-center">
-            <div class="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
-              </svg>
+            <div class="w-10 h-10 flex items-center justify-center">
+              <img src="@/assets/logo.svg" alt="FridgeWise AI Logo" class="w-10 h-10">
             </div>
             <span class="ml-3 text-xl font-bold text-gray-900">FridgeWise AI</span>
           </div>
@@ -433,10 +431,8 @@
           <!-- Company Info -->
           <div class="col-span-1 md:col-span-2">
             <div class="flex items-center mb-6">
-              <div class="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
-                </svg>
+              <div class="w-10 h-10 flex items-center justify-center">
+                <img src="@/assets/logo.svg" alt="FridgeWise AI Logo" class="w-10 h-10">
               </div>
               <span class="ml-3 text-xl font-bold">FridgeWise AI</span>
             </div>
