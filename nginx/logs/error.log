@@ -274,3 +274,45 @@
 2025/07/05 17:58:56 [error] 21#21: *462 connect() failed (111: Connection refused) while connecting to upstream, client: 37.183.10.67, server: fridgewiseai.com, request: "POST /api/auth/login HTTP/2.0", upstream: "http://172.18.0.5:3000/api/auth/login", host: "fridgewiseai.com", referrer: "https://fridgewiseai.com/auth"
 2025/07/05 17:59:00 [error] 21#21: *475 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fridgewiseai.com, request: "GET /api/ingredients-database/search?q=pomodoro&locale=it HTTP/2.0", upstream: "http://172.18.0.5:3000/api/ingredients-database/search?q=pomodoro&locale=it", host: "localhost"
 2025/07/05 17:59:51 [error] 21#21: *462 connect() failed (111: Connection refused) while connecting to upstream, client: 37.183.10.67, server: fridgewiseai.com, request: "POST /api/auth/login HTTP/2.0", upstream: "http://172.18.0.5:3000/api/auth/login", host: "fridgewiseai.com", referrer: "https://fridgewiseai.com/auth"
+2025/07/05 18:03:06 [warn] 21#21: *512 a client request body is buffered to a temporary file /var/cache/nginx/client_temp/0000000017, client: 37.183.10.67, server: fridgewiseai.com, request: "POST /api/ingredients/detect HTTP/2.0", host: "fridgewiseai.com", referrer: "https://fridgewiseai.com/app/camera"
+2025/07/05 18:03:48 [warn] 21#21: *515 a client request body is buffered to a temporary file /var/cache/nginx/client_temp/0000000018, client: 37.183.10.67, server: fridgewiseai.com, request: "POST /api/ingredients/detect HTTP/2.0", host: "fridgewiseai.com", referrer: "https://fridgewiseai.com/app/camera"
+2025/07/05 18:05:38 [error] 21#21: *517 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env HTTP/1.1", host: "fridgewiseai.com"
+2025/07/05 18:05:39 [error] 21#21: *520 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.local HTTP/1.1", host: "fridgewiseai.com"
+2025/07/05 18:05:39 [error] 21#21: *521 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.prod HTTP/1.1", host: "fridgewiseai.com"
+2025/07/05 18:05:39 [error] 21#21: *522 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.dev HTTP/1.1", host: "fridgewiseai.com"
+2025/07/05 18:05:40 [error] 21#21: *523 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env HTTP/1.1", host: "www.fridgewiseai.com"
+2025/07/05 18:05:40 [error] 21#21: *524 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.local HTTP/1.1", host: "www.fridgewiseai.com"
+2025/07/05 18:05:40 [error] 21#21: *525 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.prod HTTP/1.1", host: "www.fridgewiseai.com"
+2025/07/05 18:05:41 [error] 21#21: *526 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.dev HTTP/1.1", host: "www.fridgewiseai.com"
+2025/07/05 18:06:07 [warn] 21#21: *527 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/9/01/0000000019 while reading upstream, client: 154.28.229.162, server: fridgewiseai.com, request: "GET /assets/index-CQrAeSSf.js HTTP/1.1", upstream: "http://172.18.0.6:80/assets/index-CQrAeSSf.js", host: "fridgewiseai.com"
+2025/07/05 18:06:31 [warn] 21#21: *533 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/0/02/0000000020 while reading upstream, client: 154.28.229.162, server: fridgewiseai.com, request: "GET /assets/index-CQrAeSSf.js HTTP/1.1", upstream: "http://172.18.0.6:80/assets/index-CQrAeSSf.js", host: "fridgewiseai.com"
+2025/07/05 18:06:31 [warn] 22#22: *534 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/02/0000000021 while reading upstream, client: 154.28.229.162, server: fridgewiseai.com, request: "GET /assets/index-CQrAeSSf.js HTTP/1.1", upstream: "http://172.18.0.6:80/assets/index-CQrAeSSf.js", host: "fridgewiseai.com"
+2025/07/05 18:06:31 [warn] 21#21: *536 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/02/0000000022 while reading upstream, client: 154.28.229.162, server: fridgewiseai.com, request: "GET /assets/index-CQrAeSSf.js HTTP/1.1", upstream: "http://172.18.0.6:80/assets/index-CQrAeSSf.js", host: "fridgewiseai.com"
+2025/07/05 18:11:07 [error] 21#21: *574 access forbidden by rule, client: 199.45.154.138, server: fridgewiseai.com, request: "GET /.well-known/security.txt HTTP/1.1", host: "www.fridgewiseai.com"
+2025/07/05 18:30:14 [error] 21#21: *596 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env HTTP/1.1", host: "fridgewiseai.com"
+2025/07/05 18:30:16 [error] 21#21: *597 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.local HTTP/1.1", host: "fridgewiseai.com"
+2025/07/05 18:30:18 [error] 21#21: *598 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.prod HTTP/1.1", host: "fridgewiseai.com"
+2025/07/05 18:30:20 [error] 21#21: *599 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.dev HTTP/1.1", host: "fridgewiseai.com"
+2025/07/05 18:30:27 [error] 21#21: *600 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env HTTP/1.1", host: "www.fridgewiseai.com"
+2025/07/05 18:30:29 [error] 21#21: *601 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.local HTTP/1.1", host: "www.fridgewiseai.com"
+2025/07/05 18:30:31 [error] 21#21: *602 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.prod HTTP/1.1", host: "www.fridgewiseai.com"
+2025/07/05 18:30:34 [error] 21#21: *603 access forbidden by rule, client: 104.244.74.39, server: fridgewiseai.com, request: "HEAD /.env.dev HTTP/1.1", host: "www.fridgewiseai.com"
+2025/07/05 18:37:38 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2025/07/05 18:37:38 [notice] 22#22: gracefully shutting down
+2025/07/05 18:37:38 [notice] 21#21: gracefully shutting down
+2025/07/05 18:37:38 [notice] 24#24: gracefully shutting down
+2025/07/05 18:37:38 [notice] 24#24: exiting
+2025/07/05 18:37:38 [notice] 22#22: exiting
+2025/07/05 18:37:38 [notice] 23#23: gracefully shutting down
+2025/07/05 18:37:38 [notice] 23#23: exiting
+2025/07/05 18:37:38 [notice] 21#21: exiting
+2025/07/05 18:37:38 [notice] 24#24: exit
+2025/07/05 18:37:38 [notice] 22#22: exit
+2025/07/05 18:37:38 [notice] 23#23: exit
+2025/07/05 18:37:38 [notice] 21#21: exit
+2025/07/05 18:37:38 [notice] 1#1: signal 17 (SIGCHLD) received from 24
+2025/07/05 18:37:38 [notice] 1#1: worker process 23 exited with code 0
+2025/07/05 18:37:38 [notice] 1#1: worker process 22 exited with code 0
+2025/07/05 18:37:38 [notice] 1#1: worker process 24 exited with code 0
+2025/07/05 18:37:38 [notice] 1#1: worker process 21 exited with code 0
+2025/07/05 18:37:38 [notice] 1#1: exit
