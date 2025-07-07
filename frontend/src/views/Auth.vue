@@ -3,10 +3,8 @@
     <div class="max-w-md mx-auto w-full">
       <!-- Logo with entrance animation -->
       <div class="text-center mb-8 animate-fade-in-down">
-        <div class="w-16 h-16 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl mx-auto flex items-center justify-center shadow-lg mb-4 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
-          <svg class="w-8 h-8 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
-          </svg>
+        <div class="w-16 h-16 bg-white rounded-xl mx-auto flex items-center justify-center shadow-lg mb-4 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+          <img src="@/assets/black_simbol.svg" alt="FridgeWise Logo" class="w-10 h-10">
         </div>
         <h1 class="text-2xl font-bold text-gray-900 animate-fade-in">{{ t('app.name') }}</h1>
         <p class="text-gray-600 mt-2 animate-fade-in-up">{{ t('app.tagline') }}</p>
