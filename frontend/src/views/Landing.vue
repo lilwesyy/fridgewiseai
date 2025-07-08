@@ -24,7 +24,7 @@
           <div class="hidden md:flex items-center space-x-6">
             <a href="#features" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.features') }}</a>
             <a href="#how-it-works" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.howItWorks') }}</a>
-            <a href="#about" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.about') }}</a>
+            <!-- <a href="#about" class="text-gray-700 hover:text-primary-600 font-medium">{{ t('landing.nav.about') }}</a> -->
             
             <!-- Language Selector -->
             <div class="relative">
