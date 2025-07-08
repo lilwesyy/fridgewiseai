@@ -12,7 +12,8 @@
       "Bash(ls:*)",
       "Bash(ip route:*)",
       "Bash(sed:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
