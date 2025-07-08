@@ -10,6 +10,7 @@ import Recipes from '@/views/Recipes.vue'
 import SavedRecipes from '@/views/SavedRecipes.vue'
 import Profile from '@/views/Profile.vue'
 import CookingMode from '@/views/CookingMode.vue'
+import Analytics from '@/views/Analytics.vue'
 
 const routes = [
   {
@@ -66,6 +67,12 @@ const routes = [
         name: 'CookingMode',
         component: CookingMode,
         meta: { requiresAuth: true }
+      },
+      {
+        path: 'analytics',
+        name: 'Analytics',
+        component: Analytics,
+        meta: { requiresAuth: true, requiresAdmin: true }
       }
     ]
   }
@@ -89,6 +96,8 @@ router.beforeEach(async (to, from, next) => {
     next('/auth')
   } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
     next('/app/home')
+  } else if (to.meta.requiresAdmin && authStore.user?.email !== 'mirco.carp@icloud.com') {
+    next('/app/home') // Redirect non-admin users to home
   } else {
     next()
   }

@@ -55,7 +55,8 @@
     "camera": "Camera",
     "recipes": "Recipes",
     "saved": "Saved",
-    "profile": "Profile"
+    "profile": "Profile",
+    "analytics": "Analytics"
   },
   "notifications": {
     "auth": {
@@ -515,5 +516,75 @@
     "languagePreferenceSaved": "Language preference saved",
     "languagePreferenceFailed": "Failed to save language preference",
     "clickToChangePhoto": "Click to change photo"
+  },
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "subtitle": "Admin panel for statistics and monitoring",
+    "stats": {
+      "totalUsers": "Registered Users",
+      "activeUsers": "Active Users (7d)",
+      "totalRecipes": "Generated Recipes",
+      "onlineUsers": "Online Users",
+      "today": "today",
+      "ofTotal": "of total",
+      "outOf": "of",
+      "total": "total"
+    },
+    "onlineUsers": {
+      "title": "Online Users",
+      "noUsers": "No users online at the moment"
+    },
+    "recentUsers": {
+      "title": "Last 5 Registered Users",
+      "viewAll": "View all"
+    },
+    "performance": {
+      "title": "Performance Metrics",
+      "systemMemory": "System Memory",
+      "used": "used",
+      "cpuCount": "CPU Count",
+      "systemUptime": "System Uptime",
+      "platform": "Platform",
+      "architecture": "Architecture",
+      "nodeProcess": "Node.js Process",
+      "heapUsed": "Heap Used",
+      "heapTotal": "Heap Total",
+      "processUptime": "Process Uptime",
+      "loading": "Loading performance metrics...",
+      "status": {
+        "good": "Good",
+        "warning": "Warning",
+        "critical": "Critical"
+      }
+    },
+    "geolocation": {
+      "title": "User Geographic Distribution",
+      "byCountry": "By Country ({countries} countries, {users} users with location)",
+      "noData": "No geolocation data available",
+      "cities": "{count} city | {count} cities",
+      "users": "{count} user | {count} users",
+      "topCities": "Top Cities",
+      "loading": "Loading geolocation data..."
+    },
+    "system": {
+      "title": "System Information",
+      "appVersion": "App Version",
+      "database": "Database",
+      "apiStatus": "API Status",
+      "lastUpdate": "Last Update",
+      "online": "Online",
+      "operational": "Operational"
+    },
+    "allUsers": {
+      "title": "All Registered Users ({count})",
+      "loading": "Loading users...",
+      "noUsers": "No users found",
+      "nameNotAvailable": "Name not available",
+      "registeredOn": "Registered on"
+    },
+    "common": {
+      "loading": "Loading data...",
+      "close": "Close"
+    }
   }
 }

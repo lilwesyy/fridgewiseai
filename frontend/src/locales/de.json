@@ -55,7 +55,8 @@
     "camera": "Kamera",
     "recipes": "Rezepte",
     "saved": "Gespeichert",
-    "profile": "Profil"
+    "profile": "Profil",
+    "analytics": "Analytics"
   },
   "notifications": {
     "auth": {
@@ -518,5 +519,75 @@
     "languagePreferenceSaved": "Spracheinstellung gespeichert",
     "languagePreferenceFailed": "Spracheinstellung konnte nicht gespeichert werden",
     "clickToChangePhoto": "Klicken Sie, um das Foto zu ändern"
+  },
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "subtitle": "Admin-Panel für Statistiken und Überwachung",
+    "stats": {
+      "totalUsers": "Registrierte Benutzer",
+      "activeUsers": "Aktive Benutzer (7T)",
+      "totalRecipes": "Generierte Rezepte",
+      "onlineUsers": "Online Benutzer",
+      "today": "heute",
+      "ofTotal": "von gesamt",
+      "outOf": "von",
+      "total": "gesamt"
+    },
+    "onlineUsers": {
+      "title": "Online Benutzer",
+      "noUsers": "Momentan keine Benutzer online"
+    },
+    "recentUsers": {
+      "title": "Letzte 5 Registrierte Benutzer",
+      "viewAll": "Alle anzeigen"
+    },
+    "performance": {
+      "title": "Leistungsmetriken",
+      "systemMemory": "Systemspeicher",
+      "used": "verwendet",
+      "cpuCount": "CPU-Anzahl",
+      "systemUptime": "System-Laufzeit",
+      "platform": "Plattform",
+      "architecture": "Architektur",
+      "nodeProcess": "Node.js Prozess",
+      "heapUsed": "Heap Verwendet",
+      "heapTotal": "Heap Gesamt",
+      "processUptime": "Prozess-Laufzeit",
+      "loading": "Lade Leistungsmetriken...",
+      "status": {
+        "good": "Gut",
+        "warning": "Warnung",
+        "critical": "Kritisch"
+      }
+    },
+    "geolocation": {
+      "title": "Geografische Benutzerverteilung",
+      "byCountry": "Nach Land ({countries} Länder, {users} Benutzer mit Standort)",
+      "noData": "Keine Geolokalisierungsdaten verfügbar",
+      "cities": "{count} Stadt | {count} Städte",
+      "users": "{count} Benutzer | {count} Benutzer",
+      "topCities": "Top Städte",
+      "loading": "Lade Geolokalisierungsdaten..."
+    },
+    "system": {
+      "title": "Systeminformationen",
+      "appVersion": "App-Version",
+      "database": "Datenbank",
+      "apiStatus": "API-Status",
+      "lastUpdate": "Letztes Update",
+      "online": "Online",
+      "operational": "Betriebsbereit"
+    },
+    "allUsers": {
+      "title": "Alle Registrierten Benutzer ({count})",
+      "loading": "Lade Benutzer...",
+      "noUsers": "Keine Benutzer gefunden",
+      "nameNotAvailable": "Name nicht verfügbar",
+      "registeredOn": "Registriert am"
+    },
+    "common": {
+      "loading": "Lade Daten...",
+      "close": "Schließen"
+    }
   }
 }

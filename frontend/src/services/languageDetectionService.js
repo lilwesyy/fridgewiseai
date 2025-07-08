@@ -152,7 +152,7 @@ export async function detectUserLanguage() {
 /**
  * Salva la preferenza di lingua nel localStorage e nei cookie
  */
-export function saveLanguagePreference(language, source = 'user') {
+export function saveLanguagePreference(language, source = 'localStorage') {
   if (!SUPPORTED_LANGUAGES.includes(language)) {
     console.warn(`Language ${language} is not supported`)
     return false

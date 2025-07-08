@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
     languageDetectionMetadata: {
       source: {
         type: String,
-        enum: ['ip', 'browser', 'fallback', 'ip-geolocation'],
+        enum: ['localStorage', 'ip-geolocation', 'browser', 'browser-accepted', 'default'],
         default: null
       },
       confidence: {
@@ -136,6 +136,40 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
     default: null
+  },
+  lastSeen: {
+    type: Date,
+    default: Date.now
+  },
+  location: {
+    country: {
+      type: String,
+      default: null
+    },
+    countryCode: {
+      type: String,
+      default: null
+    },
+    city: {
+      type: String,
+      default: null
+    },
+    region: {
+      type: String,
+      default: null
+    },
+    ip: {
+      type: String,
+      default: null
+    },
+    latitude: {
+      type: Number,
+      default: null
+    },
+    longitude: {
+      type: Number,
+      default: null
+    }
   }
 }, {
   timestamps: true

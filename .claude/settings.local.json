@@ -10,7 +10,8 @@
       "Bash(openssl verify:*)",
       "Bash(sudo ls:*)",
       "Bash(ls:*)",
-      "Bash(ip route:*)"
+      "Bash(ip route:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

@@ -26,8 +26,12 @@
 import MobileHeader from '../components/layout/MobileHeader.vue'
 import BottomNavigation from '../components/layout/BottomNavigation.vue'
 import { useI18n } from 'vue-i18n'
+import { useHeartbeat } from '@/composables/useHeartbeat'
 
 const { t } = useI18n()
+
+// Start heartbeat for all authenticated users
+useHeartbeat()
 
 const props = defineProps({
   showHeader: {

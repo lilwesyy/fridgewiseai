@@ -55,7 +55,8 @@
     "camera": "Caméra",
     "recipes": "Recettes",
     "saved": "Sauvées",
-    "profile": "Profil"
+    "profile": "Profil",
+    "analytics": "Analytics"
   },
   "landing": {
     "nav": {
@@ -518,5 +519,75 @@
     "languagePreferenceSaved": "Préférence de langue sauvegardée",
     "languagePreferenceFailed": "Impossible de sauvegarder la préférence de langue",
     "clickToChangePhoto": "Cliquez pour changer la photo"
+  },
+  "analytics": {
+    "title": "Tableau de bord Analytics",
+    "subtitle": "Panneau d'administration pour les statistiques et la surveillance",
+    "stats": {
+      "totalUsers": "Utilisateurs Inscrits",
+      "activeUsers": "Utilisateurs Actifs (7j)",
+      "totalRecipes": "Recettes Générées",
+      "onlineUsers": "Utilisateurs En Ligne",
+      "today": "aujourd'hui",
+      "ofTotal": "du total",
+      "outOf": "sur",
+      "total": "total"
+    },
+    "onlineUsers": {
+      "title": "Utilisateurs En Ligne",
+      "noUsers": "Aucun utilisateur en ligne pour le moment"
+    },
+    "recentUsers": {
+      "title": "5 Derniers Utilisateurs Inscrits",
+      "viewAll": "Voir tout"
+    },
+    "performance": {
+      "title": "Métriques de Performance",
+      "systemMemory": "Mémoire Système",
+      "used": "utilisée",
+      "cpuCount": "Nombre de CPU",
+      "systemUptime": "Temps de fonctionnement système",
+      "platform": "Plateforme",
+      "architecture": "Architecture",
+      "nodeProcess": "Processus Node.js",
+      "heapUsed": "Heap Utilisée",
+      "heapTotal": "Heap Totale",
+      "processUptime": "Temps de fonctionnement processus",
+      "loading": "Chargement des métriques de performance...",
+      "status": {
+        "good": "Bon",
+        "warning": "Attention",
+        "critical": "Critique"
+      }
+    },
+    "geolocation": {
+      "title": "Distribution Géographique des Utilisateurs",
+      "byCountry": "Par Pays ({countries} pays, {users} utilisateurs avec localisation)",
+      "noData": "Aucune donnée de géolocalisation disponible",
+      "cities": "{count} ville | {count} villes",
+      "users": "{count} utilisateur | {count} utilisateurs",
+      "topCities": "Top Villes",
+      "loading": "Chargement des données de géolocalisation..."
+    },
+    "system": {
+      "title": "Informations Système",
+      "appVersion": "Version de l'App",
+      "database": "Base de données",
+      "apiStatus": "Statut API",
+      "lastUpdate": "Dernière Mise à jour",
+      "online": "En ligne",
+      "operational": "Opérationnel"
+    },
+    "allUsers": {
+      "title": "Tous les Utilisateurs Inscrits ({count})",
+      "loading": "Chargement des utilisateurs...",
+      "noUsers": "Aucun utilisateur trouvé",
+      "nameNotAvailable": "Nom non disponible",
+      "registeredOn": "Inscrit le"
+    },
+    "common": {
+      "loading": "Chargement des données...",
+      "close": "Fermer"
+    }
   }
 }

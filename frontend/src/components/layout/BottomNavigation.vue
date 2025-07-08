@@ -21,17 +21,31 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const { t } = useI18n()
+const authStore = useAuthStore()
 
-const tabs = [
+// Check if current user is admin
+const isAdmin = computed(() => {
+  return authStore.user?.email === 'mirco.carp@icloud.com'
+})
+
+const baseTabs = [
   { name: 'Home', route: '/app/home', iconType: 'home', key: 'home' },
   { name: 'Camera', route: '/app/camera', iconType: 'camera', key: 'camera' },
   { name: 'Recipes', route: '/app/recipes', iconType: 'recipes', key: 'recipes' },
   { name: 'SavedRecipes', route: '/app/saved', iconType: 'saved', key: 'saved' },
   { name: 'Profile', route: '/app/profile', iconType: 'profile', key: 'profile' }
 ]
+
+const adminTab = { name: 'Analytics', route: '/app/analytics', iconType: 'analytics', key: 'analytics' }
+
+const tabs = computed(() => {
+  return isAdmin.value ? [...baseTabs, adminTab] : baseTabs
+})
 
 const icons = {
   home: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -49,6 +63,9 @@ const icons = {
   </svg>`,
   profile: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+  </svg>`,
+  analytics: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
   </svg>`
 }
 

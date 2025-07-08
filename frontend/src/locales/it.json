@@ -55,7 +55,8 @@
     "camera": "Fotocamera",
     "recipes": "Ricette",
     "saved": "Salvate",
-    "profile": "Profilo"
+    "profile": "Profilo",
+    "analytics": "Analytics"
   },
   "notifications": {
     "auth": {
@@ -520,5 +521,75 @@
     "languagePreferenceSaved": "Preferenza lingua salvata",
     "languagePreferenceFailed": "Impossibile salvare la preferenza lingua",
     "clickToChangePhoto": "Clicca per cambiare foto"
+  },
+  "analytics": {
+    "title": "Dashboard Analytics",
+    "subtitle": "Pannello admin per statistiche e monitoraggio",
+    "stats": {
+      "totalUsers": "Utenti Registrati",
+      "activeUsers": "Utenti Attivi (7gg)",
+      "totalRecipes": "Ricette Generate",
+      "onlineUsers": "Utenti Online",
+      "today": "oggi",
+      "ofTotal": "del totale",
+      "outOf": "di",
+      "total": "totali"
+    },
+    "onlineUsers": {
+      "title": "Utenti Online",
+      "noUsers": "Nessun utente online al momento"
+    },
+    "recentUsers": {
+      "title": "Ultimi 5 Utenti Registrati",
+      "viewAll": "Visualizza tutti"
+    },
+    "performance": {
+      "title": "Metriche Performance",
+      "systemMemory": "Memoria Sistema",
+      "used": "utilizzata",
+      "cpuCount": "Conteggio CPU",
+      "systemUptime": "Uptime Sistema",
+      "platform": "Piattaforma",
+      "architecture": "Architettura",
+      "nodeProcess": "Processo Node.js",
+      "heapUsed": "Heap Utilizzata",
+      "heapTotal": "Heap Totale",
+      "processUptime": "Uptime Processo",
+      "loading": "Caricamento metriche performance...",
+      "status": {
+        "good": "Ottimo",
+        "warning": "Attenzione",
+        "critical": "Critico"
+      }
+    },
+    "geolocation": {
+      "title": "Distribuzione Geografica Utenti",
+      "byCountry": "Per Paese ({countries} paesi, {users} utenti con location)",
+      "noData": "Nessun dato di geolocalizzazione disponibile",
+      "cities": "{count} città | {count} città",
+      "users": "{count} utenti | {count} utenti",
+      "topCities": "Top Città",
+      "loading": "Caricamento dati geolocalizzazione..."
+    },
+    "system": {
+      "title": "Informazioni Sistema",
+      "appVersion": "Versione App",
+      "database": "Database",
+      "apiStatus": "Status API",
+      "lastUpdate": "Ultimo Aggiornamento",
+      "online": "Online",
+      "operational": "Operativo"
+    },
+    "allUsers": {
+      "title": "Tutti gli Utenti Registrati ({count})",
+      "loading": "Caricamento utenti...",
+      "noUsers": "Nessun utente trovato",
+      "nameNotAvailable": "Nome non disponibile",
+      "registeredOn": "Registrato il"
+    },
+    "common": {
+      "loading": "Caricamento dati...",
+      "close": "Chiudi"
+    }
   }
 }

@@ -12,6 +12,8 @@ import ingredientsDatabaseRoutes from './routes/ingredients-database.js'
 import recipeRoutes from './routes/recipes.js'
 import userRoutes from './routes/users.js'
 import activityRoutes from './routes/activity.js'
+import adminRoutes from './routes/admin.js'
+import heartbeatRoutes from './routes/heartbeat.js'
 
 // Load environment variables
 dotenv.config()
@@ -63,6 +65,8 @@ app.use('/api/ingredients-database', ingredientsDatabaseRoutes)
 app.use('/api/recipes', recipeRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/activity', activityRoutes)
+app.use('/api/admin', adminRoutes)
+app.use('/api', heartbeatRoutes)
 
 // 404 handler
 app.use('*', (req, res) => {

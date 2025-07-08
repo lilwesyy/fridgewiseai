@@ -1,6 +1,7 @@
 import User from '../models/User.js'
 import { generateToken } from '../middleware/auth.js'
 import { uploadImage, deleteImage } from '../services/cloudinaryService.js'
+import { getLocationFromIP, getRealIP } from '../services/geolocationService.js'
 import Joi from 'joi'
 import multer from 'multer'
 
@@ -106,6 +107,15 @@ export const register = async (req, res) => {
       }
       
       console.log(`🌍 Setting user language to ${detectedLanguage} based on detection`)
+    }
+
+    // Get user's IP and location
+    const userIP = getRealIP(req)
+    const location = await getLocationFromIP(userIP)
+    
+    // Add location to user data only if not local IP
+    if (location) {
+      userData.location = location
     }
 
     // Create new user

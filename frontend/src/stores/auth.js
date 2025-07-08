@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { getCurrentLanguage, getLanguageDetectionMetadata } from '@/services/languageDetectionService'
+import '@/services/api.js' // Ensure axios is configured
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
@@ -46,12 +47,18 @@ export const useAuthStore = defineStore('auth', {
         
         // Includi i metadata se disponibili
         if (detectionMetadata) {
+          // Validate and fix the source value if needed
+          const validSources = ['localStorage', 'ip-geolocation', 'browser', 'browser-accepted', 'default']
+          const source = validSources.includes(detectionMetadata.source) ? detectionMetadata.source : 'localStorage'
+          
           registrationData.languageDetectionMetadata = {
-            source: detectionMetadata.source,
+            source: source,
             confidence: detectionMetadata.confidence,
             country: detectionMetadata.locationData?.country,
             timezone: detectionMetadata.locationData?.timezone
           }
+          
+          console.log('🔍 Language detection metadata:', registrationData.languageDetectionMetadata)
         }
         
         console.log('🌍 Registering user with language:', currentLanguage)
