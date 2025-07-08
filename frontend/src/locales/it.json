@@ -76,6 +76,8 @@
       "saveError": "Errore nel salvare la ricetta",
       "removeSuccess": "Ricetta rimossa dai preferiti",
       "removeError": "Errore nel rimuovere la ricetta",
+      "deleteSuccess": "Ricetta eliminata con successo",
+      "deleteError": "Errore nell'eliminazione della ricetta",
       "shareSuccess": "Ricetta copiata negli appunti",
       "loadError": "Errore nel caricamento delle ricette"
     },
@@ -361,6 +363,7 @@
       "quick": "Veloce",
       "italian": "Italiana",
       "contorno": "Contorno",
+      "side dish": "Contorno",
       "easy": "Facile",
       "homemade": "Fatto in Casa",
       "fresh": "Fresco",
@@ -377,6 +380,14 @@
       "message": "Vuoi iniziare subito a cucinare questa ricetta in modalità guidata?",
       "confirm": "Inizia a Cucinare",
       "cancel": "Continua a Navigare"
+    },
+    "confirmDelete": "Sei sicuro di voler eliminare questa ricetta?",
+    "confirmDeleteTitle": "Elimina Ricetta",
+    "confirmDeleteMessage": "Questa azione non può essere annullata. La ricetta sarà eliminata definitivamente.",
+    "saveForCooking": "Salva e Cucina",
+    "cookingModeInfo": {
+      "title": "Vuoi usare la Modalità Cucina?",
+      "message": "Salva prima questa ricetta per accedere alla guida di cucina passo dopo passo."
     },
     "donationToast": "Ti piace l'app? Considera una donazione per supportare lo sviluppo! 💝"
   },

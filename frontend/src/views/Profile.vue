@@ -774,7 +774,7 @@ export default {
 
     openSupport() {
       // In a real app, this might open a help center or contact form
-      const supportEmail = 'support@fridgewiseai.com'
+      const supportEmail = 'info@fridgewiseai.com'
       const subject = this.$t('profile.supportEmailSubject')
       const body = this.$t('profile.supportEmailBody')
       window.location.href = `mailto:${supportEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`

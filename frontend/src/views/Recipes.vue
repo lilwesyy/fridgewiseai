@@ -122,19 +122,29 @@
           <div class="p-5">
             <div class="flex items-start justify-between mb-3">
               <h3 class="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors duration-300">{{ recipe.title }}</h3>
-              <button 
-                @click="toggleSaved(recipe._id || recipe.id)"
-                :class="[
-                  'p-2 rounded-full transition-all duration-300 hover:scale-110',
-                  savedRecipes.includes(recipe._id || recipe.id)
-                    ? 'text-red-600 hover:bg-red-50 animate-pulse-slow'
-                    : 'text-gray-400 hover:bg-gray-50'
-                ]"
-              >
-                <svg class="w-5 h-5 transition-transform duration-300 hover:scale-125" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
-                </svg>
-              </button>
+              <div class="flex space-x-1">
+                <button 
+                  @click="toggleSaved(recipe._id || recipe.id)"
+                  :class="[
+                    'p-2 rounded-full transition-all duration-300 hover:scale-110',
+                    savedRecipes.includes(recipe._id || recipe.id)
+                      ? 'text-red-600 hover:bg-red-50 animate-pulse-slow'
+                      : 'text-gray-400 hover:bg-gray-50'
+                  ]"
+                >
+                  <svg class="w-5 h-5 transition-transform duration-300 hover:scale-125" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                  </svg>
+                </button>
+                <button 
+                  @click="deleteRecipe(recipe._id || recipe.id)"
+                  class="p-2 rounded-full transition-all duration-300 hover:scale-110 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                >
+                  <svg class="w-5 h-5 transition-transform duration-300 hover:scale-125" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
             
             <p class="text-gray-600 text-sm mb-3">{{ recipe.description }}</p>
@@ -275,6 +285,21 @@
             </ol>
           </div>
 
+          <!-- Cooking Mode Info -->
+          <div v-if="!savedRecipes.includes(selectedRecipe._id || selectedRecipe.id)" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-sm font-medium text-blue-900">{{ $t('recipes.cookingModeInfo.title') }}</h4>
+                <p class="text-sm text-blue-700 mt-1">{{ $t('recipes.cookingModeInfo.message') }}</p>
+              </div>
+            </div>
+          </div>
+
           <div class="mt-6 flex space-x-3">
             <BaseButton 
               variant="secondary" 
@@ -284,52 +309,57 @@
               {{ $t('common.close') }}
             </BaseButton>
             <BaseButton 
+              variant="secondary" 
+              @click="deleteRecipe(selectedRecipe._id || selectedRecipe.id)"
+              class="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
+            >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              {{ $t('common.delete') }}
+            </BaseButton>
+            <BaseButton 
               variant="primary" 
               @click="saveRecipe(selectedRecipe)"
               :disabled="savedRecipes.includes(selectedRecipe._id || selectedRecipe.id)"
               class="flex-1"
             >
-              {{ savedRecipes.includes(selectedRecipe._id || selectedRecipe.id) ? $t('recipes.saved') : $t('common.save') }}
+              {{ savedRecipes.includes(selectedRecipe._id || selectedRecipe.id) ? $t('recipes.saved') : $t('recipes.saveForCooking') }}
             </BaseButton>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Cooking Mode Prompt Modal -->
-    <div 
-      v-if="showCookingModeModal" 
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-      @click="closeCookingModeModal"
-    >
-      <div 
-        class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl transform transition-all"
-        @click.stop
-      >
-        <div class="text-center">
-          <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-            </svg>
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteConfirm" class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50" @click="cancelDeleteRecipe">
+      <div class="min-h-screen px-4 text-center">
+        <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-lg" @click.stop>
+          <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('recipes.confirmDeleteTitle') }}</h3>
+            <p class="text-gray-600">{{ $t('recipes.confirmDeleteMessage') }}</p>
           </div>
-          
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('recipes.cookingModePrompt.title') }}</h3>
-          <p class="text-gray-600 mb-6">{{ $t('recipes.cookingModePrompt.message') }}</p>
-          
+
           <div class="flex space-x-3">
             <BaseButton 
               variant="secondary" 
-              @click="continueBrowsing"
+              @click="cancelDeleteRecipe"
               class="flex-1"
             >
-              {{ $t('recipes.cookingModePrompt.cancel') }}
+              {{ $t('common.cancel') }}
             </BaseButton>
             <BaseButton 
               variant="primary" 
-              @click="enterCookingMode"
-              class="flex-1"
+              @click="confirmDeleteRecipe"
+              class="flex-1 bg-red-600 hover:bg-red-700 focus:ring-red-500"
             >
-              {{ $t('recipes.cookingModePrompt.confirm') }}
+              {{ $t('common.delete') }}
             </BaseButton>
           </div>
         </div>
@@ -364,8 +394,8 @@ export default {
       activeFilter: 'all',
       selectedRecipe: null,
       savedRecipes: [],
-      showCookingModeModal: false,
-      cookingModeRecipe: null,
+      showDeleteConfirm: false,
+      recipeToDelete: null,
       preferences: {
         servings: 4,
         difficulty: 'easy',
@@ -512,8 +542,9 @@ export default {
           this.savedRecipes.push(recipeId)
           this.toast.success(this.$t('notifications.recipes.saveSuccess'))
           
-          // Ask if user wants to enter cooking mode
-          this.showCookingModePrompt(recipe)
+          // Close modal and redirect to saved recipes for cooking mode
+          this.selectedRecipe = null
+          this.$router.push('/app/saved')
         }
       } catch (error) {
         console.error('Failed to save recipe:', error)
@@ -533,11 +564,8 @@ export default {
           this.savedRecipes.push(recipeId)
           this.toast.success(this.$t('notifications.recipes.saveSuccess'))
           
-          // Find the recipe and ask if user wants to enter cooking mode
-          const recipe = this.recipes.find(r => (r._id || r.id) === recipeId)
-          if (recipe) {
-            this.showCookingModePrompt(recipe)
-          }
+          // Redirect to saved recipes for cooking mode
+          this.$router.push('/app/saved')
         }
       } catch (error) {
         console.error('Failed to toggle saved recipe:', error)
@@ -599,44 +627,53 @@ export default {
       }
     },
 
-    showCookingModePrompt(recipe) {
-      this.cookingModeRecipe = recipe
-      this.showCookingModeModal = true
+
+    deleteRecipe(recipeId) {
+      this.recipeToDelete = recipeId
+      this.showDeleteConfirm = true
     },
 
-    closeCookingModeModal() {
-      this.showCookingModeModal = false
-      this.cookingModeRecipe = null
-    },
+    async confirmDeleteRecipe() {
+      if (!this.recipeToDelete) return
 
-    enterCookingMode() {
-      if (this.cookingModeRecipe) {
-        // Navigate to cooking mode with the recipe ID (same as SavedRecipes.vue)
-        console.log('🍳 Starting cooking mode for recipe:', this.cookingModeRecipe.title)
-        try {
-          // Clean the recipe ID to remove any "recipe-" prefix
-          let recipeId = this.cookingModeRecipe._id || this.cookingModeRecipe.id
-          if (recipeId && recipeId.startsWith('recipe-')) {
-            recipeId = recipeId.substring(7) // Remove "recipe-" prefix
-            console.log('🧹 Cleaned recipe ID:', recipeId)
-          }
-          
-          this.$router.push({
-            name: 'CookingMode',
-            params: {
-              recipe: recipeId
-            }
-          })
-        } catch (error) {
-          console.error('❌ Navigation error:', error)
-          this.toast.error(this.$t('notifications.general.error'))
+      try {
+        await recipeService.deleteRecipe(this.recipeToDelete)
+        
+        // Remove from local recipes list
+        this.recipes = this.recipes.filter(recipe => 
+          (recipe._id || recipe.id) !== this.recipeToDelete
+        )
+        
+        // Remove from saved recipes if it was saved
+        const savedIndex = this.savedRecipes.indexOf(this.recipeToDelete)
+        if (savedIndex > -1) {
+          this.savedRecipes.splice(savedIndex, 1)
         }
+        
+        // Remove from recent activity
+        try {
+          await userDataService.removeRecentActivityByRecipeId(this.recipeToDelete)
+        } catch (error) {
+          console.warn('Failed to remove from recent activity:', error.message)
+        }
+        
+        this.toast.success(this.$t('notifications.recipes.deleteSuccess'))
+        
+        // Close modal if the deleted recipe was currently being viewed
+        if (this.selectedRecipe && (this.selectedRecipe._id || this.selectedRecipe.id) === this.recipeToDelete) {
+          this.selectedRecipe = null
+        }
+      } catch (error) {
+        console.error('Failed to delete recipe:', error)
+        this.toast.error(this.$t('notifications.recipes.deleteError'))
+      } finally {
+        this.cancelDeleteRecipe()
       }
-      this.closeCookingModeModal()
     },
 
-    continueBrowsing() {
-      this.closeCookingModeModal()
+    cancelDeleteRecipe() {
+      this.showDeleteConfirm = false
+      this.recipeToDelete = null
     }
   }
 }

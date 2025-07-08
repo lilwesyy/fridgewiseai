@@ -76,6 +76,8 @@
       "saveError": "Error saving recipe",
       "removeSuccess": "Recipe removed from favorites",
       "removeError": "Error removing recipe",
+      "deleteSuccess": "Recipe deleted successfully",
+      "deleteError": "Error deleting recipe",
       "shareSuccess": "Recipe copied to clipboard",
       "loadError": "Error loading recipes"
     },
@@ -332,6 +334,7 @@
       "quick": "Quick",
       "italian": "Italian",
       "contorno": "Side Dish",
+      "side dish": "Side Dish",
       "easy": "Easy",
       "homemade": "Homemade",
       "fresh": "Fresh",
@@ -348,6 +351,14 @@
       "message": "Would you like to start cooking this recipe in guided mode right away?",
       "confirm": "Start Cooking",
       "cancel": "Continue Browsing"
+    },
+    "confirmDelete": "Are you sure you want to delete this recipe?",
+    "confirmDeleteTitle": "Delete Recipe",
+    "confirmDeleteMessage": "This action cannot be undone. The recipe will be permanently deleted.",
+    "saveForCooking": "Save & Cook",
+    "cookingModeInfo": {
+      "title": "Want to use Cooking Mode?",
+      "message": "Save this recipe first to access step-by-step cooking guidance."
     },
     "donationToast": "Enjoying the app? Consider a donation to support development! 💝"
   },

@@ -11,7 +11,8 @@
       "Bash(sudo ls:*)",
       "Bash(ls:*)",
       "Bash(ip route:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

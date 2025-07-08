@@ -76,6 +76,8 @@
       "saveError": "Fehler beim Speichern des Rezepts",
       "removeSuccess": "Rezept aus Favoriten entfernt",
       "removeError": "Fehler beim Entfernen des Rezepts",
+      "deleteSuccess": "Rezept erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Rezepts",
       "shareSuccess": "Rezept in Zwischenablage kopiert",
       "loadError": "Fehler beim Laden der Rezepte"
     },

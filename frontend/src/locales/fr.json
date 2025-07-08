@@ -421,6 +421,8 @@
       "saveError": "Erreur lors de la sauvegarde de la recette",
       "removeSuccess": "Recette supprimée des favoris",
       "removeError": "Erreur lors de la suppression de la recette",
+      "deleteSuccess": "Recette supprimée avec succès",
+      "deleteError": "Erreur lors de la suppression de la recette",
       "shareSuccess": "Recette copiée dans le presse-papiers",
       "loadError": "Erreur lors du chargement des recettes"
     },

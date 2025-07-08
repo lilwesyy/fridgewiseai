@@ -83,6 +83,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
                   </svg>
                 </button>
+                <button 
+                  @click="deleteRecipe(recipe._id || recipe.id)"
+                  class="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-300 hover:scale-110"
+                >
+                  <svg class="w-5 h-5 transition-transform duration-300 hover:scale-125" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
               </div>
             </div>
 
@@ -261,6 +269,16 @@
               {{ $t('common.close') }}
             </BaseButton>
             <BaseButton 
+              variant="secondary" 
+              @click="deleteRecipe(selectedRecipe._id || selectedRecipe.id)"
+              class="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
+            >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              {{ $t('common.delete') }}
+            </BaseButton>
+            <BaseButton 
               variant="primary" 
               @click="cookRecipe(selectedRecipe)"
               class="flex-1"
@@ -273,6 +291,40 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteConfirm" class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50" @click="cancelDeleteRecipe">
+      <div class="min-h-screen px-4 text-center">
+        <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-lg" @click.stop>
+          <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $t('recipes.confirmDeleteTitle') }}</h3>
+            <p class="text-gray-600">{{ $t('recipes.confirmDeleteMessage') }}</p>
+          </div>
+
+          <div class="flex space-x-3">
+            <BaseButton 
+              variant="secondary" 
+              @click="cancelDeleteRecipe"
+              class="flex-1"
+            >
+              {{ $t('common.cancel') }}
+            </BaseButton>
+            <BaseButton 
+              variant="primary" 
+              @click="confirmDeleteRecipe"
+              class="flex-1 bg-red-600 hover:bg-red-700 focus:ring-red-500"
+            >
+              {{ $t('common.delete') }}
+            </BaseButton>
+          </div>
+        </div>
+      </div>
+    </div>
   </AuthenticatedLayout>
 </template>
 
@@ -280,7 +332,7 @@
 import { useToast } from 'vue-toastification'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import BaseButton from '@/components/ui/Button.vue'
-import { userDataService } from '@/services/api'
+import { userDataService, recipeService } from '@/services/api'
 
 export default {
   name: 'SavedRecipesPage',
@@ -299,6 +351,8 @@ export default {
       searchQuery: '',
       activeFilter: 'all',
       selectedRecipe: null,
+      showDeleteConfirm: false,
+      recipeToDelete: null,
       filters: [
         { key: 'all' },
         { key: 'quick' },
@@ -456,6 +510,48 @@ export default {
         })
       }
       return []
+    },
+
+    deleteRecipe(recipeId) {
+      this.recipeToDelete = recipeId
+      this.showDeleteConfirm = true
+    },
+
+    async confirmDeleteRecipe() {
+      if (!this.recipeToDelete) return
+
+      try {
+        await recipeService.deleteRecipe(this.recipeToDelete)
+        
+        // Remove from local saved recipes list
+        this.savedRecipes = this.savedRecipes.filter(recipe => 
+          (recipe._id || recipe.id) !== this.recipeToDelete
+        )
+        
+        // Remove from recent activity
+        try {
+          await userDataService.removeRecentActivityByRecipeId(this.recipeToDelete)
+        } catch (error) {
+          console.warn('Failed to remove from recent activity:', error.message)
+        }
+        
+        this.toast.success(this.$t('notifications.recipes.deleteSuccess'))
+        
+        // Close modal if the deleted recipe was currently being viewed
+        if (this.selectedRecipe && (this.selectedRecipe._id || this.selectedRecipe.id) === this.recipeToDelete) {
+          this.selectedRecipe = null
+        }
+      } catch (error) {
+        console.error('Failed to delete recipe:', error)
+        this.toast.error(this.$t('notifications.recipes.deleteError'))
+      } finally {
+        this.cancelDeleteRecipe()
+      }
+    },
+
+    cancelDeleteRecipe() {
+      this.showDeleteConfirm = false
+      this.recipeToDelete = null
     }
   }
 }

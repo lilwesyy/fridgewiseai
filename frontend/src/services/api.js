@@ -374,6 +374,17 @@ class UserDataService {
     }
   }
 
+  async removeRecentActivityByRecipeId(recipeId) {
+    try {
+      // Try to remove from backend
+      await axios.delete(`/activity/recipe/${recipeId}`)
+      return true
+    } catch (error) {
+      console.warn('Backend not available for recent activity removal:', error.message)
+      return false
+    }
+  }
+
   // Current Ingredients Management (temporary data, can stay in localStorage for now)
   getCurrentIngredients() {
     try {

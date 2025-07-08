@@ -1,37 +1,4 @@
 services:
-  # Backend API
-  backend:
-    build: ./backend
-    container_name: fridgewiseai-backend
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: production
-      MONGODB_URI: mongodb://mongodb:27017/fridgewiseai
-      RECOGNIZE_ANYTHING_API_URL: http://recognize-anything-api:8000
-      LIBRETRANSLATE_API_URL: http://libretranslate:5000
-    depends_on:
-      - mongodb
-      - recognize-anything-api
-      - libretranslate
-    networks:
-      - fridgewiseai-network
-    volumes:
-      - ./backend/.env:/app/.env:ro
-
-  # Frontend (Vue.js + Nginx)
-  frontend:
-    build: ./frontend
-    container_name: fridgewiseai-frontend
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    networks:
-      - fridgewiseai-network
-
   # MongoDB Database
   mongodb:
     image: mongo:7.0
@@ -56,7 +23,7 @@ services:
       - "8000:8000"
     environment:
       MODEL_NAME: ram_plus  # Modello migliore per food recognition
-      IMAGE_SIZE: 384
+      IMAGE_SIZE: 3841
       THRESHOLD: 0.68
     # Rimuovi --gpus all se non hai GPU NVIDIA
     # deploy:

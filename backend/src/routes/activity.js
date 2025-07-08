@@ -50,4 +50,24 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 })
 
+// Remove activities by recipe ID
+router.delete('/recipe/:recipeId', authenticateToken, async (req, res) => {
+  try {
+    const { recipeId } = req.params
+
+    await Activity.deleteMany({ 
+      userId: req.user._id, 
+      relatedId: recipeId 
+    })
+
+    res.json({ message: 'Activities removed successfully' })
+  } catch (error) {
+    console.error('Remove activities by recipe ID error:', error)
+    res.status(500).json({
+      error: 'Failed to remove activities',
+      code: 'DELETE_ERROR'
+    })
+  }
+})
+
 export default router
